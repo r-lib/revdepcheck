@@ -3,20 +3,19 @@
 
 > Automated Reverse Dependency Checking
 
-[![Linux Build Status](https://travis-ci.org//revdepcheck.svg?branch=master)](https://travis-ci.org//revdepcheck)
-
-[![Windows Build status](https://ci.appveyor.com/api/projects/status/github//revdepcheck?svg=true)](https://ci.appveyor.com/project//revdepcheck)
+[![Linux Build Status](https://travis-ci.org/gaborcsardi/revdepcheck.svg?branch=master)](https://travis-ci.org/gaborcsardi/revdepcheck)
+[![Windows Build status](https://ci.appveyor.com/api/projects/status/github/gaborcsardi/revdepcheck?svg=true)](https://ci.appveyor.com/project//revdepcheck)
 [![](http://www.r-pkg.org/badges/version/revdepcheck)](http://www.r-pkg.org/pkg/revdepcheck)
 [![CRAN RStudio mirror downloads](http://cranlogs.r-pkg.org/badges/revdepcheck)](http://www.r-pkg.org/pkg/revdepcheck)
 
 
 Automated, isolated reserve dependency checking, with automatic comparison of
-  the results to the current CRAN checks.
+the results to the current CRAN checks.
 
 ## Installation
 
 ```r
-devtools::install_github("/revdepcheck")
+source("https://install-github.me/gaborcsardi/revdepcheck")
 ```
 
 ## Usage
@@ -27,4 +26,4 @@ library(revdepcheck)
 
 ## License
 
-MIT + file LICENSE © 
+MIT © [Gábor Csárdi](https://github.com/gaborcsardi)

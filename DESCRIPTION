@@ -3,8 +3,8 @@ Title: Automated Reverse Dependency Checking
 Version: 1.0.0
 Author: Gábor Csárdi
 Maintainer: Gábor Csárdi <csardi.gabor@gmail.com>
-Description: Automated, isolated reserve dependency checking, with automatic comparison of
-  the results to the current CRAN checks.
+Description: Automated, isolated reserve dependency checking, with automatic
+    comparison of the results to the current CRAN checks.
 License: MIT + file LICENSE
 LazyData: true
 URL: https://github.com/gaborcsardi/revdepcheck
