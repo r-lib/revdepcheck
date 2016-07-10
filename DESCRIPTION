@@ -12,3 +12,9 @@ BugReports: https://github.com/gaborcsardi/revdepcheck/issues
 RoxygenNote: 5.0.1
 Suggests: 
     testthat
+Imports:
+    DBI,
+    rcmdcheck,
+    remotes,
+    RSQLite,
+    tools
