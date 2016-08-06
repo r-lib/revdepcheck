@@ -17,4 +17,5 @@ Imports:
     rcmdcheck,
     remotes,
     RSQLite,
-    tools
+    tools,
+    withr
