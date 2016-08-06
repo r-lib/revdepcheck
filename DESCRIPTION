@@ -18,6 +18,7 @@ Imports:
     remotes,
     RSQLite,
     tools,
+    utils,
     withr
 Remotes:
     rstats-db/RSQLite,

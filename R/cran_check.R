@@ -1,6 +1,7 @@
 
 #' @importFrom rcmdcheck rcmdcheck
 #' @importFrom withr with_libpaths
+#' @importFrom utils install.packages download.packages
 
 check_cran_package <- function(package, check_dir = tempfile(),
                                libdir = file.path(check_dir, "library"),
