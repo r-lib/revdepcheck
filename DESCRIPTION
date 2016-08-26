@@ -20,5 +20,6 @@ Imports:
     tools,
     withr
 Remotes:
+    rstats-db/RSQLite,
     MangoTheCat/rcmdcheck,
     MangoTheCat/remotes
