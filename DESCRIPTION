@@ -10,7 +10,7 @@ LazyData: true
 URL: https://github.com/gaborcsardi/revdepcheck
 BugReports: https://github.com/gaborcsardi/revdepcheck/issues
 RoxygenNote: 5.0.1
-Suggests: 
+Suggests:
     testthat
 Imports:
     DBI,
@@ -19,3 +19,6 @@ Imports:
     RSQLite,
     tools,
     withr
+Remotes:
+    MangoTheCat/rcmdcheck,
+    MangoTheCat/remotes
