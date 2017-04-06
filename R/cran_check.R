@@ -1,13 +1,16 @@
 
 #' @importFrom rcmdcheck rcmdcheck
 #' @importFrom withr with_libpaths
-#' @importFrom utils install.packages download.packages
+#' @importFrom crancache install.packages
+#' @importFrom utils download.packages
 
 check_cran_package <- function(package, check_dir = tempfile(),
                                libdir = file.path(check_dir, "library"),
                                quiet = FALSE) {
 
   stopifnot(is_string(package))
+
+  libdir <- normalizePath(libdir)
 
   if (!file.exists(check_dir)) dir.create(check_dir)
   if (!file.exists(libdir)) dir.create(libdir)

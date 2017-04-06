@@ -16,4 +16,3 @@ Nothing
 Make sure that the database exists
 }
 \keyword{internal}
-

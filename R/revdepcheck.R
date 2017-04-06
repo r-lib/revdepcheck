@@ -2,7 +2,7 @@
 #' @export
 #' @importFrom remotes install_local
 
-revdepcheck <- function(package = ".", overwrite = FALSE) {
+revdep_check <- function(package = ".", overwrite = FALSE, quiet = TRUE) {
 
   package <- normalizePath(package)
 
@@ -10,42 +10,29 @@ revdepcheck <- function(package = ".", overwrite = FALSE) {
 
   if (!overwrite && check_existing_checks(package)) {
     stop("Reverse dependency results already exist, call\n",
-         "revdepcheck() with `overwrite = TRUE`, or use\n",
-         "revdepcheck$resume()")
+         "  revdep_check() with `overwrite = TRUE`, or use\n",
+         "  revdep_resume()")
   }
 
   ## Also creates it if needed
-  revdepcheck$clean(package)
+  revdep_clean(package)
 
   ## Install the package itself
-  install_local(package, lib = check_dir(package, "library"), quiet = TRUE)
+  install_local(package, lib = check_dir(package, "library"), quiet = quiet)
 
   ## Resume also works from an empty table
-  revdepcheck$resume(package)
+  revdep_resume(package, quiet = quiet)
 }
 
-class(revdepcheck) <- "revdepcheck_package"
-
-`$.revdepcheck_package` <- function (x, name) {
-  if (name %in% names(revdepcheck_functions)) {
-    revdepcheck_functions[[name]]
-
-  } else {
-    stop("Unknown 'revdepcheck' function")
-  }
-}
-
-revdepcheck_functions <- list(
-  "results" = function(package = ".") { check_results(package) },
-  "resume"  = function(package = ".") { check_resume(package) },
-  "clean"   = function(package = ".") { check_clean(package) }
-)
-
-check_results <- function(package) {
+revdep_results <- function(revdep) {
   ## TODO
 }
 
-check_resume <- function(package) {
+#' @export
+
+revdep_resume <- function(package, quiet = TRUE) {
+
+  package <- normalizePath(package)
 
   revdeps <- cran_revdeps(get_package_name(package))
   done <- db_list(package)
@@ -56,15 +43,15 @@ check_resume <- function(package) {
   for (pkg in todo) {
     message("Checking ", pkg)
     res <- check_cran_package(
-      pkg, check_dir = chkdir, libdir = libdir, quiet = TRUE
+      pkg, check_dir = chkdir, libdir = libdir, quiet = quiet
     )
     db_insert(package, res)
   }
 }
 
-check_clean <- function(package) {
-  db_setup(package)                     # Make sure it exists
-  db_clean(package)                     # Delete all records
+revdep_clean <- function(package) {
+  db_setup(package)              # Make sure it exists
+  db_clean(package)              # Delete all records
 }
 
 check_existing_checks <- function(package) {
