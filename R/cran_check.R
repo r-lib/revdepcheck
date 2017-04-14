@@ -1,7 +1,7 @@
 
 #' @importFrom rcmdcheck rcmdcheck
 #' @importFrom withr with_libpaths
-#' @importFrom crancache install.packages
+#' @importFrom crancache install_packages
 #' @importFrom utils download.packages
 
 check_cran_package <- function(package, check_dir = tempfile(),
@@ -21,7 +21,7 @@ check_cran_package <- function(package, check_dir = tempfile(),
   ## To install dependencies
   with_libpaths(
     libdir,
-    install.packages(
+    install_packages(
       dependencies = TRUE,
       package,
       lib = libdir,
