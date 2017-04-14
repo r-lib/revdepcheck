@@ -1,6 +1,7 @@
 
 #' @export
 #' @importFrom devtools install_local
+#' @importFrom withr with_libpaths
 
 revdep_check <- function(package = ".", overwrite = FALSE, quiet = TRUE) {
 
@@ -18,7 +19,11 @@ revdep_check <- function(package = ".", overwrite = FALSE, quiet = TRUE) {
   revdep_clean(package)
 
   ## Install the package itself
-  install_local(package, lib = check_dir(package, "library"), quiet = quiet)
+  with_libpaths(
+    check_dir(package, "library"),
+    install_local(package, quiet = quiet),
+    "prefix"
+  )
 
   ## Resume also works from an empty table
   revdep_resume(package, quiet = quiet)
