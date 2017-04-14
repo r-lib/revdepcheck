@@ -21,8 +21,7 @@ revdep_check <- function(package = ".", overwrite = FALSE, quiet = TRUE) {
   ## Install the package itself
   with_libpaths(
     check_dir(package, "library"),
-    install_local(package, quiet = quiet),
-    "prefix"
+    install_local(package, quiet = quiet)
   )
 
   ## Resume also works from an empty table
