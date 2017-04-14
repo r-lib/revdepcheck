@@ -9,11 +9,12 @@ License: MIT + file LICENSE
 LazyData: true
 URL: https://github.com/gaborcsardi/revdepcheck
 BugReports: https://github.com/gaborcsardi/revdepcheck/issues
-RoxygenNote: 6.0.1
+RoxygenNote: 6.0.1.9000
 Suggests:
     testthat
 Imports:
     crancache,
+    devtools,
     DBI,
     rcmdcheck,
     remotes,

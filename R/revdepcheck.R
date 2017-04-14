@@ -1,6 +1,6 @@
 
 #' @export
-#' @importFrom remotes install_local
+#' @importFrom devtools install_local
 
 revdep_check <- function(package = ".", overwrite = FALSE, quiet = TRUE) {
 
