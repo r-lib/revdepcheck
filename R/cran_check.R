@@ -1,8 +1,7 @@
 
 #' @importFrom rcmdcheck rcmdcheck
 #' @importFrom withr with_libpaths
-#' @importFrom crancache install_packages
-#' @importFrom utils download.packages
+#' @importFrom crancache install_packages download_packages
 
 check_cran_package <- function(package, check_dir = tempfile(),
                                libdir = file.path(check_dir, "library"),
@@ -31,7 +30,7 @@ check_cran_package <- function(package, check_dir = tempfile(),
   )
 
   ## Download the source package
-  spkg <- download.packages(
+  spkg <- download_packages(
     package,
     down_dir,
     type = "source",
