@@ -22,5 +22,9 @@ Imports:
     tools,
     utils,
     withr
-Remotes: r-hub/crancache
+Remotes: 
+    r-hub/crancache,
+    r-pkgs/processx,
+    r-pkgs/callr,
+    r-pkgs/rcmdcheck
 Encoding: UTF-8
