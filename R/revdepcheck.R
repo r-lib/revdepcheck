@@ -3,7 +3,8 @@
 #' @importFrom devtools install_local
 #' @importFrom withr with_libpaths
 
-revdep_check <- function(package = ".", overwrite = FALSE, quiet = TRUE) {
+revdep_check <- function(package = ".", overwrite = FALSE, quiet = TRUE,
+                         timeout = as.difftime(10, units = "mins")) {
 
   package <- normalizePath(package)
 
@@ -25,7 +26,7 @@ revdep_check <- function(package = ".", overwrite = FALSE, quiet = TRUE) {
   )
 
   ## Resume also works from an empty table
-  revdep_resume(package, quiet = quiet)
+  revdep_resume(package, quiet = quiet, timeout = timeout)
 }
 
 revdep_results <- function(revdep) {
@@ -34,7 +35,8 @@ revdep_results <- function(revdep) {
 
 #' @export
 
-revdep_resume <- function(package, quiet = TRUE) {
+revdep_resume <- function(package, quiet = TRUE,
+                          timeout = as.difftime(10, units = "mins")) {
 
   package <- normalizePath(package)
 
@@ -47,7 +49,8 @@ revdep_resume <- function(package, quiet = TRUE) {
   for (pkg in todo) {
     message("Checking ", pkg)
     res <- check_cran_package(
-      pkg, check_dir = chkdir, libdir = libdir, quiet = quiet
+      pkg, check_dir = chkdir, libdir = libdir, quiet = quiet,
+      timeout = timeout
     )
     db_insert(package, res)
   }

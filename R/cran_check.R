@@ -5,7 +5,8 @@
 
 check_cran_package <- function(package, check_dir = tempfile(),
                                libdir = file.path(check_dir, "library"),
-                               quiet = FALSE) {
+                               quiet = FALSE,
+                               timeout = as.difftime(10, units = "mins")) {
 
   stopifnot(is_string(package))
 
@@ -38,5 +39,5 @@ check_cran_package <- function(package, check_dir = tempfile(),
   )[, 2]
 
   ## Check it, return the result
-  rcmdcheck(spkg, libpath = libdir, quiet = quiet)
+  rcmdcheck(spkg, libpath = libdir, quiet = quiet, timeout = timeout)
 }
