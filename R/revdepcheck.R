@@ -1,6 +1,6 @@
 
 #' @export
-#' @importFrom devtools install_local
+#' @importFrom remotes install_local
 #' @importFrom withr with_libpaths
 
 revdep_check <- function(package = ".", overwrite = FALSE, quiet = TRUE,

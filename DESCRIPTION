@@ -14,7 +14,6 @@ Suggests:
     testthat
 Imports:
     crancache,
-    devtools,
     DBI,
     rcmdcheck,
     remotes,
@@ -24,5 +23,6 @@ Imports:
     withr
 Remotes: 
     r-hub/crancache,
-    r-pkgs/rcmdcheck
+    r-pkgs/rcmdcheck,
+    r-pkgs/remotes
 Encoding: UTF-8
