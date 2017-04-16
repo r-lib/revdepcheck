@@ -33,11 +33,13 @@ db_setup <- function(package) {
   db_metadata_init(package)
 
   ## Every NOTE, WARNING or ERROR is a separate record in the DB.
-  ## The whole standard output is also stored with type 'OUTPUT'
+  ## The whole standard output is also stored with type 'OUTPUT'.
+  ## Contents 00install.out file will be stored as INSTALL_OUT, if
+  ## there were any errors.
   dbExecute(db,
     "CREATE TABLE revdeps (
       package TEXT,
-      type VARCHAR(10),      -- OUTPUT, NOTE, WARNING, ERROR
+      type VARCHAR(10),      -- OUTPUT, NOTE, WARNING, ERROR, INSTALL_OUT
       output TEXT
     )"
   )
@@ -97,6 +99,9 @@ db_insert <- function(package, results) {
   for (ent in results$errors)   ins("ERROR", ent)
   for (ent in results$warnings) ins("WARNING", ent)
   for (ent in results$notes)    ins("NOTE", ent)
+  if (!is.null(results$install_out)) {
+    ins("INSTALL_OUT", results$install_out)
+  }
   dbExecute(db, "COMMIT")
   on.exit()
 }
