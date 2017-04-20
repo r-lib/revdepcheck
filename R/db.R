@@ -106,6 +106,35 @@ db_insert <- function(package, results) {
   on.exit()
 }
 
-db_results <- function(package) {
+filter_result_pkgs <- function(res, revdeps) {
+  if (!is.null(revdeps)) {
+    res <- res[res$package %in% revdeps, ]
+    if (any(miss <- ! revdeps %in% res$package)) {
+      warning(
+        "No results for packages: ",
+        paste(sQuote(revdeps[miss]), collapse = ", ")
+      )
+    }
+  }
+  res
+}
+
+db_results <- function(pkg, revdeps) {
+  res <- dbGetQuery(db(pkg),
+    "SELECT package, SUM(type=='NOTE') AS note,
+            SUM(type=='WARNING') AS warning, SUM(type=='ERROR') AS error
+       FROM revdeps GROUP BY package")
+  filter_result_pkgs(res, revdeps)
+}
+
+db_details <- function(pkg, revdeps) {
+  res <- dbGetQuery(db(pkg),
+    "SELECT package, type, output
+       FROM revdeps")
+  fres <- filter_result_pkgs(res, revdeps)
+  fres[fres$type %in% c('NOTE', 'WARNING', 'ERROR'), ]
+}
+
+db_maintainers <- function(pkg, revdeps) {
   ## TODO
 }
