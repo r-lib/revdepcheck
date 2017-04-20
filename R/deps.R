@@ -1,13 +1,13 @@
 
 #' @importFrom tools dependsOnPkgs
 
-cran_revdeps <- function(package) {
+cran_revdeps <- function(package, dependencies) {
   stopifnot(is_string(package))
   dependsOnPkgs(
     package,
     recursive = FALSE,
     installed = cran_rds(),
-    dependencies = "all"
+    dependencies = dependencies
   )
 }
 
