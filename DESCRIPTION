@@ -10,11 +10,15 @@ LazyData: true
 URL: https://github.com/gaborcsardi/revdepcheck
 BugReports: https://github.com/gaborcsardi/revdepcheck/issues
 RoxygenNote: 6.0.1.9000
+Roxygen: list(markdown = TRUE)
 Suggests:
     testthat
 Imports:
+    callr,
     crancache,
+    debugme,
     DBI,
+    processx,
     rcmdcheck,
     remotes,
     RSQLite,
@@ -22,7 +26,8 @@ Imports:
     utils,
     withr
 Remotes: 
+    r-pkgs/callr@background,
     r-hub/crancache,
-    r-pkgs/rcmdcheck,
+    r-pkgs/rcmdcheck@background,
     r-pkgs/remotes
 Encoding: UTF-8
