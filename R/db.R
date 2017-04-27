@@ -35,11 +35,13 @@ db_setup <- function(package) {
   ## Every NOTE, WARNING or ERROR is a separate record in the DB.
   ## The whole standard output is also stored with type 'OUTPUT'.
   ## Contents 00install.out file will be stored as INSTALL_OUT, if
-  ## there were any errors.
+  ## there were any errors. PREPERROR means that there was an error
+  ## before starting the actual check
   dbExecute(db,
     "CREATE TABLE revdeps (
       package TEXT,
-      type VARCHAR(10),      -- OUTPUT, NOTE, WARNING, ERROR, INSTALL_OUT
+      type VARCHAR(10), -- OUTPUT, NOTE, WARNING, ERROR, INSTALL_OUT,
+                        -- PREPERROR
       output TEXT
     )"
   )

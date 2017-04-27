@@ -6,7 +6,8 @@
 revdep_check <- function(pkg = ".", dependencies = c("Depends", "Imports",
                                       "Suggests", "LinkingTo"),
                          overwrite = FALSE, quiet = TRUE,
-                         timeout = as.difftime(10, units = "mins")) {
+                         timeout = as.difftime(10, units = "mins"),
+                         num_workers = 1) {
 
   pkg <- normalizePath(pkg)
 
@@ -29,7 +30,7 @@ revdep_check <- function(pkg = ".", dependencies = c("Depends", "Imports",
 
   ## Resume also works from an empty table
   revdep_resume(pkg, dependencies = dependencies, quiet = quiet,
-                timeout = timeout)
+                timeout = timeout, num_workers = num_workers)
 }
 
 #' @export
@@ -37,7 +38,8 @@ revdep_check <- function(pkg = ".", dependencies = c("Depends", "Imports",
 revdep_resume <- function(pkg = ".", dependencies = c("Depends", "Imports",
                                        "Suggests", "LinkingTo"),
                           quiet = TRUE,
-                          timeout = as.difftime(10, units = "mins")) {
+                          timeout = as.difftime(10, units = "mins"),
+                          num_workers = 1) {
 
   pkg <- normalizePath(pkg)
 
@@ -45,16 +47,20 @@ revdep_resume <- function(pkg = ".", dependencies = c("Depends", "Imports",
   done <- db_list(pkg)
   todo <- setdiff(revdeps, done)
 
-  chkdir <- check_dir(pkg, "check")
-  libdir <- check_dir(pkg, "library")
-  for (pkg1 in todo) {
-    message("Checking ", pkg1)
-    res <- check_cran_package(
-      pkg1, check_dir = chkdir, libdir = libdir, quiet = quiet,
-      timeout = timeout
-    )
-    db_insert(pkg, res)
-  }
+  state <- list(
+    options = list(
+      chkdir = check_dir(pkg, "check"),
+      libdir = check_dir(pkg, "library"),
+      quiet = quiet,
+      timeout = timeout,
+      num_workers = num_workers),
+    packages = data.frame(
+      package = todo,
+      state = "todo",
+      stringsAsFactors = FALSE)
+  )
+
+  run_event_loop(state)
 }
 
 revdep_clean <- function(pkg) {
