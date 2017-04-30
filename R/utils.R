@@ -16,3 +16,7 @@ download_dir <- function() {
 get_package_name <- function(path) {
   read.dcf(file.path(path, "DESCRIPTION"))[, "Package"]
 }
+
+create_dir <- function(path) {
+  dir.create(path, recursive = TRUE, showWarnings = FALSE)
+}

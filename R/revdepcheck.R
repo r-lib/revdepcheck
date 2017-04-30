@@ -2,6 +2,7 @@
 #' @export
 #' @importFrom remotes install_local
 #' @importFrom withr with_libpaths
+#' @importFrom crancache install_packages
 
 revdep_check <- function(pkg = ".", dependencies = c("Depends", "Imports",
                                       "Suggests", "LinkingTo"),
@@ -22,10 +23,16 @@ revdep_check <- function(pkg = ".", dependencies = c("Depends", "Imports",
   ## Also creates it if needed
   revdep_clean(pkg)
 
-  ## Install the package itself
+  ## Install the package itself, both versions
   with_libpaths(
-    check_dir(pkg, "library"),
+    check_dir(pkg, "new"),
     install_local(pkg, quiet = quiet)
+  )
+  with_libpaths(
+    check_dir(pkg, "old"), {
+      package_name <- get_package_name(pkg)[[1]]
+      install_packages(package_name, quiet = quiet)
+    }
   )
 
   ## Resume also works from an empty table
@@ -50,7 +57,6 @@ revdep_resume <- function(pkg = ".", dependencies = c("Depends", "Imports",
   state <- list(
     options = list(
       chkdir = check_dir(pkg, "check"),
-      libdir = check_dir(pkg, "library"),
       quiet = quiet,
       timeout = timeout,
       num_workers = num_workers),
