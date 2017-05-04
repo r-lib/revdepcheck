@@ -26,9 +26,19 @@ This is the event loop of the revdep check process
 \item \code{todo}: haven't done anything yet
 \item \code{deps_installing}: the dependencies are being installed now
 \item \code{deps_installed}: the dependencies were already installed
-\item \code{checking}: we are checking the package right now
-\item \code{done}: packages was checked, result is in the database
+\item \code{checking}: checking with the old version right now
+\item \code{checking-checking}: checking with both versions right now
+\item \code{done-checking}: done with the old version, checking with the new
+version right now
+\item \code{checking-done}: checking with the old version, new version was
+already done.
+\item \code{done-deps_installed}: done with the old version, check with new
+version has not started yet
+\item \code{done}: packages was checked with both versions
 }
 }
+
+We only start the check with the new version after the check with the
+old version, which simplifies the state transitions a bit.
 }
 \keyword{internal}

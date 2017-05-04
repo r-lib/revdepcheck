@@ -24,10 +24,12 @@ revdep_check <- function(pkg = ".", dependencies = c("Depends", "Imports",
   revdep_clean(pkg)
 
   ## Install the package itself, both versions
+  "!DEBUG Installing new version from `pkg`"
   with_libpaths(
     check_dir(pkg, "new"),
     install_local(pkg, quiet = quiet)
   )
+  "!DEBUG Installing CRAN (old) version"
   with_libpaths(
     check_dir(pkg, "old"), {
       package_name <- get_package_name(pkg)[[1]]
@@ -49,14 +51,16 @@ revdep_resume <- function(pkg = ".", dependencies = c("Depends", "Imports",
                           num_workers = 1) {
 
   pkg <- normalizePath(pkg)
+  pkgname <- get_package_name(pkg)
 
-  revdeps <- cran_revdeps(get_package_name(pkg), dependencies)
+  revdeps <- cran_revdeps(pkgname, dependencies)
   done <- db_list(pkg)
   todo <- setdiff(revdeps, done)
 
   state <- list(
     options = list(
       pkgdir = pkg,
+      pkgname = pkgname,
       quiet = quiet,
       timeout = timeout,
       num_workers = num_workers),
