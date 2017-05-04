@@ -4,23 +4,30 @@
 \alias{check_dir}
 \title{Set up the directory structure for the checks}
 \usage{
-check_dir(pkgdir, what = c("check", "db", "old", "new", "pkg"),
-  package = NULL)
+check_dir(pkgdir, what = c("root", "db", "old", "new", "pkg", "check",
+  "pkgold", "pkgnew"), package = NULL)
 }
 \arguments{
 \item{pkgdir}{Path to the package we are revdep-checking.}
 
 \item{what}{Directory to query:
 \itemize{
-\item \code{"check"}: the root of the check directory,
+\item \code{"root"}: the root of the check directory,
 \item \code{"db"}: the database file,
 \item \code{"old"}: the library of the old version of the package.
 \item \code{"new"}: the library of the new version of the package.
 \item \code{"pkg"}: the library of the reverse dependency, the \code{package}
 argument must be supplied as well.
+\item \code{"check"}: the check directory of the reverse dependency, the
+\code{package} argument must be supplied as well.
+\item \code{"pkgold"}: package libraries to use when checking \code{package} with
+the old version.
+\item \code{"pkgnew"}: package libraries to use when checking \code{package} with
+the new version.
 }}
 
-\item{package}{The name of the package, if \code{what} is \code{"pkg"}.}
+\item{package}{The name of the package, if \code{what} is \code{"pkg"}, \code{"check"},
+\code{"pkgold"} or \code{"pkgnew"}.}
 }
 \value{
 Character scalar, the requested path.

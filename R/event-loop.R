@@ -13,8 +13,18 @@
 #'     * `todo`: haven't done anything yet
 #'     * `deps_installing`: the dependencies are being installed now
 #'     * `deps_installed`: the dependencies were already installed
-#'     * `checking`: we are checking the package right now
-#'     * `done`: packages was checked, result is in the database
+#'     * `checking`: checking with the old version right now
+#'     * `checking-checking`: checking with both versions right now
+#'     * `done-checking`: done with the old version, checking with the new
+#'        version right now
+#'     * `checking-done`: checking with the old version, new version was
+#'        already done.
+#'     * `done-deps_installed`: done with the old version, check with new
+#'        version has not started yet
+#'     * `done`: packages was checked with both versions
+#'
+#' We only start the check with the new version after the check with the
+#' old version, which simplifies the state transitions a bit.
 #'
 #' @keywords internal
 
@@ -88,8 +98,10 @@ handle_event <- function(state, which) {
   ## Read out stdout and stderr
   state$workers[[which]]$stdout <-
     c(state$workers[[which]]$stdout, out <- proc$read_output_lines())
+  cat(out, sep = "\n")
   state$workers[[which]]$stderr <-
     c(state$workers[[which]]$stderr, err <- proc$read_error_lines())
+  cat(err, sep = "n")
 
   ## If there is still output, then wait a bit more
   if (proc$is_incomplete_output() || proc$is_incomplete_error()) {
@@ -119,7 +131,7 @@ handle_event <- function(state, which) {
 #' schedule a dependency install.
 #'
 #' If there is nothing we can do now, then we schedule an idle job, i.e.
-#' just wait until a worke is done.
+#' just wait until a worker gets done.
 #'
 #' @param state See [run_event_loop()] for a description.
 #'
@@ -134,18 +146,33 @@ schedule_next_task <- function(state) {
     return(task("idle"))
   }
 
-  ## A package is ready to check?
-  ready_to_check <- state$packages$state == "deps_installed"
-  if (any(ready_to_check)) {
-    pkg <- state$packages$package[ready_to_check][1]
-    "!DEBUG schedule building `pkg`"
-    return(task("check", pkg))
+  ## done-deps_installed -> done-checking
+  ready <- state$package$state == "done-deps_installed"
+  if (any(ready)) {
+    pkg <- state$packages$package[ready][1]
+    return(task("check", pkg, "new"))
   }
 
-  ## A package is ready to dep-install?
-  ready_to_start <- state$packages$state == "todo"
-  if (any(ready_to_start)) {
-    pkg <- state$packages$package[ready_to_start][1]
+  ## checking -> checking-checking
+  ready <- state$packages$state == "checking"
+  if (any(ready)) {
+    pkg <- state$packages$package[ready][1]
+    "!DEBUG schedule checking `pkg` with the new version"
+    return(task("check", pkg, "new"))
+  }
+
+  ## deps_installed -> checking
+  ready <- state$packages$state == "deps_installed"
+  if (any(ready)) {
+    pkg <- state$packages$package[ready][1]
+    "!DEBUG schedule checking `pkg` with the old version"
+    return(task("check", pkg, "old"))
+  }
+
+  ## todo -> deps_installing
+  ready <- state$packages$state == "todo"
+  if (any(ready)) {
+    pkg <- state$packages$package[ready][1]
     "!DEBUG schedule dependency installs for `pkg`"
     return(task("deps_install", pkg))
   }

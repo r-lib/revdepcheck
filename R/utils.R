@@ -9,16 +9,15 @@ is_package_dir <- function(x) {
     file.exists(file.path(x, "DESCRIPTION"))
 }
 
-download_dir <- function() {
-  file.path(tempdir(), "downloaded_packages")
-}
-
 get_package_name <- function(path) {
   read.dcf(file.path(path, "DESCRIPTION"))[, "Package"]
 }
 
-create_dir <- function(path) {
-  dir.create(path, recursive = TRUE, showWarnings = FALSE)
+create_dir <- function(paths) {
+  vapply(
+    paths, FUN = dir.create, FUN.VALUE = logical(1),
+    recursive = TRUE, showWarnings = FALSE
+  )
 }
 
 #' @importFrom tools package_dependencies

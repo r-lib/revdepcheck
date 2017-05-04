@@ -20,6 +20,6 @@ schedule a check. Otherwise, if a package is in \code{todo}, then we
 schedule a dependency install.
 
 If there is nothing we can do now, then we schedule an idle job, i.e.
-just wait until a worke is done.
+just wait until a worker gets done.
 }
 \keyword{internal}
