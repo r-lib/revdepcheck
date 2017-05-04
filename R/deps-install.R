@@ -8,18 +8,12 @@ do_deps_install <- function(state, task) {
 
   "!DEBUG Install dependencies for package `package_name`"
   func <- function(libdir, packages, quiet) {
-    ifun <- crancache::install_packages
-    withr::with_libpaths(
-      libdir, {
-        print(.libPaths())
-        ifun(
-          packages,
-          dependencies = TRUE,
-          lib = libdir,
-          quiet = quiet,
-          use_cache = "cran"
-        )
-      }
+    crancache::install_packages(
+      packages,
+      dependencies = TRUE,
+      lib = libdir,
+      quiet = quiet,
+      use_cache = "cran"
     )
   }
 
