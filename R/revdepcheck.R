@@ -28,7 +28,7 @@ revdep_check <- function(pkg = ".", dependencies = c("Depends", "Imports",
   with_libpaths(
     check_dir(pkg, "old"), {
       package_name <- get_package_name(pkg)[[1]]
-      install_packages(package_name, quiet = quiet)
+      install_packages(package_name, quiet = quiet, use_cache = "cran")
     }
   )
   "!DEBUG Installing new version from `pkg`"
