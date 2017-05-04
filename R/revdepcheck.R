@@ -56,7 +56,7 @@ revdep_resume <- function(pkg = ".", dependencies = c("Depends", "Imports",
 
   state <- list(
     options = list(
-      chkdir = check_dir(pkg, "check"),
+      pkgdir = pkg,
       quiet = quiet,
       timeout = timeout,
       num_workers = num_workers),

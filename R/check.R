@@ -3,7 +3,7 @@
 
 do_check <- function(state, task) {
   ## TODO
-  px <- process$new("sleep", "10", stdout = "|", stderr = "|")
+  px <- process$new("sleep", "1", stdout = "|", stderr = "|")
   worker <- list(process = px, package = task[[2]], stdout = character(),
                  stderr = character(), task = task)
   state$workers <- c(state$workers, list(worker))

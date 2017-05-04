@@ -87,9 +87,9 @@ handle_event <- function(state, which) {
 
   ## Read out stdout and stderr
   state$workers[[which]]$stdout <-
-    c(state$workers[[which]]$stdout, proc$read_output_lines())
+    c(state$workers[[which]]$stdout, out <- proc$read_output_lines())
   state$workers[[which]]$stderr <-
-    c(state$workers[[which]]$stderr, proc$read_error_lines())
+    c(state$workers[[which]]$stderr, err <- proc$read_error_lines())
 
   ## If there is still output, then wait a bit more
   if (proc$is_incomplete_output() || proc$is_incomplete_error()) {
