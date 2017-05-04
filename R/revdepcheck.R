@@ -24,17 +24,17 @@ revdep_check <- function(pkg = ".", dependencies = c("Depends", "Imports",
   revdep_clean(pkg)
 
   ## Install the package itself, both versions
-  "!DEBUG Installing new version from `pkg`"
-  with_libpaths(
-    check_dir(pkg, "new"),
-    install_local(pkg, quiet = quiet)
-  )
   "!DEBUG Installing CRAN (old) version"
   with_libpaths(
     check_dir(pkg, "old"), {
       package_name <- get_package_name(pkg)[[1]]
       install_packages(package_name, quiet = quiet)
     }
+  )
+  "!DEBUG Installing new version from `pkg`"
+  with_libpaths(
+    check_dir(pkg, "new"),
+    install_local(pkg, quiet = quiet)
   )
 
   ## Resume also works from an empty table
