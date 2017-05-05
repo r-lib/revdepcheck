@@ -17,6 +17,7 @@ Imports:
     callr,
     crancache,
     debugme,
+    desc,
     DBI,
     jsonlite,
     processx,

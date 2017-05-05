@@ -100,9 +100,12 @@ handle_finished_check <- function(state, worker) {
     notes = length(chkres$notes)
   )
 
+  description <- desc::desc(text = chkres$output$description)
+  maintainer <- description$get_maintainer()
+
   db_insert(
     state$options$pkgdir, worker$package,
-    version = chkres$version, status = status,
+    version = chkres$version, maintainer = maintainer, status = status,
     which = my_task$args[[2]], duration = duration,
     starttime = as.character(starttime), result = unclass(toJSON(chkres)),
     summary = unclass(toJSON(summary))
