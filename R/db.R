@@ -43,6 +43,7 @@ db_setup <- function(package) {
     "CREATE TABLE revdeps (
       package TEXT,
       version TEXT,
+      maintainer TEXT,
       status TEXT,         -- PREPERROR, INSTALLERROR, ERROR, WARNING, OK
       which TEXT,
       duration TEXT,       -- seconds
@@ -90,7 +91,7 @@ db_list <- function(package) {
 
 #' @importFrom DBI dbExecute sqlInterpolate
 
-db_insert <- function(pkgdir, package, version, status,
+db_insert <- function(pkgdir, package, version, maintainer, status,
                       which = c("old", "new"),
                       duration, starttime, result, summary) {
 
@@ -98,16 +99,16 @@ db_insert <- function(pkgdir, package, version, status,
 
   db <- db(pkgdir)
   q <- "INSERT INTO revdeps
-         (package, version, status, which, duration, starttime, result,
-          summary) VALUES
-         (?package, ?version, ?status, ?which, ?duration, ?starttime,
-          ?result, ?summary)"
+         (package, version, maintainer, status, which, duration,
+          starttime, result, summary) VALUES
+         (?package, ?version, ?maintainer, ?status, ?which, ?duration,
+          ?starttime, ?result, ?summary)"
 
   dbExecute(db,
     sqlInterpolate(db, q,
-      package = package, version = version, status = status,
-      which = which, duration = duration, starttime = starttime,
-      result = result, summary = summary
+      package = package, version = version, maintainer = maintainer,
+      status = status, which = which, duration = duration,
+      starttime = starttime, result = result, summary = summary
     )
   )
 }
