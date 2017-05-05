@@ -48,6 +48,8 @@ do_check <- function(state, task) {
 }
 
 handle_finished_check <- function(state, worker) {
+  starttime <- worker$process$get_start_time()
+  duration <- as.numeric(Sys.time() - starttime)
   wpkg <- match(worker$package, state$packages$package)
 
   current_state <- state$packages$state[wpkg]
@@ -75,7 +77,47 @@ handle_finished_check <- function(state, worker) {
     }
   state$packages$state[wpkg] <- new_state
 
-  ## TODO: update DB
+  chkres <- tryCatch(
+    worker$process$parse_results(),
+    error = function(e) e
+  )
+
+  status <- if (!inherits(chkres, "rcmdcheck")) {
+    "PREPERROR"
+  } else if (length(chkres$errors)) {
+    "ERROR"
+  } else if (length(chkres$warnings)) {
+    "WARNING"
+  } else if (length(chkres$notes)) {
+    "NOTE"
+  } else {
+    "OK"
+  }
+
+  summary <- list(
+    errors = length(chkres$errors),
+    warnings = length(chkres$warnings),
+    notes = length(chkres$notes)
+  )
+
+  db_insert(
+    state$options$pkgdir, worker$package,
+    version = chkres$version, status = status,
+    which = my_task$args[[2]], duration = duration,
+    starttime = as.character(starttime), result = unclass(toJSON(chkres)),
+    summary = unclass(toJSON(summary))
+  )
 
   state
+}
+
+toJSON <- function(x, force = TRUE, ...) {
+  jsonlite::toJSON(
+    list(
+      class = class(x),
+      object = unclass(x)
+    ),
+    force = force,
+    ...
+  )
 }

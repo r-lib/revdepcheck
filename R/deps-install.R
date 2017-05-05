@@ -59,12 +59,31 @@ do_deps_install <- function(state, task) {
 }
 
 handle_finished_deps_install <- function(state, worker) {
+  starttime <- worker$process$get_start_time()
+  duration <- as.numeric(Sys.time() - starttime)
   wpkg <- match(worker$package, state$packages$package)
 
   if (worker$process$get_exit_status()) {
     ## failed, we just stop the whole package
     state$packages$state[wpkg] <- "done"
-    ## TODO: update DB that we failed
+
+    rresult <- tryCatch(
+      worker$process$get_result(),
+      error = function(e) conditionMessage(e)
+    )
+    result <- list(
+      stdout = worker$stdout,
+      stderr = worker$stderr,
+      errormsg = rresult
+    )
+
+    for (which in c("old", "new")) {
+      db_insert(
+        state$options$pkgdir, worker$package, status = "PREPERROR",
+        which = which, duration = duration, starttime = starttime,
+        result = TOJSON(result), summary = NULL
+      )
+    }
 
   } else {
     ## succeeded
