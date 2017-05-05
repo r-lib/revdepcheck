@@ -71,6 +71,8 @@ revdep_resume <- function(pkg = ".", dependencies = c("Depends", "Imports",
   )
 
   run_event_loop(state)
+
+  revdep_results(pkg)
 }
 
 revdep_clean <- function(pkg) {
