@@ -18,6 +18,7 @@ Imports:
     crancache,
     debugme,
     DBI,
+    jsonlite,
     processx,
     rcmdcheck,
     remotes,

@@ -66,7 +66,7 @@ revdep_resume <- function(pkg = ".", dependencies = c("Depends", "Imports",
       num_workers = num_workers),
     packages = data.frame(
       package = todo,
-      state = "todo",
+      state = if (length(todo)) "todo" else character(),
       stringsAsFactors = FALSE)
   )
 

@@ -1,6 +1,8 @@
 
 dbenv <- new.env()
 
+db_version <- "2.0.0"
+
 #' @importFrom RSQLite dbIsValid dbConnect SQLite
 
 db <- function(package) {
@@ -40,9 +42,13 @@ db_setup <- function(package) {
   dbExecute(db,
     "CREATE TABLE revdeps (
       package TEXT,
-      type VARCHAR(10), -- OUTPUT, NOTE, WARNING, ERROR, INSTALL_OUT,
-                        -- PREPERROR
-      output TEXT
+      version TEXT,
+      status TEXT,         -- PREPERROR, INSTALLERROR, ERROR, WARNING, OK
+      which TEXT,
+      duration TEXT,       -- seconds
+      starttime TEXT,      -- when the check was performed
+      result TEXT,         -- JSON, unparsed outputs
+      summary TEXT         -- JSON, parsed outputs
     )"
   )
   dbExecute(db, "CREATE INDEX idx_revdeps_package ON revdeps(package)")
@@ -54,7 +60,7 @@ db_metadata_init <- function(package) {
   db <- db(package)
   q <- "INSERT INTO metadata VALUES (?name, ?val)"
 
-  dbExecute(db, sqlInterpolate(db, q, name = "dbversion", val = "1.0.0"))
+  dbExecute(db, sqlInterpolate(db, q, name = "dbversion", val = db_version))
   dbExecute(db, sqlInterpolate(db, q, name = "package",
                                  val = get_package_name(package)))
 }
@@ -84,28 +90,26 @@ db_list <- function(package) {
 
 #' @importFrom DBI dbExecute sqlInterpolate
 
-db_insert <- function(package, results) {
-  db <- db(package)
-  q <- "INSERT INTO revdeps VALUES (?package, ?type, ?output)"
-  ins <- function(type, output) {
-    dbExecute(db,
-      sqlInterpolate(db, q,
-        package = results$package, type = type, output = output
-      )
-    )
-  }
+db_insert <- function(pkgdir, package, version, status,
+                      which = c("old", "new"),
+                      duration, starttime, result, summary) {
 
-  dbExecute(db, "BEGIN")
-  on.exit(try(dbExecute(db, "ROLLBACK"), silent = TRUE))
-  ins("OUTPUT", results$output$stdout)
-  for (ent in results$errors)   ins("ERROR", ent)
-  for (ent in results$warnings) ins("WARNING", ent)
-  for (ent in results$notes)    ins("NOTE", ent)
-  if (!is.null(results$install_out)) {
-    ins("INSTALL_OUT", results$install_out)
-  }
-  dbExecute(db, "COMMIT")
-  on.exit()
+  which <- match.arg(which)
+
+  db <- db(pkgdir)
+  q <- "INSERT INTO revdeps
+         (package, version, status, which, duration, starttime, result,
+          summary) VALUES
+         (?package, ?version, ?status, ?which, ?duration, ?starttime,
+          ?result, ?summary)"
+
+  dbExecute(db,
+    sqlInterpolate(db, q,
+      package = package, version = version, status = status,
+      which = which, duration = duration, starttime = starttime,
+      result = result, summary = summary
+    )
+  )
 }
 
 filter_result_pkgs <- function(res, revdeps) {
@@ -122,21 +126,13 @@ filter_result_pkgs <- function(res, revdeps) {
 }
 
 db_results <- function(pkg, revdeps) {
-  res <- dbGetQuery(db(pkg),
-    "SELECT package, SUM(type=='NOTE') AS note,
-            SUM(type=='WARNING') AS warning, SUM(type=='ERROR') AS error
-       FROM revdeps GROUP BY package")
-  filter_result_pkgs(res, revdeps)
+  TODO
 }
 
 db_details <- function(pkg, revdeps) {
-  res <- dbGetQuery(db(pkg),
-    "SELECT package, type, output
-       FROM revdeps")
-  fres <- filter_result_pkgs(res, revdeps)
-  fres[fres$type %in% c('NOTE', 'WARNING', 'ERROR'), ]
+  TODO
 }
 
 db_maintainers <- function(pkg, revdeps) {
-  ## TODO
+  TODO
 }
