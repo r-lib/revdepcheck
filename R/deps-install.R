@@ -65,6 +65,8 @@ handle_finished_deps_install <- function(state, worker) {
   duration <- as.numeric(Sys.time() - starttime)
   wpkg <- match(worker$package, state$packages$package)
 
+  worker$process$wait(timeout = 1000)
+  worker$process$kill()
   if (worker$process$get_exit_status()) {
     ## failed, we just stop the whole package
     state$packages$state[wpkg] <- "done"
