@@ -45,7 +45,7 @@ do_deps_install <- function(state, task) {
     args = args,
     system_profile = FALSE,
     user_profile = FALSE,
-    env = c(CRANCACHE_REPOS = "cran")
+    env = c(CRANCACHE_REPOS = "cran", CRANCACHE_QUIET = "yes")
   )
   px <- r_process$new(px_opts)
 
