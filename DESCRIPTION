@@ -21,6 +21,7 @@ Imports:
     DBI,
     jsonlite,
     processx,
+    progress,
     rcmdcheck,
     remotes,
     RSQLite,

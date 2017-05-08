@@ -112,7 +112,9 @@ handle_finished_check <- function(state, worker) {
   )
 
   if (new_state == "done") {
+    cat("\r")
     print(revdep_results(state$options$pkgdir, worker$package))
+    state$progress_bar$tick(tokens = list(packages = checking_now(state)))
   }
 
   state

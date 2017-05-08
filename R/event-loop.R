@@ -27,9 +27,12 @@
 #' old version, which simplifies the state transitions a bit.
 #'
 #' @keywords internal
+#' @importFrom progress progress_bar
 
 run_event_loop <- function(state) {
   "!DEBUG running event loop"
+
+  message("Starting to check packages")
 
   ## Kill all child processes if we quit from this function
   on.exit(remove_workers(state), add = TRUE)
@@ -37,8 +40,15 @@ run_event_loop <- function(state) {
   ## This is a list of worker processes
   state$workers <- list()
 
+  ## Our global progress bar
+  state$progress_bar <- progress_bar$new(
+    total = nrow(state$packages),
+    format = "[:current/:total] :spin :elapsed | ETA: :eta | :packages"
+  )
+
   while (1) {
     "!DEBUG event loop iteration, `length(state$workers)` workers"
+    state$progress_bar$tick(0, tokens = list(packages = checking_now(state)))
     if (are_we_done(state)) break;
     events <- poll(state)
     state <- handle_events(state, events)
@@ -52,6 +62,12 @@ run_event_loop <- function(state) {
 
 are_we_done <- function(state) {
   all(state$packages$state == "done")
+}
+
+checking_now <- function(state) {
+  now <- ! state$packages$state %in% c("todo", "done")
+  str <- paste(state$packages$package[now], collapse = ", ")
+  substr(str, 1, 50)
 }
 
 poll <- function(state) {
@@ -76,7 +92,7 @@ get_timeout <- function(state) {
     FUN.VALUE = numeric(1),
     timeout = state$options$timeout
   )
-  max(min(ts), 0)
+  max(min(ts, 1000), 0)
 }
 
 get_process_waiting_time <- function(worker, timeout) {
