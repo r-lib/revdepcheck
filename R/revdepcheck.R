@@ -1,7 +1,7 @@
 
 #' @export
 #' @importFrom remotes install_local
-#' @importFrom withr with_libpaths
+#' @importFrom withr with_libpaths with_envvar
 #' @importFrom crancache install_packages
 
 revdep_check <- function(pkg = ".", dependencies = c("Depends", "Imports",
@@ -23,18 +23,28 @@ revdep_check <- function(pkg = ".", dependencies = c("Depends", "Imports",
   ## Also creates it if needed
   revdep_clean(pkg)
 
-  ## Install the package itself, both versions
+  ## Install the package itself, both versions, first the CRAN version
+  ## We instruct crancache to only use the cache of CRAN packages
+  ## (to avoid installing locally installed newer versions.
   "!DEBUG Installing CRAN (old) version"
-  with_libpaths(
-    check_dir(pkg, "old"), {
-      package_name <- get_package_name(pkg)[[1]]
-      install_packages(package_name, quiet = quiet, use_cache = "cran")
-    }
+  with_envvar(
+    c(CRANCACHE_REPOS = "cran"),
+    with_libpaths(
+      check_dir(pkg, "old"), {
+        package_name <- get_package_name(pkg)[[1]]
+        install_packages(package_name, quiet = quiet)
+      }
+    )
   )
+
+  ## Now the new version
   "!DEBUG Installing new version from `pkg`"
-  with_libpaths(
-    check_dir(pkg, "new"),
-    install_local(pkg, quiet = quiet)
+  with_envvar(
+    c(CRANCACHE_REPOS = "cran"),
+    with_libpaths(
+      check_dir(pkg, "new"),
+      install_local(pkg, quiet = quiet)
+    )
   )
 
   ## Resume also works from an empty table
