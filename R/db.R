@@ -131,12 +131,19 @@ filter_result_pkgs <- function(res, revdeps) {
 db_results <- function(pkg, revdeps) {
   db <- db(pkg)
 
-  old <- dbGetQuery(db,
-    "SELECT * FROM revdeps where which = 'old'"
-  )
-  new <- dbGetQuery(db,
-    "SELECT * FROM revdeps where which = 'new'"
-  )
+  if (is.null(revdeps)) {
+    old <- dbGetQuery(db, "SELECT * FROM revdeps WHERE which = 'old'")
+    new <- dbGetQuery(db, "SELECT * FROM revdeps WHERE which = 'new'")
+
+  } else {
+    revdepstr <- paste0("(", paste0('"', revdeps, '"', collapse = ","), ")")
+    old <- dbGetQuery(db, paste0(
+      "SELECT * FROM revdeps
+       WHERE which = 'old' AND package IN ", revdepstr))
+    new <- dbGetQuery(db, paste0(
+      "SELECT * FROM revdeps
+       WHERE which = 'new' AND package IN ", revdepstr))
+  }
 
   oldpackages <- old$package
   newpackages <- new$package
