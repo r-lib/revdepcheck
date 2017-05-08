@@ -26,13 +26,15 @@ This is the event loop of the revdep check process
 \item \code{todo}: haven't done anything yet
 \item \code{deps_installing}: the dependencies are being installed now
 \item \code{deps_installed}: the dependencies were already installed
+\item \code{downloading}: the source package to check is being downloaded
+\item \code{downloaded}: the source package was downloaded
 \item \code{checking}: checking with the old version right now
 \item \code{checking-checking}: checking with both versions right now
 \item \code{done-checking}: done with the old version, checking with the new
 version right now
 \item \code{checking-done}: checking with the old version, new version was
 already done.
-\item \code{done-deps_installed}: done with the old version, check with new
+\item \code{done-downloaded}: done with the old version, check with new
 version has not started yet
 \item \code{done}: packages was checked with both versions
 }

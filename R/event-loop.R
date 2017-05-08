@@ -13,13 +13,15 @@
 #'     * `todo`: haven't done anything yet
 #'     * `deps_installing`: the dependencies are being installed now
 #'     * `deps_installed`: the dependencies were already installed
+#'     * `downloading`: the source package to check is being downloaded
+#'     * `downloaded`: the source package was downloaded
 #'     * `checking`: checking with the old version right now
 #'     * `checking-checking`: checking with both versions right now
 #'     * `done-checking`: done with the old version, checking with the new
 #'        version right now
 #'     * `checking-done`: checking with the old version, new version was
 #'        already done.
-#'     * `done-deps_installed`: done with the old version, check with new
+#'     * `done-downloaded`: done with the old version, check with new
 #'        version has not started yet
 #'     * `done`: packages was checked with both versions
 #'
@@ -130,6 +132,9 @@ handle_event <- function(state, which) {
   if (worker$task$name == "deps_install") {
     handle_finished_deps_install(state, worker)
 
+  } else if (worker$task$name == "download") {
+    handle_finished_download(state, worker)
+
   } else if (worker$task$name == "check") {
     handle_finished_check(state, worker)
   }
@@ -161,8 +166,8 @@ schedule_next_task <- function(state) {
     return(task("idle"))
   }
 
-  ## done-deps_installed -> done-checking
-  ready <- state$package$state == "done-deps_installed"
+  ## done-downloaded -> done-checking
+  ready <- state$package$state == "done-downloaded"
   if (any(ready)) {
     pkg <- state$packages$package[ready][1]
     return(task("check", pkg, "new"))
@@ -176,12 +181,20 @@ schedule_next_task <- function(state) {
     return(task("check", pkg, "new"))
   }
 
-  ## deps_installed -> checking
-  ready <- state$packages$state == "deps_installed"
+  ## downloaded -> checking
+  ready <- state$packages$state == "downloaded"
   if (any(ready)) {
     pkg <- state$packages$package[ready][1]
     "!DEBUG schedule checking `pkg` with the old version"
     return(task("check", pkg, "old"))
+  }
+
+  ## deps_installed -> downloading
+  ready <- state$packages$state == "deps_installed"
+  if (any(ready)) {
+    pkg <- state$packages$package[ready][1]
+    "!DEBUG schedule downloading `pkg` with the old version"
+    return(task("download", pkg))
   }
 
   ## todo -> deps_installing
@@ -206,8 +219,12 @@ do_task <- function(state, task) {
     state
 
   } else if (task$name == "deps_install") {
-    "!DEBUG do a dependncy install task: `task[[2]]`"
+    "!DEBUG do a dependency install task: `task[[2]]`"
     do_deps_install(state, task)
+
+  } else if (task$name == "download") {
+    "!DEBUG do a download task: `task[[2]]`"
+    do_download(state, task)
 
   } else if (task$name == "check") {
     "!DEBUG do a check task: `task[[2]]`"
