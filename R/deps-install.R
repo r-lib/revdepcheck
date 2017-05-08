@@ -16,8 +16,7 @@ do_deps_install <- function(state, task) {
         packages,
         dependencies = TRUE,
         lib = libdir[1],
-        quiet = quiet,
-        use_cache = "cran"
+        quiet = quiet
       )
     )
   }
@@ -39,11 +38,14 @@ do_deps_install <- function(state, task) {
     quiet = state$options$quiet
   )
 
+  ## CRANCACHE_REPOS makes sure that we only use cached CRAN packages,
+  ## but not packages that were installed from elsewhere
   px_opts <- r_process_options(
     func = func,
     args = args,
     system_profile = FALSE,
-    user_profile = FALSE
+    user_profile = FALSE,
+    env = c(CRANCACHE_REPOS = "cran")
   )
   px <- r_process$new(px_opts)
 
