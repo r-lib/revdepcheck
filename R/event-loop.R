@@ -67,9 +67,9 @@ are_we_done <- function(state) {
 }
 
 checking_now <- function(state) {
-  now <- ! state$packages$state %in% c("todo", "done")
-  str <- paste(state$packages$package[now], collapse = ", ")
-  paste0("(", sum(now), ") ", substr(str, 1, 50))
+  pkgs <- sort(vapply(state$workers, "[[", character(1), "package"))
+  str <- paste(pkgs, collapse = ", ")
+  paste0("(", length(pkgs), ") ", substr(str, 1, 50))
 }
 
 poll <- function(state) {
