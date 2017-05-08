@@ -103,6 +103,7 @@ get_process_waiting_time <- function(worker, timeout) {
 
 handle_events <- function(state, events) {
   for (i in which(events)) state <- handle_event(state, i)
+  state$workers <- drop_nulls(state$workers)
   state
 }
 
@@ -124,7 +125,7 @@ handle_event <- function(state, which) {
 
   ## Otherwise update the state, and the DB
   worker <- state$workers[[which]]
-  state$workers <- state$workers[-which]
+  state$workers[which] <- list(NULL)
 
   if (worker$task$name == "deps_install") {
     handle_finished_deps_install(state, worker)

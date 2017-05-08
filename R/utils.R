@@ -38,3 +38,8 @@ base_packages <- function() {
 lapply_with_names <- function(X, FUN, ...) {
   structure(lapply(X, FUN, ...), names = names(X))
 }
+
+drop_nulls <- function(x) {
+  is_null <- vapply(x, is.null, logical(1))
+  x[!is_null]
+}
