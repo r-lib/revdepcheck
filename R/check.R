@@ -113,14 +113,3 @@ handle_finished_check <- function(state, worker) {
 
   state
 }
-
-toJSON <- function(x, force = TRUE, ...) {
-  jsonlite::toJSON(
-    list(
-      class = class(x),
-      object = unclass(x)
-    ),
-    force = force,
-    ...
-  )
-}

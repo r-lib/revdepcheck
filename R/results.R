@@ -5,7 +5,9 @@
 #' @export
 
 revdep_results <- function(pkg = ".", revdeps = NULL) {
-  db_results(pkg, revdeps)
+  res <- db_results(pkg, revdeps)
+  class(res) <- "revdepcheck_results"
+  res
 }
 
 #' Details of reverse dependency check results
@@ -36,4 +38,5 @@ revdep_report <- function(pkg = ".",
 revdep_emails <- function(pkg = ".", revdeps = NULL) {
   addr <- db_maintainers(pkg, revdeps)
   results <- revdep_results(pkg, revdeps)
+  TODO
 }

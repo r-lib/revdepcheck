@@ -126,8 +126,37 @@ filter_result_pkgs <- function(res, revdeps) {
   res
 }
 
+#' @importFrom rcmdcheck compare_checks
+
 db_results <- function(pkg, revdeps) {
-  TODO
+  db <- db(pkg)
+
+  old <- dbGetQuery(db,
+    "SELECT * FROM revdeps where which = 'old'"
+  )
+  new <- dbGetQuery(db,
+    "SELECT * FROM revdeps where which = 'new'"
+  )
+
+  oldpackages <- old$package
+  newpackages <- new$package
+
+  onlynew <- setdiff(newpackages, oldpackages)
+  onlyold <- setdiff(oldpackages, newpackages)
+  if (length(onlynew) || length(onlyold)) {
+    warning(
+      "Some packages were not checked with both versions: ",
+      paste(sQuote(c(onlynew, onlyold)), collapse = ", ")
+    )
+  }
+
+  packages <- intersect(oldpackages, newpackages)
+
+  lapply_with_names(packages, function(p) {
+    oldcheck <- checkFromJSON(old$result[match(p, old$package)])
+    newcheck <- checkFromJSON(new$result[match(p, new$package)])
+    compare_checks(oldcheck, newcheck)
+  })
 }
 
 db_details <- function(pkg, revdeps) {
