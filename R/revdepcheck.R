@@ -27,6 +27,7 @@ revdep_check <- function(pkg = ".", dependencies = c("Depends", "Imports",
   ## We instruct crancache to only use the cache of CRAN packages
   ## (to avoid installing locally installed newer versions.
   "!DEBUG Installing CRAN (old) version"
+  message("Installing CRAN version of package")
   with_envvar(
     c(CRANCACHE_REPOS = "cran"),
     with_libpaths(
@@ -39,6 +40,7 @@ revdep_check <- function(pkg = ".", dependencies = c("Depends", "Imports",
 
   ## Now the new version
   "!DEBUG Installing new version from `pkg`"
+  message("Installing DEV version of package")
   with_envvar(
     c(CRANCACHE_REPOS = "cran"),
     with_libpaths(
