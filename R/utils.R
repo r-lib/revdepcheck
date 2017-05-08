@@ -34,3 +34,7 @@ deps_for_package <- function(package) {
 base_packages <- function() {
   rownames(installed.packages(priority="base"))
 }
+
+lapply_with_names <- function(X, FUN, ...) {
+  structure(lapply(X, FUN, ...), names = names(X))
+}
