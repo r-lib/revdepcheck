@@ -11,7 +11,10 @@ do_check <- function(state, task) {
 
   dir <- check_dir(pkgdir, "check", pkgname)
   lib <- check_dir(pkgdir, if (iam_old) "pkgold" else "pkgnew", pkgname)
-  tarball <- crancache::download_packages(pkgname, dir)[,2]
+  tarball <- with_envvar(
+    c(CRANCACHE_REPOS = "cran", CRANCACHE_QUIET = "yes"),
+    crancache::download_packages(pkgname, dir)[,2]
+  )
 
   ## We reverse the library, because the new version of the revdep checked
   ## package might have custom non-CRAN dependencies, and we want these
@@ -30,13 +33,13 @@ do_check <- function(state, task) {
   current_state <- state$packages$state[wpkg]
 
   new_state <-
-    if (current_state == "deps_installed" && iam_old) {
+    if (current_state == "downloaded" && iam_old) {
       "checking"
 
     } else if (current_state == "checking" && !iam_old) {
       "checking-checking"
 
-    } else if (current_state == "done-deps_installed" && !iam_old) {
+    } else if (current_state == "done-downloaded" && !iam_old) {
       "done-checking"
 
     } else {
@@ -58,7 +61,7 @@ handle_finished_check <- function(state, worker) {
 
   new_state <-
     if (current_state == "checking" && iam_old) {
-      "done-deps_installed"
+      "done-downloaded"
 
     } else if (current_state == "checking-checking" && iam_old) {
       "done-checking"
