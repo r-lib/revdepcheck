@@ -67,7 +67,7 @@ are_we_done <- function(state) {
 }
 
 checking_now <- function(state) {
-  pkgs <- sort(vapply(state$workers, "[[", character(1), "package"))
+  pkgs <- sort(unlist(lapply(state$workers, "[[", "package")))
   str <- paste(pkgs, collapse = ", ")
   paste0("(", length(pkgs), ") ", substr(str, 1, 50))
 }
