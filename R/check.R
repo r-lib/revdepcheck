@@ -111,5 +111,9 @@ handle_finished_check <- function(state, worker) {
     summary = unclass(toJSON(summary))
   )
 
+  if (new_state == "done") {
+    print(revdep_results(state$options$pkgdir, worker$package))
+  }
+
   state
 }
