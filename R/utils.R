@@ -38,7 +38,8 @@ base_packages <- function() {
 }
 
 lapply_with_names <- function(X, FUN, ...) {
-  structure(lapply(X, FUN, ...), names = names(X))
+  n <- if (!is.null(names(X))) names(X) else if (is.character(X)) X
+  structure(lapply(X, FUN, ...), names = n)
 }
 
 drop_nulls <- function(x) {

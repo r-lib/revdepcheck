@@ -17,11 +17,22 @@ revdep_results <- function(pkg = ".", revdeps = NULL) {
 #'
 #' @family revdep check functions
 #' @export
+#' @importFrom rcmdcheck compare_checks
 
 revdep_details <- function(pkg = ".", revdep) {
-  res <- db_details(pkg, revdep)
+  assert_that(is_string(revdep))
+  record <- db_details(pkg, revdep)
+  old <- checkFromJSON(record$old$result[[1]])
+  new <- checkFromJSON(record$new$result[[1]])
+  res <- compare_checks(old, new)
   class(res) <- "revdepcheck_details"
   res
+}
+
+#' @export
+
+revdep_list_packages <- function(pkg = ".") {
+  db_list(pkg)
 }
 
 #' Markdown report of reverse dependency check results

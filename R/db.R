@@ -178,11 +178,7 @@ db_results <- function(pkg, revdeps) {
 }
 
 db_details <- function(pkg, revdep) {
-  res <- db_get_results(pkg, revdep)
-
-  packages <- unique(c(res$old$package, res$new$package))
-  browser()
-
+  db_get_results(pkg, revdep)
 }
 
 db_maintainers <- function(pkg, revdeps) {
