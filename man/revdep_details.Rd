@@ -4,7 +4,12 @@
 \alias{revdep_details}
 \title{Details of reverse dependency check results}
 \usage{
-revdep_details(pkg = ".", revdeps = NULL)
+revdep_details(pkg = ".", revdep)
+}
+\arguments{
+\item{pkg}{Path to the revdep-checked package tree.}
+
+\item{revdep}{Name of the reverse dependency.}
 }
 \description{
 Details of reverse dependency check results

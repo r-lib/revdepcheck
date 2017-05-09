@@ -12,11 +12,16 @@ revdep_results <- function(pkg = ".", revdeps = NULL) {
 
 #' Details of reverse dependency check results
 #'
+#' @param pkg Path to the revdep-checked package tree.
+#' @param revdep Name of the reverse dependency.
+#'
 #' @family revdep check functions
 #' @export
 
-revdep_details <- function(pkg = ".", revdeps = NULL) {
-  db_details(pkg, revdeps)
+revdep_details <- function(pkg = ".", revdep) {
+  res <- db_details(pkg, revdep)
+  class(res) <- "revdepcheck_details"
+  res
 }
 
 #' Markdown report of reverse dependency check results

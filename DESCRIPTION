@@ -15,7 +15,9 @@ Suggests:
     testthat
 Imports:
     callr,
+    clisymbols,
     crancache,
+    crayon,
     debugme,
     desc,
     DBI,

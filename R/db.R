@@ -126,27 +126,37 @@ filter_result_pkgs <- function(res, revdeps) {
   res
 }
 
-#' @importFrom rcmdcheck compare_checks
-
-db_results <- function(pkg, revdeps) {
+db_get_results <- function(pkg, revdeps) {
   db <- db(pkg)
 
   if (is.null(revdeps)) {
-    old <- dbGetQuery(db, "SELECT * FROM revdeps WHERE which = 'old'")
-    new <- dbGetQuery(db, "SELECT * FROM revdeps WHERE which = 'new'")
+    old <- dbGetQuery(db,
+      "SELECT * FROM revdeps WHERE which = 'old'
+       ORDER BY package COLLATE NOCASE")
+    new <- dbGetQuery(db,
+      "SELECT * FROM revdeps WHERE which = 'new'
+       ORDER BY package COLLATE NOCASE")
 
   } else {
     revdepstr <- paste0("(", paste0('"', revdeps, '"', collapse = ","), ")")
     old <- dbGetQuery(db, paste0(
       "SELECT * FROM revdeps
-       WHERE which = 'old' AND package IN ", revdepstr))
+       WHERE which = 'old' AND package IN ", revdepstr,
+      "ORDER BY package COLLATE NOCASE"))
     new <- dbGetQuery(db, paste0(
       "SELECT * FROM revdeps
-       WHERE which = 'new' AND package IN ", revdepstr))
+       WHERE which = 'new' AND package IN ", revdepstr,
+      "ORDER BY package COLLATE NOCASE"))
   }
 
-  oldpackages <- old$package
-  newpackages <- new$package
+  list(old = old, new = new)
+}
+
+db_results <- function(pkg, revdeps) {
+  res <- db_get_results(pkg, revdeps)
+
+  oldpackages <- res$old$package
+  newpackages <- res$new$package
 
   onlynew <- setdiff(newpackages, oldpackages)
   onlyold <- setdiff(oldpackages, newpackages)
@@ -160,14 +170,19 @@ db_results <- function(pkg, revdeps) {
   packages <- intersect(oldpackages, newpackages)
 
   lapply_with_names(packages, function(p) {
-    oldcheck <- checkFromJSON(old$result[match(p, old$package)])
-    newcheck <- checkFromJSON(new$result[match(p, new$package)])
-    compare_checks(oldcheck, newcheck)
+    version <- res$old$version[match(p, res$old$package)]
+    oldcheck <- checkFromJSON(res$old$result[match(p, res$old$package)])
+    newcheck <- checkFromJSON(res$new$result[match(p, res$new$package)])
+    try_compare_checks(oldcheck, newcheck, p, version)
   })
 }
 
-db_details <- function(pkg, revdeps) {
-  TODO
+db_details <- function(pkg, revdep) {
+  res <- db_get_results(pkg, revdep)
+
+  packages <- unique(c(res$old$package, res$new$package))
+  browser()
+
 }
 
 db_maintainers <- function(pkg, revdeps) {

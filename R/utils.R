@@ -45,3 +45,31 @@ drop_nulls <- function(x) {
   is_null <- vapply(x, is.null, logical(1))
   x[!is_null]
 }
+
+#' @importFrom crayon col_nchar
+
+col_align <- function(text, width = getOption("width"),
+                      align = c("left", "center", "right")) {
+
+  align <- match.arg(align)
+  nc <- col_nchar(text)
+
+  if (width <= nc) {
+    text
+
+  } else if (align == "left") {
+    paste0(text, make_space(width - nc))
+
+  } else if (align == "center") {
+    paste0(make_space(ceiling((width - nc) / 2)),
+           text,
+           make_space(floor((width - nc) / 2)))
+
+  } else {
+    paste0(make_space(width - nc), text)
+  }
+}
+
+make_space <- function(num, filling = " ") {
+  strrep(filling, num)
+}
