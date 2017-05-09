@@ -16,12 +16,17 @@ do_check <- function(state, task) {
     crancache::download_packages(pkgname, dir)[,2]
   )
 
+  outdir <- file.path(dir, task$args[[2]])
+  unlink(outdir, recursive = TRUE)
+  dir.create(outdir, recursive = TRUE, showWarnings = FALSE)
+
   ## We reverse the library, because the new version of the revdep checked
   ## package might have custom non-CRAN dependencies, and we want these
   ## to be first on the library path
   px <- rcmdcheck_process$new(
     path = tarball,
-    libpath = rev(lib)
+    libpath = rev(lib),
+    args = c("-o", outdir)
   )
 
   ## Update state
