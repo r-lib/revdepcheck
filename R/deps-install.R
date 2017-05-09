@@ -69,6 +69,7 @@ handle_finished_deps_install <- function(state, worker) {
   worker$process$kill()
   if (worker$process$get_exit_status()) {
     ## failed, we just stop the whole package
+    cleanup_library(state, worker)
     state$packages$state[wpkg] <- "done"
 
     rresult <- tryCatch(

@@ -75,9 +75,11 @@ handle_finished_check <- function(state, worker) {
       "checking-done"
 
     } else if (current_state == "checking-done" && iam_old) {
+      cleanup_library(state, worker)
       "done"
 
     } else if (current_state == "done-checking" && !iam_old) {
+      cleanup_library(state, worker)
       "done"
 
     } else {
