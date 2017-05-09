@@ -86,7 +86,17 @@ db_clean <- function(package) {
 db_list <- function(package) {
   if (!file.exists(check_dir(package, "db"))) return(character())
   if (!dbExistsTable(db(package), "revdeps")) return(character())
-  dbGetQuery(db(package), "SELECT DISTINCT package FROM revdeps")[[1]]
+  pkgs <- dbGetQuery(
+    db(package),
+    "SELECT DISTINCT package, which FROM revdeps"
+  )
+
+  ## Check if both the old and new run is done
+  package_names <- unique(pkgs$package)
+  Filter(
+    function(p) sum(pkgs$package == p) == 2,
+    package_names
+  )
 }
 
 #' @importFrom DBI dbExecute sqlInterpolate
