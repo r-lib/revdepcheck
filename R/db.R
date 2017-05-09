@@ -108,6 +108,16 @@ db_insert <- function(pkgdir, package, version, maintainer, status,
   which <- match.arg(which)
 
   db <- db(pkgdir)
+
+  ## To avoid duplicate records in the DB
+  dbExecute(db,
+    sqlInterpolate(db,
+      "DELETE FROM revdeps WHERE package = ?package AND which = ?which",
+      package = package,
+      which = which
+    )
+  )
+
   q <- "INSERT INTO revdeps
          (package, version, maintainer, status, which, duration,
           starttime, result, summary) VALUES
