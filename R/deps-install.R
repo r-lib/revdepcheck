@@ -14,7 +14,7 @@ do_deps_install <- function(state, task) {
       libdir,
       ip(
         packages,
-        dependencies = TRUE,
+        dependencies = FALSE,
         lib = libdir[1],
         quiet = quiet
       )
@@ -33,7 +33,7 @@ do_deps_install <- function(state, task) {
   packages <- setdiff(packages, state$options$pkgname)
 
   args <- list(
-    libdir = check_dir(pkgdir, "pkgold", pkgname),
+    libdir = check_dir(pkgdir, "pkg", pkgname),
     package = packages,
     quiet = state$options$quiet
   )
