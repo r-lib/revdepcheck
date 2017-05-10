@@ -45,7 +45,7 @@ run_event_loop <- function(state) {
   ## Our global progress bar
   state$progress_bar <- progress_bar$new(
     total = nrow(state$packages),
-    format = "[:current/:total] :spin :elapsed | ETA: :eta | :packages"
+    format = "[:current/:total] :spin :elapsedfull | ETA: :eta | :packages"
   )
 
   while (1) {
