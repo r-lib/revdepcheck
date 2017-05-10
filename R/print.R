@@ -26,12 +26,14 @@ print.revdepcheck_details <- function(x, ...) {
   ## First a summary
   cat("\n")
   cat(rule(left = "Summary"))
+  cat("\n")
   x2 <- x
   class(x2) <- "rcmdcheck_comparison"
   print(x2, header = FALSE)
 
   ## Old version
   cat(rule(left = "Before"))
+  cat("\n")
   if (inherits(x$old, "error")) {
     cat(red("<Error before the package check started>"))
   } else {
@@ -41,6 +43,7 @@ print.revdepcheck_details <- function(x, ...) {
   ## New version
   cat("\n")
   cat(rule(left = "After"))
+  cat("\n")
   if (inherits(x$new, "error")) {
     cat(red("<Error before the package check started>"))
   } else {
