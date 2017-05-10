@@ -38,6 +38,7 @@ print.revdepcheck_details <- function(x, ...) {
     cat(red("<Error before the package check started>"))
   } else {
     print(x$old[[1]], header = FALSE)
+    print_install_out(x$old[[1]])
   }
 
   ## New version
@@ -48,5 +49,24 @@ print.revdepcheck_details <- function(x, ...) {
     cat(red("<Error before the package check started>"))
   } else {
     print(x$new, header = FALSE)
+    print_install_out(x$new)
+  }
+}
+
+#' @importFrom rcmdcheck check_details
+
+print_install_out <- function(x) {
+  details <- check_details(x)
+  if (any(grepl("Installation failed.*00install.out.*for details",
+                details$errors))) {
+    out <- strsplit(details$install_out, "\n")[[1]]
+    cat("\n", symbol$line, symbol$line, sep = "")
+    if (length(out) > 15) {
+      cat(" 'install.out' contents (last 13 lines):\n")
+      out <- c("...", tail(out, 13))
+    } else {
+      cat(" 'install.out' contents:\n")
+    }
+    cat(out, sep = "\n")
   }
 }
