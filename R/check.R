@@ -110,7 +110,7 @@ handle_finished_check <- function(state, worker) {
     notes = length(chkres$notes)
   )
 
-  description <- desc::desc(text = chkres$output$description)
+  description <- desc::desc(text = chkres$description)
   maintainer <- description$get_maintainer()
 
   db_insert(
