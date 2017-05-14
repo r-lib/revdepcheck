@@ -1,6 +1,8 @@
 
 #' @importFrom processx process
 #' @importFrom callr r_process r_process_options
+#' @importFrom crancache available_packages
+#' @importFrom withr with_envvar
 
 do_deps_install <- function(state, task) {
 
@@ -31,6 +33,15 @@ do_deps_install <- function(state, task) {
   ## We don't want to install the revdep checked package again,
   ## that's in a separate library
   packages <- setdiff(packages, state$options$pkgname)
+
+  ## We do this, because if a package is not available,
+  ## utils::install.packages does not install anything, just gives a
+  ## warning
+  available <- with_envvar(
+    c(CRANCACHE_REPOS = "cran", CRANCACHE_QUIET = "yes"),
+    rownames(available_packages())
+  )
+  packages <- intersect(available, packages)
 
   args <- list(
     libdir = check_dir(pkgdir, "pkg", pkgname),
