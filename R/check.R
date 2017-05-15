@@ -23,10 +23,13 @@ do_check <- function(state, task) {
   ## We reverse the library, because the new version of the revdep checked
   ## package might have custom non-CRAN dependencies, and we want these
   ## to be first on the library path
-  px <- rcmdcheck_process$new(
-    path = tarball,
-    libpath = rev(lib),
-    args = c("-o", outdir)
+  px <- with_envvar(
+    c(RGL_USE_NULL = "TRUE", DISPLAY = ""),
+    rcmdcheck_process$new(
+      path = tarball,
+      libpath = rev(lib),
+      args = c("-o", outdir)
+    )
   )
 
   ## Update state
