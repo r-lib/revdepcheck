@@ -12,7 +12,7 @@ do_check <- function(state, task) {
   dir <- check_dir(pkgdir, "check", pkgname)
   lib <- check_dir(pkgdir, if (iam_old) "pkgold" else "pkgnew", pkgname)
   tarball <- with_envvar(
-    c(CRANCACHE_REPOS = "cran", CRANCACHE_QUIET = "yes"),
+    c(CRANCACHE_REPOS = "cran,bioc", CRANCACHE_QUIET = "yes"),
     crancache::download_packages(pkgname, dir)[,2]
   )
 

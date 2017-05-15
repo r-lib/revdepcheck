@@ -27,7 +27,7 @@ Imports:
     processx,
     progress,
     rcmdcheck,
-    remotes,
+    remotes (>= 1.0.0.9000),
     RSQLite,
     tools,
     utils,

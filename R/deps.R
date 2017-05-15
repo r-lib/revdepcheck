@@ -1,27 +1,20 @@
 
 #' @importFrom tools dependsOnPkgs
+#' @importFrom remotes bioc_install_repos
+#' @importFrom crancache available_packages
 
-cran_revdeps <- function(package, dependencies) {
+cran_revdeps <- function(package, dependencies, bioc) {
   stopifnot(is_string(package))
+  repos <- c(
+    if (bioc) bioc_install_repos(),
+    getOption("repos"),
+    c("CRAN-cloud" = "https://cloud.r-project.org")
+  )
+
   dependsOnPkgs(
     package,
     recursive = FALSE,
-    installed = cran_rds(),
+    installed = available_packages(repos = repos),
     dependencies = dependencies
   )
 }
-
-cran_rds <- (function() {
-  rds <- NULL
-  function() {
-    if (is.null(rds)) {
-      con <- gzcon(
-        url("http://cran.R-project.org/web/packages/packages.rds", "rb")
-      )
-      on.exit(close(con))
-      rds <<- readRDS(con)
-      rownames(rds) <<- rds[, "Package"]
-    }
-    rds
-  }
-})()

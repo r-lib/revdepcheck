@@ -8,7 +8,7 @@ revdep_check <- function(pkg = ".", dependencies = c("Depends", "Imports",
                                       "Suggests", "LinkingTo"),
                          overwrite = FALSE, quiet = TRUE,
                          timeout = as.difftime(10, units = "mins"),
-                         num_workers = 1) {
+                         num_workers = 1, bioc = TRUE) {
 
   pkg <- normalizePath(pkg)
 
@@ -29,7 +29,7 @@ revdep_check <- function(pkg = ".", dependencies = c("Depends", "Imports",
   "!DEBUG Installing CRAN (old) version"
   message("Installing CRAN version of package")
   with_envvar(
-    c(CRANCACHE_REPOS = "cran"),
+    c(CRANCACHE_REPOS = "cran,bioc"),
     with_libpaths(
       check_dir(pkg, "old"), {
         package_name <- get_package_name(pkg)[[1]]
@@ -42,7 +42,7 @@ revdep_check <- function(pkg = ".", dependencies = c("Depends", "Imports",
   "!DEBUG Installing new version from `pkg`"
   message("Installing DEV version of package")
   with_envvar(
-    c(CRANCACHE_REPOS = "cran"),
+    c(CRANCACHE_REPOS = "cran,bioc"),
     with_libpaths(
       check_dir(pkg, "new"),
       install_local(pkg, quiet = quiet)
@@ -51,7 +51,7 @@ revdep_check <- function(pkg = ".", dependencies = c("Depends", "Imports",
 
   ## Resume also works from an empty table
   revdep_resume(pkg, dependencies = dependencies, quiet = quiet,
-                timeout = timeout, num_workers = num_workers)
+                timeout = timeout, num_workers = num_workers, bioc = bioc)
 }
 
 #' @export
@@ -60,12 +60,12 @@ revdep_resume <- function(pkg = ".", dependencies = c("Depends", "Imports",
                                        "Suggests", "LinkingTo"),
                           quiet = TRUE,
                           timeout = as.difftime(10, units = "mins"),
-                          num_workers = 1) {
+                          num_workers = 1, bioc = TRUE) {
 
   pkg <- normalizePath(pkg)
   pkgname <- get_package_name(pkg)
 
-  revdeps <- cran_revdeps(pkgname, dependencies)
+  revdeps <- cran_revdeps(pkgname, dependencies, bioc = bioc)
   done <- db_list(pkg)
   todo <- setdiff(revdeps, done)
 

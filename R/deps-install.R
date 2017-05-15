@@ -10,7 +10,7 @@ do_deps_install <- function(state, task) {
   pkgname <- task$args[[1]]
 
   "!DEBUG Install dependencies for package `pkgname`"
-  func <- function(libdir, packages, quiet) {
+  func <- function(libdir, packages, quiet, repos) {
     ip <- crancache::install_packages
     withr::with_libpaths(
       libdir,
@@ -18,10 +18,19 @@ do_deps_install <- function(state, task) {
         packages,
         dependencies = FALSE,
         lib = libdir[1],
-        quiet = quiet
+        quiet = quiet,
+        repos = repos
       )
     )
   }
+
+  ## We set repos, so that dependencies from BioConductor are installed
+  ## automatically
+  repos <- c(
+    bioc_install_repos(),
+    getOption("repos"),
+    c("CRAN-cloud" = "https://cloud.r-project.org")
+  )
 
   ## We have to do this "manually", because some of the dependencies
   ## might be also dependencies of crancache, so they will be already
@@ -38,15 +47,16 @@ do_deps_install <- function(state, task) {
   ## utils::install.packages does not install anything, just gives a
   ## warning
   available <- with_envvar(
-    c(CRANCACHE_REPOS = "cran", CRANCACHE_QUIET = "yes"),
-    rownames(available_packages())
+    c(CRANCACHE_REPOS = "cran,bioc", CRANCACHE_QUIET = "yes"),
+    rownames(available_packages(repos = repos))
   )
   packages <- intersect(available, packages)
 
   args <- list(
     libdir = check_dir(pkgdir, "pkg", pkgname),
     package = packages,
-    quiet = state$options$quiet
+    quiet = state$options$quiet,
+    repos = repos
   )
 
   ## CRANCACHE_REPOS makes sure that we only use cached CRAN packages,
@@ -56,7 +66,7 @@ do_deps_install <- function(state, task) {
     args = args,
     system_profile = FALSE,
     user_profile = FALSE,
-    env = c(CRANCACHE_REPOS = "cran", CRANCACHE_QUIET = "yes")
+    env = c(CRANCACHE_REPOS = "cran,bioc", CRANCACHE_QUIET = "yes")
   )
   px <- r_process$new(px_opts)
 

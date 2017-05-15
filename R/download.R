@@ -17,7 +17,7 @@ do_download <- function(state, task) {
     args = list(pkgname = pkgname, dir = dir),
     system_profile = FALSE,
     user_profile = FALSE,
-    env = c(CRANCACHE_REPOS = "cran", CRANCACHE_QUIET = "yes")
+    env = c(CRANCACHE_REPOS = "cran,bioc", CRANCACHE_QUIET = "yes")
   )
   px <- r_process$new(px_opts)
 
