@@ -65,6 +65,7 @@ revdep_resume <- function(pkg = ".", dependencies = c("Depends", "Imports",
   pkg <- normalizePath(pkg)
   pkgname <- get_package_name(pkg)
 
+  "!DEBUG getting reverse dependencies for `basename(pkg)`"
   revdeps <- cran_revdeps(pkgname, dependencies, bioc = bioc)
   done <- db_list(pkg)
   todo <- setdiff(revdeps, done)

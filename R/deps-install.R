@@ -37,6 +37,7 @@ do_deps_install <- function(state, task) {
   ## installed in another library directory, and also loaded.
   ## But we want to install everything into the package's specific library,
   ## because this is the only library used for the check.
+  "!DEBUG Querying dependencies of `pkgname`"
   packages <- deps_for_package(pkgname)
 
   ## We don't want to install the revdep checked package again,
@@ -46,6 +47,7 @@ do_deps_install <- function(state, task) {
   ## We do this, because if a package is not available,
   ## utils::install.packages does not install anything, just gives a
   ## warning
+  "!DEBUG dropping unavailable dependencies for `pkgname`"
   available <- with_envvar(
     c(CRANCACHE_REPOS = "cran,bioc", CRANCACHE_QUIET = "yes"),
     rownames(available_packages(repos = repos))
