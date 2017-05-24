@@ -105,9 +105,10 @@ handle_finished_deps_install <- function(state, worker) {
 
     for (which in c("old", "new")) {
       db_insert(
-        state$options$pkgdir, worker$package, status = "PREPERROR",
-        which = which, duration = duration, starttime = starttime,
-        result = TOJSON(result), summary = NULL
+        state$options$pkgdir, worker$package, version = NULL,
+        status = "PREPERROR", which = which, duration = duration,
+        starttime = starttime, result = unclass(toJSON(result)),
+        summary = NULL
       )
     }
 

@@ -101,9 +101,9 @@ db_list <- function(package) {
 
 #' @importFrom DBI dbExecute sqlInterpolate
 
-db_insert <- function(pkgdir, package, version, maintainer, status,
-                      which = c("old", "new"),
-                      duration, starttime, result, summary) {
+db_insert <- function(pkgdir, package, version = NULL, maintainer = NULL,
+                      status, which = c("old", "new"), duration, starttime,
+                      result, summary) {
 
   which <- match.arg(which)
 
@@ -124,11 +124,15 @@ db_insert <- function(pkgdir, package, version, maintainer, status,
          (?package, ?version, ?maintainer, ?status, ?which, ?duration,
           ?starttime, ?result, ?summary)"
 
+
+  ## TODO: better way to get version, maintainer, so they are never NULL
   dbExecute(db,
     sqlInterpolate(db, q,
-      package = package, version = version %||% "", maintainer = maintainer,
+      package = package, version = version %||% "",
+      maintainer = maintainer %||% "",
       status = status, which = which, duration = duration,
-      starttime = starttime, result = result, summary = summary
+      starttime = as.character(starttime), result = result,
+      summary = summary %||% ""
     )
   )
 }
