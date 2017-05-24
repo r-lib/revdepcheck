@@ -51,6 +51,7 @@ run_event_loop <- function(state) {
   while (1) {
     "!DEBUG event loop iteration, `length(state$workers)` workers"
     state$progress_bar$tick(0, tokens = list(packages = checking_now(state)))
+    check_for_timeouts(state)
     if (are_we_done(state)) break;
     events <- poll(state)
     state <- handle_events(state, events)
@@ -60,6 +61,24 @@ run_event_loop <- function(state) {
 
   "!DEBUG event loop is done"
   NULL
+}
+
+## In case of a timeout, we just kill the process here.
+## This will trigger an event for it, that will be picked up by
+## handle_events(). If we failed to kill it (because it finished, just
+## before the kill signal, that is fine, too, then handle_events()
+## will consider it as a normal termination.
+
+check_for_timeouts <- function(state) {
+  now <- Sys.time()
+  for (w in state$workers) {
+    if (now - w$process$get_start_time() > state$options$timeout &&
+        w$process$is_alive()) {
+      "!DEBUG Killing worker for package `w$package`"
+      w$killed <- TRUE
+      w$process$kill()
+    }
+  }
 }
 
 are_we_done <- function(state) {

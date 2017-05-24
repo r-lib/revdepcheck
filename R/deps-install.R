@@ -93,10 +93,15 @@ handle_finished_deps_install <- function(state, worker) {
     cleanup_library(state, worker)
     state$packages$state[wpkg] <- "done"
 
-    rresult <- tryCatch(
-      worker$process$get_result(),
-      error = function(e) conditionMessage(e)
-    )
+    rresult <- if (isTRUE(worker$killed)) {
+      "Process was killed while installing dependencies"
+    } else {
+      tryCatch(
+        worker$process$get_result(),
+        error = function(e) conditionMessage(e)
+      )
+    }
+
     result <- list(
       stdout = worker$stdout,
       stderr = worker$stderr,
