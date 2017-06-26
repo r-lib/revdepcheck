@@ -34,7 +34,7 @@ Imports:
     withr
 Remotes:
     r-pkgs/boxes,
-    r-pkgs/callr@background,
+    r-pkgs/callr,
     r-hub/crancache,
     gaborcsardi/progress,
     r-lib/rcmdcheck@background,
