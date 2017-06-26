@@ -37,6 +37,6 @@ Remotes:
     r-pkgs/callr@background,
     r-hub/crancache,
     gaborcsardi/progress,
-    r-pkgs/rcmdcheck@background,
-    r-pkgs/remotes
+    r-lib/rcmdcheck@background,
+    r-lib/remotes
 Encoding: UTF-8
