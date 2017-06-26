@@ -36,7 +36,7 @@ Imports:
 Remotes:
     r-pkgs/boxes,
     r-pkgs/callr,
-    r-hub/crancache,
+    r-hub/crancache@0185576111,
     gaborcsardi/progress,
     r-lib/rcmdcheck,
     r-lib/remotes
