@@ -97,7 +97,9 @@ handle_finished_deps_install <- function(state, worker) {
 
     rresult <- if (isTRUE(worker$killed)) {
       "Process was killed while installing dependencies"
+      status <- "TIMEOUT"
     } else {
+      status <- "PREPERROR"
       tryCatch(
         worker$process$get_result(),
         error = function(e) conditionMessage(e)
@@ -113,7 +115,7 @@ handle_finished_deps_install <- function(state, worker) {
     for (which in c("old", "new")) {
       db_insert(
         state$options$pkgdir, worker$package, version = NULL,
-        status = "PREPERROR", which = which, duration = duration,
+        status = status, which = which, duration = duration,
         starttime = starttime, result = unclass(toJSON(result)),
         summary = NULL
       )

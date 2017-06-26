@@ -90,12 +90,18 @@ handle_finished_check <- function(state, worker) {
     }
   state$packages$state[wpkg] <- new_state
 
-  chkres <- tryCatch(
-    worker$process$parse_results(),
-    error = function(e) e
-  )
+  chkres <- if (isTRUE(worker$killed)) {
+    "Process was killed while checking"
+  } else {
+    tryCatch(
+      worker$process$parse_results(),
+      error = function(e) e
+    )
+  }
 
-  status <- if (!inherits(chkres, "rcmdcheck")) {
+  status <- if (isTRUE(worker$killed)) {
+    "TIMEOUT"
+  } else if (!inherits(chkres, "rcmdcheck")) {
     "PREPERROR"
   } else if (length(chkres$errors)) {
     "ERROR"
