@@ -46,6 +46,13 @@ run_event_loop <- function(state) {
     format = "[:current/:total] :elapsedfull | ETA: :eta | :packages"
   )
 
+  # Initialise one task for each worker
+  for (i in seq_len(state$options$num_workers)) {
+    state$progress_bar$tick(0, tokens = list(packages = checking_now(state)))
+    task <- schedule_next_task(state)
+    state <- do_task(state, task)
+  }
+
   while (1) {
     "!DEBUG event loop iteration, `length(state$workers)` workers"
     state$progress_bar$tick(0, tokens = list(packages = checking_now(state)))
