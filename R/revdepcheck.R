@@ -27,11 +27,23 @@ revdep_check <- function(pkg = ".", dependencies = c("Depends", "Imports",
 
 #' @export
 
-revdep_setup <- function(pkg, overwrite = TRUE) {
+revdep_setup <- function(pkg, overwrite = FALSE) {
   if (!overwrite && check_existing_checks(pkg)) {
-    stop("Reverse dependency results already exist, call\n",
+    if (!interactive()) {
+      stop("Reverse dependency results already exist, call\n",
          "  revdep_check() with `overwrite = TRUE`, or use\n",
-         "  revdep_resume()")
+         "  revdep_resume()", call. = FALSE)
+    } else {
+      choice <- menu(
+        title = "Reverse dependency results already exist",
+        c("Overwrite", "Resume")
+      )
+
+      if (choice == 1) {
+        db_clean(pkg)
+      }
+      return()
+    }
   }
 
   db_setup(pkg)              # Make sure it exists
