@@ -139,21 +139,9 @@ revdep_add <- function(pkg = ".", packages) {
 
 revdep_add_broken <- function(pkg = ".") {
   packages <- revdep_results(pkg, db_list(pkg))
+  broken <- vapply(packages, is_broken, integer(1))
 
-  n_broken_type <- function(x, type) {
-    recs <- x$cmp[x$cmp$type == type, , drop = FALSE]
-    old <- unique(recs$hash[recs$which == "old"])
-    new <- unique(recs$hash[recs$which == "new"])
-
-    length(setdiff(new, old))
-  }
-  n_broken <- function(x) {
-    n_broken_type(x, "error") + n_broken_type(x, "warning") + n_broken_type(x, "note")
-  }
-
-  ok <- vapply(packages, n_broken, integer(1)) == 0
-
-  to_add <- db_list(pkg)[!ok]
+  to_add <- db_list(pkg)[broken]
   if (length(to_add) == 0) {
     message("No broken packages to re-test")
   } else {
