@@ -58,7 +58,7 @@ do_check <- function(state, task) {
   state
 }
 
-check_env_vars <- function(check_version = FALSE, force_suggests = TRUE) {
+check_env_vars <- function(check_version = FALSE, force_suggests = FALSE) {
   c(
     aspell_env_var(),
     # Switch off expensive check for package version
