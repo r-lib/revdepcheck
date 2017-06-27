@@ -14,20 +14,22 @@ revdep_check <- function(pkg = ".", dependencies = c("Depends", "Imports",
   pkg <- normalizePath(pkg, mustWork = FALSE)
   stopifnot(is_package_dir(pkg))
 
-  ## Creates if needed; stops if exists & !overwrite
-  revdep_setup(pkg, overwrite = overwrite)
+  ## Creates and initializes database, including computing revdeps
+  revdep_setup(pkg, overwrite = overwrite, dependencies = dependencies, bioc = bioc)
 
   ## Install CRAN and dev versions
   revdep_install(pkg, quiet = quiet)
 
   ## Resume also works from an empty table
-  revdep_resume(pkg, dependencies = dependencies, quiet = quiet,
-                timeout = timeout, num_workers = num_workers, bioc = bioc)
+  revdep_resume(pkg, quiet = quiet, timeout = timeout, num_workers = num_workers)
 }
 
 #' @export
 
-revdep_setup <- function(pkg, overwrite = FALSE) {
+revdep_setup <- function(pkg, overwrite = FALSE,
+                         dependencies = c("Depends", "Imports",
+                                          "Suggests", "LinkingTo"),
+                         bioc = TRUE) {
   if (!overwrite && check_existing_checks(pkg)) {
     if (!interactive()) {
       stop("Reverse dependency results already exist, call\n",
@@ -39,15 +41,20 @@ revdep_setup <- function(pkg, overwrite = FALSE) {
         c("Overwrite", "Resume")
       )
 
-      if (choice == 1) {
-        db_clean(pkg)
+      if (choice == 2) {
+        return()
       }
-      return()
     }
   }
 
   db_setup(pkg)              # Make sure it exists
   db_clean(pkg)              # Delete all records
+
+  "!DEBUG getting reverse dependencies for `basename(pkg)`"
+  pkgname <- get_package_name(pkg)
+  message("Determining revdeps for ", pkgname)
+  revdeps <- cran_revdeps(pkgname, dependencies, bioc = bioc)
+  db_todo_add(pkg, revdeps)
 }
 
 #' @export
@@ -85,9 +92,7 @@ revdep_install <- function(pkg, quiet = FALSE) {
 
 #' @export
 
-revdep_resume <- function(pkg = ".", dependencies = c("Depends", "Imports",
-                                       "Suggests", "LinkingTo"),
-                          quiet = TRUE,
+revdep_resume <- function(pkg = ".", quiet = TRUE,
                           timeout = as.difftime(10, units = "mins"),
                           num_workers = 1, bioc = TRUE) {
 
@@ -95,11 +100,7 @@ revdep_resume <- function(pkg = ".", dependencies = c("Depends", "Imports",
   pkgname <- get_package_name(pkg)
   message(center = rule(center = "REVDEP CHECKS", line_color = "black"))
 
-  "!DEBUG getting reverse dependencies for `basename(pkg)`"
-  message("Determining revdeps")
-  revdeps <- cran_revdeps(pkgname, dependencies, bioc = bioc)
-  done <- db_list(pkg)
-  todo <- setdiff(revdeps, done)
+  todo <- db_todo(pkg)
 
   state <- list(
     options = list(

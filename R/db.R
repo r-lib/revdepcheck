@@ -29,6 +29,7 @@ db_setup <- function(package) {
 
   dbExecute(db, "DROP TABLE IF EXISTS revdeps")
   dbExecute(db, "DROP TABLE IF EXISTS metadata")
+  dbExecute(db, "DROP TABLE IF EXISTS todo")
 
   dbExecute(db, "CREATE TABLE metadata (name TEXT, value TEXT)")
 
@@ -53,6 +54,8 @@ db_setup <- function(package) {
     )"
   )
   dbExecute(db, "CREATE INDEX idx_revdeps_package ON revdeps(package)")
+
+  dbExecute(db, "CREATE TABLE todo (package TEXT)")
 }
 
 #' @importFrom DBI dbExecute sqlInterpolate
@@ -99,6 +102,23 @@ db_list <- function(package) {
   )
 }
 
+#' @importFrom DBI dbGetQuery
+
+db_todo <- function(pkgdir) {
+  db <- db(pkgdir)
+
+  dbGetQuery(db, "SELECT package FROM todo")[[1]]
+}
+
+#' @importFrom DBI dbWriteTable
+
+db_todo_add <- function(pkgdir, packages) {
+  db <- db(pkgdir)
+
+  df <- data.frame(package = packages, stringsAsFactors = FALSE)
+  dbWriteTable(db, "todo", df, append = TRUE)
+}
+
 #' @importFrom DBI dbExecute sqlInterpolate
 
 db_insert <- function(pkgdir, package, version = NULL, maintainer = NULL,
@@ -115,6 +135,12 @@ db_insert <- function(pkgdir, package, version = NULL, maintainer = NULL,
       "DELETE FROM revdeps WHERE package = ?package AND which = ?which",
       package = package,
       which = which
+    )
+  )
+  dbExecute(db,
+    sqlInterpolate(db,
+      "DELETE FROM todo WHERE package = ?package",
+      package = package
     )
   )
 
