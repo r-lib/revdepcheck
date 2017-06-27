@@ -84,6 +84,7 @@ revdep_resume <- function(pkg = ".", dependencies = c("Depends", "Imports",
   message(center = rule(center = "REVDEP CHECKS", line_color = "black"))
 
   "!DEBUG getting reverse dependencies for `basename(pkg)`"
+  message("Determining revdeps")
   revdeps <- cran_revdeps(pkgname, dependencies, bioc = bioc)
   done <- db_list(pkg)
   todo <- setdiff(revdeps, done)
@@ -102,6 +103,7 @@ revdep_resume <- function(pkg = ".", dependencies = c("Depends", "Imports",
   )
 
   if (length(todo)) {
+    message("Starting checks")
     run_event_loop(state)
   } else {
     message("All reverse dependencies were checked already:")
