@@ -42,6 +42,8 @@ revdep_setup <- function(pkg, overwrite = TRUE) {
 
 revdep_install <- function(pkg, quiet = FALSE) {
 
+  message(rule(center = "INSTALL", line_color = "black"))
+
   ## Install the package itself, both versions, first the CRAN version
   ## We instruct crancache to only use the cache of CRAN packages
   ## (to avoid installing locally installed newer versions.
@@ -79,6 +81,7 @@ revdep_resume <- function(pkg = ".", dependencies = c("Depends", "Imports",
 
   pkg <- normalizePath(pkg)
   pkgname <- get_package_name(pkg)
+  message(center = rule(center = "REVDEP CHECKS", line_color = "black"))
 
   "!DEBUG getting reverse dependencies for `basename(pkg)`"
   revdeps <- cran_revdeps(pkgname, dependencies, bioc = bioc)
