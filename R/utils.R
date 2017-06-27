@@ -75,3 +75,5 @@ col_align <- function(text, width = getOption("width"),
 make_space <- function(num, filling = " ") {
   strrep(filling, num)
 }
+
+compact <- function(x) Filter(Negate(is.null), x)

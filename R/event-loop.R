@@ -84,14 +84,15 @@ are_we_done <- function(state) {
 }
 
 checking_now <- function(state) {
-  if (length(state$workers) == 0) {
+  workers <- compact(state$workers)
+  if (length(workers) == 0) {
     return()
   }
 
-  pkgs <- vapply(state$workers, "[[", "package", FUN.VALUE = character(1))
+  pkgs <- vapply(workers, "[[", "package", FUN.VALUE = character(1))
   ord <- order(pkgs)
 
-  tasks <- vapply(state$workers, function(x) x$task$name, FUN.VALUE = character(1))
+  tasks <- vapply(workers, function(x) x$task$name, FUN.VALUE = character(1))
   task_lookup <- c("download" = "D", "deps_install" = "I", "check" = "C")
   tasks_abbr <- unname(task_lookup[tasks])
 
