@@ -93,7 +93,7 @@ are_we_done <- function(state) {
 checking_now <- function(state) {
   workers <- compact(state$workers)
   if (length(workers) == 0) {
-    return()
+    return("")
   }
 
   pkgs <- vapply(workers, "[[", "package", FUN.VALUE = character(1))
