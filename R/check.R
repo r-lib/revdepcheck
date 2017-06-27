@@ -24,7 +24,7 @@ do_check <- function(state, task) {
   ## package might have custom non-CRAN dependencies, and we want these
   ## to be first on the library path
   px <- with_envvar(
-    c(RGL_USE_NULL = "TRUE", DISPLAY = ""),
+    check_env_vars(),
     rcmdcheck_process$new(
       path = tarball,
       libpath = rev(lib),
@@ -57,6 +57,24 @@ do_check <- function(state, task) {
 
   state
 }
+
+check_env_vars <- function(check_version = FALSE, force_suggests = TRUE) {
+  c(
+    aspell_env_var(),
+    "_R_CHECK_CRAN_INCOMING_" = as.character(check_version),
+    "_R_CHECK_FORCE_SUGGESTS_" = as.character(force_suggests),
+    "RGL_USE_NULL" = "TRUE",
+    DISPLAY = ""
+  )
+}
+
+aspell_env_var <- function() {
+  tryCatch({
+    utils::aspell(NULL)
+    c("_R_CHECK_CRAN_INCOMING_USE_ASPELL_" = "TRUE")
+  }, error = function(e) character())
+}
+
 
 handle_finished_check <- function(state, worker) {
   starttime <- worker$process$get_start_time()
