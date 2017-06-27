@@ -15,7 +15,21 @@ try_compare_checks <- function(old, new, package, version) {
     )
 
   } else {
-    compare_checks(old, new)
+    tryCatch(
+      compare_checks(old, new),
+      error = function(e) {
+        structure(
+          list(
+            old = old,
+            new = new,
+            cmp = NULL,
+            package = package,
+            version = version
+          ),
+          class = "rcmdcheck_error"
+        )
+      }
+    )
   }
 }
 
