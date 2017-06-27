@@ -77,3 +77,8 @@ make_space <- function(num, filling = " ") {
 }
 
 compact <- function(x) Filter(Negate(is.null), x)
+
+clear_line <- function(width = getOption("width")) {
+  spaces <- paste(rep(" ", width), collapse = "")
+  cat("\r", spaces, "\r", sep = "")
+}
