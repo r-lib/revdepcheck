@@ -118,7 +118,7 @@ revdep_resume <- function(pkg = ".", dependencies = c("Depends", "Imports",
     message("Starting checks")
     run_event_loop(state)
   } else {
-    message("All reverse dependencies were checked already:")
+    message("All reverse dependencies were checked already")
   }
 
   invisible(revdep_results(pkg))
