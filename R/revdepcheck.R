@@ -11,7 +11,7 @@ revdep_check <- function(pkg = ".", dependencies = c("Depends", "Imports",
                          timeout = as.difftime(10, units = "mins"),
                          num_workers = 1, bioc = TRUE) {
 
-  pkg <- normalizePath(pkg)
+  pkg <- normalizePath(pkg, mustWork = FALSE)
   stopifnot(is_package_dir(pkg))
 
   ## Creates if needed; stops if exists & !overwrite
@@ -79,7 +79,7 @@ revdep_resume <- function(pkg = ".", dependencies = c("Depends", "Imports",
                           timeout = as.difftime(10, units = "mins"),
                           num_workers = 1, bioc = TRUE) {
 
-  pkg <- normalizePath(pkg)
+  pkg <- normalizePath(pkg, mustWork = FALSE)
   pkgname <- get_package_name(pkg)
   message(center = rule(center = "REVDEP CHECKS", line_color = "black"))
 
