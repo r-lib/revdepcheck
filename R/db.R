@@ -117,6 +117,8 @@ db_todo_add <- function(pkgdir, packages) {
 
   df <- data.frame(package = packages, stringsAsFactors = FALSE)
   dbWriteTable(db, "todo", df, append = TRUE)
+
+  invisible(pkgdir)
 }
 
 #' @importFrom DBI dbExecute sqlInterpolate
