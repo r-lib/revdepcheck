@@ -60,7 +60,6 @@ do_check <- function(state, task) {
 
 check_env_vars <- function(check_version = FALSE, force_suggests = FALSE) {
   c(
-    aspell_env_var(),
     # Switch off expensive check for package version
     # https://github.com/hadley/devtools/issues/1271
     if (getRversion() >= "3.4.0" && as.numeric(R.version[["svn rev"]]) >= 70944) {
@@ -73,14 +72,6 @@ check_env_vars <- function(check_version = FALSE, force_suggests = FALSE) {
     DISPLAY = ""
   )
 }
-
-aspell_env_var <- function() {
-  tryCatch({
-    utils::aspell(NULL)
-    c("_R_CHECK_CRAN_INCOMING_USE_ASPELL_" = "TRUE")
-  }, error = function(e) character())
-}
-
 
 handle_finished_check <- function(state, worker) {
   starttime <- worker$process$get_start_time()
