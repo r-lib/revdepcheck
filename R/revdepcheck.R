@@ -12,17 +12,35 @@ revdep_check <- function(pkg = ".", dependencies = c("Depends", "Imports",
                          num_workers = 1, bioc = TRUE) {
 
   pkg <- normalizePath(pkg)
-
   stopifnot(is_package_dir(pkg))
 
+  ## Creates if needed; stops if exists & !overwrite
+  revdep_setup(pkg, overwrite = overwrite)
+
+  ## Install CRAN and dev versions
+  revdep_install(pkg, quiet = quiet)
+
+  ## Resume also works from an empty table
+  revdep_resume(pkg, dependencies = dependencies, quiet = quiet,
+                timeout = timeout, num_workers = num_workers, bioc = bioc)
+}
+
+#' @export
+
+revdep_setup <- function(pkg, overwrite = TRUE) {
   if (!overwrite && check_existing_checks(pkg)) {
     stop("Reverse dependency results already exist, call\n",
          "  revdep_check() with `overwrite = TRUE`, or use\n",
          "  revdep_resume()")
   }
 
-  ## Also creates it if needed
-  revdep_clean(pkg)
+  db_setup(pkg)              # Make sure it exists
+  db_clean(pkg)              # Delete all records
+}
+
+#' @export
+
+revdep_install <- function(pkg, quiet = FALSE) {
 
   ## Install the package itself, both versions, first the CRAN version
   ## We instruct crancache to only use the cache of CRAN packages
@@ -49,10 +67,6 @@ revdep_check <- function(pkg = ".", dependencies = c("Depends", "Imports",
       install_local(pkg, quiet = quiet)
     )
   )
-
-  ## Resume also works from an empty table
-  revdep_resume(pkg, dependencies = dependencies, quiet = quiet,
-                timeout = timeout, num_workers = num_workers, bioc = bioc)
 }
 
 #' @export
@@ -91,11 +105,6 @@ revdep_resume <- function(pkg = ".", dependencies = c("Depends", "Imports",
   }
 
   invisible(revdep_results(pkg))
-}
-
-revdep_clean <- function(pkg) {
-  db_setup(pkg)              # Make sure it exists
-  db_clean(pkg)              # Delete all records
 }
 
 check_existing_checks <- function(pkg) {
