@@ -88,8 +88,14 @@ checking_now <- function(state) {
     return()
   }
 
-  pkgs <- sort(unlist(lapply(state$workers, "[[", "package")))
-  str <- paste(pkgs, collapse = ", ")
+  pkgs <- vapply(state$workers, "[[", "package", FUN.VALUE = character(1))
+  ord <- order(pkgs)
+
+  tasks <- vapply(state$workers, function(x) x$task$name, FUN.VALUE = character(1))
+  task_lookup <- c("download" = "D", "deps_install" = "I", "check" = "C")
+  tasks_abbr <- unname(task_lookup[tasks])
+
+  str <- paste0(pkgs[ord], " [", tasks_abbr[ord], "]", collapse = ", ")
   paste0("(", length(pkgs), ") ", substr(str, 1, 50))
 }
 
