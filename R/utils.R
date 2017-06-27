@@ -82,3 +82,13 @@ clear_line <- function(width = getOption("width")) {
   spaces <- paste(rep(" ", width), collapse = "")
   cat("\r", spaces, "\r", sep = "")
 }
+
+str_trunc <- function(x, n) {
+  if (n <= 3) {
+    substr("...", 1, n)
+  } else if (nchar(x) < n) {
+    x
+  } else {
+    paste0(substr(x, 1, n - 3), "...")
+  }
+}

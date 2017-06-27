@@ -103,8 +103,9 @@ checking_now <- function(state) {
   task_lookup <- c("download" = "D", "deps_install" = "I", "check" = "C")
   tasks_abbr <- unname(task_lookup[tasks])
 
+  width <- getOption("width") - 35 # conservative estimate
   str <- paste0(pkgs[ord], " [", tasks_abbr[ord], "]", collapse = ", ")
-  paste0("(", length(pkgs), ") ", substr(str, 1, 50))
+  paste0("(", length(pkgs), ") ", str_trunc(str, width))
 }
 
 poll <- function(state) {
