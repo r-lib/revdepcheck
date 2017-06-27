@@ -86,6 +86,10 @@ are_we_done <- function(state) {
 }
 
 checking_now <- function(state) {
+  if (length(state$workers) == 0) {
+    return()
+  }
+
   pkgs <- sort(unlist(lapply(state$workers, "[[", "package")))
   str <- paste(pkgs, collapse = ", ")
   paste0("(", length(pkgs), ") ", substr(str, 1, 50))
@@ -186,7 +190,7 @@ schedule_next_task <- function(state) {
   }
 
   ## done-downloaded -> done-checking
-  ready <- state$package$state == "done-downloaded"
+  ready <- state$packages$state == "done-downloaded"
   if (any(ready)) {
     pkg <- state$packages$package[ready][1]
     return(task("check", pkg, "new"))
