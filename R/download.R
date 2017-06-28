@@ -39,7 +39,7 @@ download_done <- function(state, worker) {
   state
 }
 
-download <- function(pkgdir, pkgname) {
+download <- function(pkgdir, pkgname, new_session = FALSE) {
   px_opts <- download_opts(pkgdir, pkgname)
   execute_r(px_opts, new_session = new_session)
 }
