@@ -3,25 +3,26 @@
 
 check_proc <- function(pkgdir, pkgname, iam_old = TRUE) {
   dir <- check_dir(pkgdir, "check", pkgname)
-  lib <- check_dir(pkgdir, if (iam_old) "pkgold" else "pkgnew", pkgname)
-  out <- file.path(dir, if (iam_old) "old" else "new")
-
   tarball <- with_envvar(
     c(CRANCACHE_REPOS = "cran,bioc", CRANCACHE_QUIET = "yes"),
     crancache::download_packages(pkgname, dir)[,2]
   )
 
+  out <- file.path(dir, if (iam_old) "old" else "new")
   unlink(out, recursive = TRUE)
   dir.create(out, recursive = TRUE, showWarnings = FALSE)
 
   ## We reverse the library, because the new version of the revdep checked
   ## package might have custom non-CRAN dependencies, and we want these
   ## to be first on the library path
+  lib <- rev(check_dir(pkgdir, if (iam_old) "pkgold" else "pkgnew", pkgname))
+  library_info(file.path(out, "libraries.txt"), lib)
+
   with_envvar(
     check_env_vars(),
     rcmdcheck_process$new(
       path = tarball,
-      libpath = rev(lib),
+      libpath = lib,
       args = c("-o", out)
     )
   )
@@ -166,3 +167,19 @@ check <- function(pkgdir, pkgname, iam_old = TRUE) {
 
   invisible(res)
 }
+
+library_info <- function(file = "", libpath = .libPaths()) {
+  libraries <- lapply(libpath, installed.packages)
+
+  package_list <- function(library) {
+    nv <- paste0(format(library[, "Package"]), " (", library[, "Version"], ")")
+    paste0(nv, "\n", collapse = "")
+  }
+
+  library_sum <- vapply(libraries, package_list, character(1))
+  cat(
+    paste0("Library: ", libpath, "\n", library_sum, collapse = "\n"),
+    file = file
+  )
+}
+
