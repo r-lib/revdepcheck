@@ -30,6 +30,7 @@ Imports:
     rcmdcheck (>= 1.2.1.9000),
     remotes (>= 1.0.0.9000),
     RSQLite,
+    sessioninfo,
     tools,
     utils,
     withr
