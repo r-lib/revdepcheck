@@ -66,6 +66,7 @@ check_task <- function(state, task) {
 
 check_env_vars <- function(check_version = FALSE, force_suggests = FALSE) {
   c(
+    "R_ENVIRON_USER" = tempfile(),
     # Switch off expensive check for package version
     # https://github.com/hadley/devtools/issues/1271
     if (getRversion() >= "3.4.0" && as.numeric(R.version[["svn rev"]]) >= 70944) {
