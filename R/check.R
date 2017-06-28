@@ -1,21 +1,23 @@
 
 #' @importFrom rcmdcheck rcmdcheck_process
 
-check_proc <- function(pkgdir, pkgname, iam_old = TRUE) {
+check_proc <- function(pkgdir, pkgname, version = c("old", "new")) {
+  version <- match.arg(version)
+
   dir <- check_dir(pkgdir, "check", pkgname)
   tarball <- with_envvar(
     c(CRANCACHE_REPOS = "cran,bioc", CRANCACHE_QUIET = "yes"),
     crancache::download_packages(pkgname, dir)[,2]
   )
 
-  out <- file.path(dir, if (iam_old) "old" else "new")
+  out <- file.path(dir, version)
   unlink(out, recursive = TRUE)
   dir.create(out, recursive = TRUE, showWarnings = FALSE)
 
   ## We reverse the library, because the new version of the revdep checked
   ## package might have custom non-CRAN dependencies, and we want these
   ## to be first on the library path
-  lib <- rev(check_dir(pkgdir, if (iam_old) "pkgold" else "pkgnew", pkgname))
+  lib <- rev(check_dir(pkgdir, paste0("pkg", version), pkgname))
   library_info(file.path(out, "libraries.txt"), lib)
 
   with_envvar(
@@ -31,10 +33,10 @@ check_proc <- function(pkgdir, pkgname, iam_old = TRUE) {
 check_task <- function(state, task) {
   pkgdir <- state$options$pkgdir
   pkgname <- task$args[[1]]
-  iam_old <- task$args[[2]] == "old"
+  version <- task$args[[2]]
 
   "!DEBUG Checking `pkgname`"
-  px <- check_proc(pkgdir, pkgname, iam_old)
+  px <- check_proc(pkgdir, pkgname, version = version)
 
   ## Update state
   worker <- list(process = px, package = pkgname,
@@ -45,13 +47,13 @@ check_task <- function(state, task) {
   current_state <- state$packages$state[wpkg]
 
   new_state <-
-    if (current_state == "downloaded" && iam_old) {
+    if (current_state == "downloaded" && version == "old") {
       "checking"
 
-    } else if (current_state == "checking" && !iam_old) {
+    } else if (current_state == "checking" && version == "new") {
       "checking-checking"
 
-    } else if (current_state == "done-downloaded" && !iam_old) {
+    } else if (current_state == "done-downloaded" && version == "new") {
       "done-checking"
 
     } else {
