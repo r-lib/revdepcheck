@@ -1,36 +1,39 @@
 
 #' @importFrom rcmdcheck rcmdcheck_process
 
-do_check <- function(state, task) {
-
-  pkgdir <- state$options$pkgdir
-  pkgname <- task$args[[1]]
-  iam_old <- task$args[[2]] == "old"
-
-  "!DEBUG Checking `pkgname`"
-
+check_proc <- function(pkgdir, pkgname, iam_old = TRUE) {
   dir <- check_dir(pkgdir, "check", pkgname)
   lib <- check_dir(pkgdir, if (iam_old) "pkgold" else "pkgnew", pkgname)
+  out <- file.path(dir, if (iam_old) "old" else "new")
+
   tarball <- with_envvar(
     c(CRANCACHE_REPOS = "cran,bioc", CRANCACHE_QUIET = "yes"),
     crancache::download_packages(pkgname, dir)[,2]
   )
 
-  outdir <- file.path(dir, task$args[[2]])
-  unlink(outdir, recursive = TRUE)
-  dir.create(outdir, recursive = TRUE, showWarnings = FALSE)
+  unlink(out, recursive = TRUE)
+  dir.create(out, recursive = TRUE, showWarnings = FALSE)
 
   ## We reverse the library, because the new version of the revdep checked
   ## package might have custom non-CRAN dependencies, and we want these
   ## to be first on the library path
-  px <- with_envvar(
+  with_envvar(
     check_env_vars(),
     rcmdcheck_process$new(
       path = tarball,
       libpath = rev(lib),
-      args = c("-o", outdir)
+      args = c("-o", out)
     )
   )
+}
+
+check_task <- function(state, task) {
+  pkgdir <- state$options$pkgdir
+  pkgname <- task$args[[1]]
+  iam_old <- task$args[[2]] == "old"
+
+  "!DEBUG Checking `pkgname`"
+  px <- check_proc(pkgdir, pkgname, iam_old)
 
   ## Update state
   worker <- list(process = px, package = pkgname,
@@ -73,7 +76,7 @@ check_env_vars <- function(check_version = FALSE, force_suggests = FALSE) {
   )
 }
 
-handle_finished_check <- function(state, worker) {
+check_done <- function(state, worker) {
   starttime <- worker$process$get_start_time()
   duration <- as.numeric(Sys.time() - starttime)
   wpkg <- match(worker$package, state$packages$package)
@@ -152,4 +155,14 @@ handle_finished_check <- function(state, worker) {
   }
 
   state
+}
+
+check <- function(pkgdir, pkgname, iam_old = TRUE) {
+  proc <- check_proc(pkgdir, pkgname, iam_old)
+  proc$wait()
+
+  res <- proc$parse_results()
+  print(res)
+
+  invisible(res)
 }

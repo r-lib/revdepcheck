@@ -92,3 +92,21 @@ str_trunc <- function(x, n) {
     paste0(substr(x, 1, n - 3), "...")
   }
 }
+
+
+#' @importFrom withr with_options with_libpaths with_envvar
+
+execute_r <- function(px_opts, new_session = FALSE) {
+  if (new_session) {
+    do.call(r, px_opts)
+  } else {
+    with_options(
+      list(repos = px_opts$repos),
+      with_libpaths(px_opts$libpath,
+        with_envvar(px_opts$env,
+          do.call(px_opts$func, px_opts$args)
+        )
+      )
+    )
+  }
+}

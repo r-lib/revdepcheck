@@ -167,13 +167,13 @@ handle_event <- function(state, which) {
   state$workers[which] <- list(NULL)
 
   if (worker$task$name == "deps_install") {
-    handle_finished_deps_install(state, worker)
+    deps_install_done(state, worker)
 
   } else if (worker$task$name == "download") {
-    handle_finished_download(state, worker)
+    download_done(state, worker)
 
   } else if (worker$task$name == "check") {
-    handle_finished_check(state, worker)
+    check_done(state, worker)
   }
 }
 
@@ -257,15 +257,15 @@ do_task <- function(state, task) {
 
   } else if (task$name == "deps_install") {
     "!DEBUG do a dependency install task: `task[[2]]`"
-    do_deps_install(state, task)
+    deps_install_task(state, task)
 
   } else if (task$name == "download") {
     "!DEBUG do a download task: `task[[2]]`"
-    do_download(state, task)
+    download_task(state, task)
 
   } else if (task$name == "check") {
     "!DEBUG do a check task: `task[[2]]`"
-    do_check(state, task)
+    check_task(state, task)
 
   } else {
     stop("Unknown task")

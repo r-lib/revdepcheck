@@ -1,15 +1,9 @@
-
 #' @importFrom processx process
-#' @importFrom callr r_process r_process_options
+#' @importFrom callr r r_process r_process_options
 #' @importFrom crancache available_packages
 #' @importFrom withr with_envvar
 
-do_deps_install <- function(state, task) {
-
-  pkgdir <- state$options$pkgdir
-  pkgname <- task$args[[1]]
-
-  "!DEBUG Install dependencies for package `pkgname`"
+deps_install_opts <- function(pkgdir, pkgname, quiet = FALSE) {
   func <- function(libdir, packages, quiet, repos) {
     ip <- crancache::install_packages
     withr::with_libpaths(
@@ -42,7 +36,7 @@ do_deps_install <- function(state, task) {
 
   ## We don't want to install the revdep checked package again,
   ## that's in a separate library
-  packages <- setdiff(packages, state$options$pkgname)
+  packages <- setdiff(packages, get_package_name(pkgdir))
 
   ## We do this, because if a package is not available,
   ## utils::install.packages does not install anything, just gives a
@@ -57,19 +51,28 @@ do_deps_install <- function(state, task) {
   args <- list(
     libdir = check_dir(pkgdir, "pkg", pkgname),
     package = packages,
-    quiet = state$options$quiet,
+    quiet = quiet,
     repos = repos
   )
 
   ## CRANCACHE_REPOS makes sure that we only use cached CRAN packages,
   ## but not packages that were installed from elsewhere
-  px_opts <- r_process_options(
+  r_process_options(
     func = func,
     args = args,
     system_profile = FALSE,
     user_profile = FALSE,
     env = c(CRANCACHE_REPOS = "cran,bioc", CRANCACHE_QUIET = "yes")
   )
+}
+
+deps_install_task <- function(state, task) {
+
+  pkgdir <- state$options$pkgdir
+  pkgname <- task$args[[1]]
+
+  "!DEBUG Install dependencies for package `pkgname`"
+  px_opts <- deps_install_opts(pkgdir, pkgname, quiet = state$options$quiet)
   px <- r_process$new(px_opts)
 
   ## Update state
@@ -83,7 +86,7 @@ do_deps_install <- function(state, task) {
   state
 }
 
-handle_finished_deps_install <- function(state, worker) {
+deps_install_done <- function(state, worker) {
   starttime <- worker$process$get_start_time()
   duration <- as.numeric(Sys.time() - starttime)
   wpkg <- match(worker$package, state$packages$package)
@@ -128,3 +131,9 @@ handle_finished_deps_install <- function(state, worker) {
 
   state
 }
+
+deps_install <- function(pkgdir, pkgname, quiet = FALSE, new_session = FALSE) {
+  px_opts <- deps_install_opts(pkgdir, pkgname, quiet = FALSE)
+  execute_r(px_opts, new_session = new_session)
+}
+
