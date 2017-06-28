@@ -68,13 +68,13 @@ revdep_install <- function(pkg, quiet = FALSE) {
   ## (to avoid installing locally installed newer versions.
   "!DEBUG Installing CRAN (old) version"
   message("Installing CRAN version of package")
+  package_name <- get_package_name(pkg)[[1]]
+
   with_envvar(
     c(CRANCACHE_REPOS = "cran,bioc"),
     with_libpaths(
-      check_dir(pkg, "old"), {
-        package_name <- get_package_name(pkg)[[1]]
-        install_packages(package_name, quiet = quiet)
-      }
+      check_dir(pkg, "old"),
+      install_packages(package_name, quiet = quiet)
     )
   )
 
