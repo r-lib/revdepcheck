@@ -98,14 +98,15 @@ checking_now <- function(state) {
   }
 
   pkgs <- vapply(workers, "[[", "package", FUN.VALUE = character(1))
-  ord <- order(pkgs)
 
   tasks <- vapply(workers, function(x) x$task$name, FUN.VALUE = character(1))
   task_lookup <- c("download" = "D", "deps_install" = "I", "check" = "C")
   tasks_abbr <- unname(task_lookup[tasks])
+  pkg_tasks <- split(tasks_abbr, pkgs)
+  pkg_sum <- vapply(pkg_tasks, paste, collapse = "", FUN.VALUE = character(1))
 
   width <- getOption("width") - 35 # conservative estimate
-  str <- paste0(pkgs[ord], " [", tasks_abbr[ord], "]", collapse = ", ")
+  str <- paste0(names(pkg_tasks), " [", pkg_sum, "]", collapse = ", ")
   paste0("(", length(pkgs), ") ", str_trunc(str, width))
 }
 
