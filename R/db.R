@@ -239,6 +239,6 @@ db_details <- function(pkg, revdep) {
   db_get_results(pkg, revdep)
 }
 
-db_maintainers <- function(pkg, revdeps) {
-  ## TODO
+db_maintainers <- function(pkg) {
+  dbGetQuery(db(pkg), "SELECT DISTINCT maintainer FROM revdeps")
 }
