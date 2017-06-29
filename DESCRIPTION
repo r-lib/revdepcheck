@@ -25,6 +25,7 @@ Imports:
     desc,
     DBI,
     jsonlite,
+    knitr,
     processx,
     progress,
     rcmdcheck (>= 1.2.1.9000),
