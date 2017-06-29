@@ -1,4 +1,18 @@
-
+#' Run revdep checks
+#'
+#' `revdep_check()` is designed to work even if interrupted. If for some reason
+#' you need to stop the checks, or the session dies, just rerun `revdep_check()`
+#' and it will resume from where it last stopped. To completed reset the
+#' results of a previous run, use `revdep_reset()`.
+#'
+#' @param pkg Path to package
+#' @param dependencies Which types of revdeps to check
+#' @param quiet Suppress output from internal processes?
+#' @param timeout Maximum time to wait (in seconds) for `R CMD check` to
+#'   complete.
+#' @param num_workers Number of parallel workers to use
+#' @param bioc Also check revdeps in BioConductor?
+#'
 #' @export
 #' @importFrom remotes install_local
 #' @importFrom withr with_libpaths with_envvar
@@ -28,8 +42,6 @@ revdep_check <- function(pkg = ".", dependencies = c("Depends", "Imports",
   revdep_clean(pkg)
 }
 
-#' @export
-
 revdep_setup <- function(pkg = ".",
                          dependencies = c("Depends", "Imports",
                                           "Suggests", "LinkingTo"),
@@ -48,8 +60,6 @@ revdep_setup <- function(pkg = ".",
   revdeps <- cran_revdeps(pkgname, dependencies, bioc = bioc)
   db_todo_add(pkg, revdeps)
 }
-
-#' @export
 
 revdep_install <- function(pkg = ".", quiet = FALSE) {
   pkg <- pkg_check(pkg)
@@ -90,8 +100,6 @@ pkglib_exists <- function(pkgdir) {
   file.exists(dir_find(pkgdir, "old")) && file.exists(dir_find(pkgdir, "new"))
 }
 
-#' @export
-
 revdep_resume <- function(pkg = ".", quiet = TRUE,
                           timeout = as.difftime(10, units = "mins"),
                           num_workers = 1, bioc = TRUE) {
@@ -129,8 +137,6 @@ check_existing_checks <- function(pkg) {
   length(db_list(pkg)) != 0
 }
 
-#' @export
-
 revdep_clean <- function(pkg = ".") {
   pkg <- pkg_check(pkg)
   message(center = rule(center = "REVDEP CHECKS", line_color = "black"))
@@ -151,6 +157,7 @@ revdep_clean <- function(pkg = ".") {
 }
 
 #' @export
+#' @rdname revdep_check
 
 revdep_reset <- function(pkg = ".") {
   pkg <- pkg_check(pkg)

@@ -7,7 +7,7 @@
 \title{Set up/retrieve the directory structure for the checks}
 \usage{
 dir_find(pkgdir, what = c("root", "db", "old", "new", "pkg", "check",
-  "pkgold", "pkgnew"), package = NULL)
+  "checks", "lib", "pkgold", "pkgnew"), package = NULL)
 
 dir_setup(pkgdir)
 
