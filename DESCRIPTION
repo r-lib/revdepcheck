@@ -29,6 +29,7 @@ Imports:
     DBI,
     jsonlite,
     knitr,
+    prettyunits,
     processx,
     progress,
     rcmdcheck (>= 1.2.1.9000),

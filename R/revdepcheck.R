@@ -131,6 +131,8 @@ pkglib_exists <- function(pkgdir) {
   file.exists(dir_find(pkgdir, "old")) && file.exists(dir_find(pkgdir, "new"))
 }
 
+#' @importFrom prettyunits vague_dt
+
 revdep_run_check <- function(pkg = ".", quiet = TRUE,
                           timeout = as.difftime(10, units = "mins"),
                           num_workers = 1, bioc = TRUE) {
@@ -140,7 +142,7 @@ revdep_run_check <- function(pkg = ".", quiet = TRUE,
 
   todo <- db_todo(pkg)
   status("CHECK", paste0(length(todo), " packages"))
-
+  start <- Sys.time()
 
   state <- list(
     options = list(
@@ -156,10 +158,12 @@ revdep_run_check <- function(pkg = ".", quiet = TRUE,
   )
 
   run_event_loop(state)
+  end <- Sys.time()
 
   status <- report_status(pkg)
   cat_line(green("OK: "), status$ok)
   cat_line(red("BROKEN: "), status$broken)
+  cat_line("Total time: ", vague_dt(end - start, format = "short"))
 
   invisible()
 }
