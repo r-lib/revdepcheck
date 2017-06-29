@@ -9,7 +9,7 @@ library_compare <- function(pkg) {
   )
 
   same <- function(x, y) (is.na(x) == is.na(y)) & (x == y)
-  lib_cmp[["Δ"]] <- ifelse(same(lib_cmp$new, lib_cmp$old), "", "*")
+  lib_cmp[["\u0394"]] <- ifelse(same(lib_cmp$new, lib_cmp$old), "", "*")
 
   # Move tested package to top
   pkgname <- get_package_name(pkg)
