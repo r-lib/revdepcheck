@@ -32,7 +32,7 @@ deps_install_opts <- function(pkgdir, pkgname, quiet = FALSE) {
   ## But we want to install everything into the package's specific library,
   ## because this is the only library used for the check.
   "!DEBUG Querying dependencies of `pkgname`"
-  packages <- deps_for_package(pkgname)
+  packages <- cran_deps(pkgname)
 
   ## We don't want to install the revdep checked package again,
   ## that's in a separate library

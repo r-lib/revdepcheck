@@ -22,16 +22,6 @@ create_dir <- function(paths) {
   )
 }
 
-#' @importFrom tools package_dependencies
-
-deps_for_package <- function(package) {
-  direct_deps <- unlist(package_dependencies(package, which = "most"))
-  indirect_deps <- unlist(package_dependencies(
-    direct_deps, recursive = TRUE))
-  all_deps <- unique(unname(c(direct_deps, indirect_deps)))
-  setdiff(all_deps, base_packages())
-}
-
 #' @importFrom utils installed.packages
 
 base_packages <- function() {

@@ -1,5 +1,5 @@
 
-#' @importFrom tools dependsOnPkgs
+#' @importFrom tools package_dependencies
 #' @importFrom remotes bioc_install_repos
 #' @importFrom crancache available_packages
 
@@ -11,14 +11,21 @@ cran_revdeps <- function(package, dependencies, bioc) {
     c("CRAN-cloud" = "https://cloud.r-project.org")
   )
 
-  res <- dependsOnPkgs(
+  package_dependencies(
     package,
     recursive = FALSE,
-    installed = available_packages(repos = repos),
-    dependencies = dependencies
-  )
+    reverse = TRUE,
+    db = available_packages(repos = repos),
+    which = dependencies
+  )[[1]]
+}
 
-  ## dependsOnPkgs sometimes return and empty string, not sure why,
-  ## but we just remove it for now
-  setdiff(res, "")
+#' @importFrom tools package_dependencies
+
+cran_deps <- function(package) {
+  direct_deps <- unlist(package_dependencies(package, which = "most"))
+  indirect_deps <- unlist(package_dependencies(
+    direct_deps, recursive = TRUE))
+  all_deps <- unique(unname(c(direct_deps, indirect_deps)))
+  setdiff(all_deps, base_packages())
 }
