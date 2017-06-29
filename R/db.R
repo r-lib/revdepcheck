@@ -240,5 +240,5 @@ db_details <- function(pkg, revdep) {
 }
 
 db_maintainers <- function(pkg, revdeps) {
-  TODO
+  ## TODO
 }
