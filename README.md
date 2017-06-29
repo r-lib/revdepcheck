@@ -18,8 +18,10 @@
   relies on [crancache](https://github.com/r-lib/crancache). You can see what 
   packages are currently cached with `crancache::crancache_list()`.
   
-* revdepcheck runs checks in parallel, and by default, limits check time 
-  to at most 10 minutes.
+* revdepcheck is carefully designed to make long running checks as pleasant
+  as possible. You run checks in parallel, check time is limited to 10 minutes,
+  and an elegant progress bar keeps you up-to-date with what's happening
+  (including an estimate of how much time is remaining).
 
 ## Installation
 
