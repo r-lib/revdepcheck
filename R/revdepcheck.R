@@ -30,15 +30,21 @@ revdep_check <- function(pkg = ".", dependencies = c("Depends", "Imports",
   if (!db_exists(pkg))
     revdep_setup(pkg, dependencies = dependencies, bioc = bioc)
 
+  has_todo <- length(db_todo(pkg)) > 0
+
   ## Install CRAN and dev versions
-  if (!pkglib_exists(pkg))
+  if (!pkglib_exists(pkg) && has_todo)
     revdep_install(pkg, quiet = quiet)
 
-  ## Resume also works from an empty table
-  if (length(db_todo(pkg)) > 0)
+  ## Run checks
+  if (has_todo)
     revdep_run_check(pkg, quiet = quiet, timeout = timeout, num_workers = num_workers)
 
-  revdep_clean(pkg)
+  if (pkglib_exists(pkg))
+    revdep_clean(pkg)
+
+  if (!report_exists(pkg))
+    revdep_report(pkg)
 }
 
 revdep_setup <- function(pkg = ".",
@@ -167,6 +173,25 @@ revdep_clean <- function(pkg = ".") {
   unlink(file.path(rcheck, package), recursive = TRUE)
 
   invisible()
+}
+
+revdep_report <- function(pkg = ".") {
+  pkg <- pkg_check(pkg)
+
+  status("REPORT")
+
+  root <- dir_find(pkg, "root")
+
+  message("Writing summary to 'revdep/README.md'")
+  revdep_report_summary(pkg, file = file.path(root, "README.md"))
+
+  message("Writing problems to 'revdep/problems.md'")
+  revdep_report_problems(pkg, file = file.path(root, "problems.md"))
+}
+
+report_exists <- function(pkg) {
+  root <- dir_find(pkg, "root")
+  file.exists(file.path(root, "README.md")) && file.exists(file.path(root, "problems.md"))
 }
 
 #' @export

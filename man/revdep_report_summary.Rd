@@ -5,9 +5,9 @@
 \alias{revdep_report_problems}
 \title{Markdown report of reverse dependency check results}
 \usage{
-revdep_report_summary(pkg = ".")
+revdep_report_summary(pkg = ".", file = "")
 
-revdep_report_problems(pkg = ".")
+revdep_report_problems(pkg = ".", file = "")
 }
 \arguments{
 \item{pkg}{Path to package}
