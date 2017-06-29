@@ -1,15 +1,25 @@
-
 # revdepcheck
 
-> Automated Reverse Dependency Checking
+> Automated, Isolated, Reverse Dependency Checking
 
 [![Linux Build Status](https://travis-ci.org/r-lib/revdepcheck.svg?branch=master)](https://travis-ci.org/r-lib/revdepcheck)
 [![Windows Build status](https://ci.appveyor.com/api/projects/status/github/r-lib/revdepcheck?svg=true)](https://ci.appveyor.com/project/gaborcsardi/revdepcheck)
 [![](http://www.r-pkg.org/badges/version/revdepcheck)](http://www.r-pkg.org/pkg/revdepcheck)
 [![CRAN RStudio mirror downloads](http://cranlogs.r-pkg.org/badges/revdepcheck)](http://www.r-pkg.org/pkg/revdepcheck)
 
-Automated, isolated reserve dependency checking, with automatic comparison of
-the results to the current CRAN checks.
+## Features
+
+* To avoid false positives due to existing failures, revdepcheck runs 
+  `R CMD check` twice for each revdep, once with the CRAN version of your 
+  package, and once with the local development version. revdepcheck
+  reports the difference, so you can see exactly what has changed.
+
+* To speed up installation of revdeps and their dependencies, revdepcheck 
+  relies on [crancache](https://github.com/r-lib/crancache). You can see what 
+  packages are currently cached with `crancache::crancache_list()`.
+  
+* revdepcheck runs checks in parallel, and by default, limits check time 
+  to at most 10 minutes.
 
 ## Installation
 
@@ -21,6 +31,13 @@ source("https://install-github.me/r-lib/revdepcheck")
 
 ```r
 library(revdepcheck)
+
+# Check package in working directory
+# Will automatically create revdep/ directory if it doesn't already exist
+revdep_check(num_workers = 4)
+
+# Clear out all previous results
+revdep_reset()
 ```
 
 ## License
