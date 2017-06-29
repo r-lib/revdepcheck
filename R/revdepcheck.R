@@ -26,7 +26,7 @@ revdep_check <- function(pkg = ".", dependencies = c("Depends", "Imports",
   if (length(db_todo(pkg)) > 0)
     revdep_resume(pkg, quiet = quiet, timeout = timeout, num_workers = num_workers)
 
-
+  revdep_clean(pkg)
 }
 
 #' @export
@@ -124,6 +124,28 @@ revdep_resume <- function(pkg = ".", quiet = TRUE,
 check_existing_checks <- function(pkg) {
   length(db_list(pkg)) != 0
 }
+
+#' @export
+
+revdep_clean <- function(pkg = ".") {
+  message(center = rule(center = "REVDEP CHECKS", line_color = "black"))
+
+  # Delete local installs
+  unlink(file.path(pkg, "revdep", "install"), recursive = TRUE)
+  unlink(file.path(pkg, "revdep", "library"), recursive = TRUE)
+
+  # Delete all sources/binaries cached by R CMD check
+  check_dir <- file.path(pkg, "revdep", "checks")
+  package <- dir(check_dir)
+  rcheck <- c(
+    file.path(check_dir, package, "new", paste0(package, ".Rcheck")),
+    file.path(check_dir, package, "old", paste0(package, ".Rcheck"))
+  )
+
+  unlink(file.path(rcheck, "00_pkg_src"), recursive = TRUE)
+  unlink(file.path(rcheck, package), recursive = TRUE)
+}
+
 
 #' @export
 
