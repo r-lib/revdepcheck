@@ -154,7 +154,9 @@ revdep_clean <- function(pkg = ".") {
 
 revdep_reset <- function(pkg = ".") {
   pkg <- pkg_check(pkg)
-  rm(list = pkg, envir = dbenv)
+
+  if (exists(pkg, envir = dbenv))
+    rm(list = pkg, envir = dbenv)
 
   unlink(dir_find(pkg, "lib"), recursive = TRUE)
   unlink(dir_find(pkg, "checks"), recursive = TRUE)
