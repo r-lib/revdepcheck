@@ -10,7 +10,7 @@ db <- function(package) {
       dbIsValid(con <- dbenv[[package]])) {
     con
   } else {
-    dbenv[[package]] <- dbConnect(SQLite(), check_dir(package, "db"))
+    dbenv[[package]] <- dbConnect(SQLite(), dir_find(package, "db"))
     dbenv[[package]]
   }
 }
@@ -87,7 +87,7 @@ db_clean <- function(package) {
 #' @importFrom RSQLite dbExistsTable
 
 db_exists <- function(package) {
-  if (!file.exists(check_dir(package, "db"))) return(FALSE)
+  if (!file.exists(dir_find(package, "db"))) return(FALSE)
   if (!dbExistsTable(db(package), "revdeps")) return(FALSE)
 
   TRUE

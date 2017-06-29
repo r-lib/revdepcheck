@@ -1,5 +1,5 @@
 
-#' Set up the directory structure for the checks
+#' Set up/retrieve the directory structure for the checks
 #'
 #' Currently the following files and directories are used.
 #' They are all in the main revdep directory, which is `revdep` in the
@@ -33,54 +33,54 @@
 #'
 #' @keywords internal
 
-check_dir <- function(pkgdir,
-                      what = c("root", "db", "old", "new", "pkg", "check",
-                               "pkgold", "pkgnew"),
-                      package = NULL) {
+dir_find <- function(pkgdir,
+                     what = c("root", "db", "old", "new", "pkg", "check",
+                              "checks", "lib", "pkgold", "pkgnew"),
+                     package = NULL) {
 
-  what <- match.arg(what)
-
+  pkgdir <- pkg_check(pkgdir)
   pkg <- pkg_name(pkgdir)
 
-  create_dir(file.path(pkgdir, "revdep"))
-  create_dir(file.path(pkgdir, "revdep", "library"))
-  create_dir(file.path(pkgdir, "revdep", "library", pkg, "old"))
-  create_dir(file.path(pkgdir, "revdep", "library", pkg, "new"))
+  switch(match.arg(what),
+    root =  file.path(pkgdir, "revdep"),
+    db =    file.path(pkgdir, "revdep", "data.sqlite"),
 
-  if (what == "root") {
-    file.path(pkgdir, "revdep")
+    checks = file.path(pkgdir, "revdep", "checks"),
+    check = file.path(pkgdir, "revdep", "checks", package),
 
-  } else if (what == "db") {
-    file.path(pkgdir, "revdep", "data.sqlite")
+    lib =   file.path(pkgdir, "revdep", "library"),
+    pkg =   file.path(pkgdir, "revdep", "library", package),
+    old =   file.path(pkgdir, "revdep", "library", pkg, "old"),
+    new =   file.path(pkgdir, "revdep", "library", pkg, "new"),
 
-  } else if (what == "old") {
-    file.path(pkgdir, "revdep", "library", pkg, "old")
-
-  } else if (what == "new") {
-    file.path(pkgdir, "revdep", "library", pkg, "new")
-
-  } else if (what == "pkg") {
-    create_dir(path <- file.path(pkgdir, "revdep", "library", package))
-    path
-
-  } else if (what == "check") {
-    create_dir(path <- file.path(pkgdir, "revdep", "checks", package))
-    path
-
-  } else if (what == "pkgold") {
     ## Order is important here, because installs should go to the first
-    create_dir(
-      paths <- c(file.path(pkgdir, "revdep", "library", package),
-                 file.path(pkgdir, "revdep", "library", pkg, "old"))
-    )
-    paths
-
-  } else if (what == "pkgnew") {
-    ## Order is important here, because installs should go to the first
-    create_dir(
-      paths <- c(file.path(pkgdir, "revdep", "library", package),
-                 file.path(pkgdir, "revdep", "library", pkg, "new"))
-    )
-    paths
-  }
+    pkgold = c(file.path(pkgdir, "revdep", "library", package),
+               file.path(pkgdir, "revdep", "library", pkg, "old")),
+    pkgnew = c(file.path(pkgdir, "revdep", "library", package),
+               file.path(pkgdir, "revdep", "library", pkg, "new"))
+  )
 }
+
+#' @export
+#' @rdname dir_find
+
+dir_setup <- function(pkgdir) {
+  dir_create(dir_find(pkgdir, "root"))
+}
+
+#' @export
+#' @rdname dir_find
+
+dir_setup_package <- function(pkgdir, package) {
+  dir_create(dir_find(pkgdir, "pkgold", package))
+  dir_create(dir_find(pkgdir, "pkgnew", package))
+  dir_create(dir_find(pkgdir, "check", package))
+}
+
+dir_create <- function(paths) {
+  vapply(
+    paths, FUN = dir.create, FUN.VALUE = logical(1),
+    recursive = TRUE, showWarnings = FALSE
+  )
+}
+

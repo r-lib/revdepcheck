@@ -4,7 +4,7 @@
 check_proc <- function(pkgdir, pkgname, version = c("old", "new")) {
   version <- match.arg(version)
 
-  dir <- check_dir(pkgdir, "check", pkgname)
+  dir <- dir_find(pkgdir, "check", pkgname)
   tarball <- with_envvar(
     c(CRANCACHE_REPOS = "cran,bioc", CRANCACHE_QUIET = "yes"),
     crancache::download_packages(pkgname, dir)[,2]
@@ -17,7 +17,7 @@ check_proc <- function(pkgdir, pkgname, version = c("old", "new")) {
   ## We reverse the library, because the new version of the revdep checked
   ## package might have custom non-CRAN dependencies, and we want these
   ## to be first on the library path
-  lib <- rev(check_dir(pkgdir, paste0("pkg", version), pkgname))
+  lib <- rev(dir_find(pkgdir, paste0("pkg", version), pkgname))
   library_info(file.path(out, "libraries.txt"), lib)
 
   with_envvar(

@@ -5,13 +5,6 @@ is_string <- function(x) {
   is.character(x) && length(x) == 1 && !is.na(x)
 }
 
-create_dir <- function(paths) {
-  vapply(
-    paths, FUN = dir.create, FUN.VALUE = logical(1),
-    recursive = TRUE, showWarnings = FALSE
-  )
-}
-
 #' @importFrom utils installed.packages
 
 base_packages <- function() {

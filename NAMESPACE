@@ -2,6 +2,8 @@
 
 S3method(print,revdepcheck_details)
 S3method(print,revdepcheck_results)
+export(dir_setup)
+export(dir_setup_package)
 export(revdep_add)
 export(revdep_add_broken)
 export(revdep_check)

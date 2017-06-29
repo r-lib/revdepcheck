@@ -37,6 +37,8 @@ revdep_setup <- function(pkg = ".",
 
   pkg <- pkg_check(pkg)
 
+  dir_setup(pkg)
+
   db_setup(pkg)              # Make sure it exists
   db_clean(pkg)              # Delete all records
 
@@ -54,6 +56,9 @@ revdep_install <- function(pkg = ".", quiet = FALSE) {
 
   message(rule(center = "INSTALL", line_color = "black"))
 
+  dir_create(dir_find(pkg, "old"))
+  dir_create(dir_find(pkg, "new"))
+
   ## Install the package itself, both versions, first the CRAN version
   ## We instruct crancache to only use the cache of CRAN packages
   ## (to avoid installing locally installed newer versions.
@@ -64,7 +69,7 @@ revdep_install <- function(pkg = ".", quiet = FALSE) {
   with_envvar(
     c(CRANCACHE_REPOS = "cran,bioc"),
     with_libpaths(
-      check_dir(pkg, "old"),
+      dir_find(pkg, "old"),
       install_packages(package_name, quiet = quiet)
     )
   )
@@ -75,17 +80,14 @@ revdep_install <- function(pkg = ".", quiet = FALSE) {
   with_envvar(
     c(CRANCACHE_REPOS = "cran,bioc"),
     with_libpaths(
-      check_dir(pkg, "new"),
+      dir_find(pkg, "new"),
       install_local(pkg, quiet = quiet)
     )
   )
 }
 
 pkglib_exists <- function(pkgdir) {
-  pkg <- pkg_name(pkgdir)
-
-  file.exists(file.path(pkgdir, "revdep", "library", pkg, "old")) &&
-    file.exists(file.path(pkgdir, "revdep", "library", pkg, "new"))
+  file.exists(dir_find(pkgdir, "old")) && file.exists(dir_find(pkgdir, "new"))
 }
 
 #' @export
@@ -134,11 +136,10 @@ revdep_clean <- function(pkg = ".") {
   message(center = rule(center = "REVDEP CHECKS", line_color = "black"))
 
   # Delete local installs
-  unlink(file.path(pkg, "revdep", "install"), recursive = TRUE)
-  unlink(file.path(pkg, "revdep", "library"), recursive = TRUE)
+  unlink(dir_find(pkg, "library"), recursive = TRUE)
 
   # Delete all sources/binaries cached by R CMD check
-  check_dir <- file.path(pkg, "revdep", "checks")
+  check_dir <- dir_find(pkg, "checks")
   package <- dir(check_dir)
   rcheck <- c(
     file.path(check_dir, package, "new", paste0(package, ".Rcheck")),
@@ -147,6 +148,17 @@ revdep_clean <- function(pkg = ".") {
 
   unlink(file.path(rcheck, "00_pkg_src"), recursive = TRUE)
   unlink(file.path(rcheck, package), recursive = TRUE)
+}
+
+#' @export
+
+revdep_reset <- function(pkg = ".") {
+  pkg <- pkg_check(pkg)
+  rm(list = pkg, envir = dbenv)
+
+  unlink(dir_find(pkg, "lib"), recursive = TRUE)
+  unlink(dir_find(pkg, "checks"), recursive = TRUE)
+  unlink(dir_find(pkg, "db"), recursive = TRUE)
 }
 
 

@@ -49,7 +49,7 @@ deps_install_opts <- function(pkgdir, pkgname, quiet = FALSE) {
   packages <- intersect(available, packages)
 
   args <- list(
-    libdir = check_dir(pkgdir, "pkg", pkgname),
+    libdir = dir_find(pkgdir, "pkg", pkgname),
     package = packages,
     quiet = quiet,
     repos = repos
@@ -70,6 +70,9 @@ deps_install_task <- function(state, task) {
 
   pkgdir <- state$options$pkgdir
   pkgname <- task$args[[1]]
+
+  dir_setup_package(pkgdir, pkgname)
+
 
   "!DEBUG Install dependencies for package `pkgname`"
   px_opts <- deps_install_opts(pkgdir, pkgname, quiet = state$options$quiet)

@@ -1,5 +1,5 @@
 download_opts <- function(pkgdir, pkgname) {
-  dir <- check_dir(pkgdir, "check", pkgname)
+  dir <- dir_find(pkgdir, "check", pkgname)
 
   func <- function(pkgname, dir) {
     crancache::download_packages(pkgname, dir)[,2]

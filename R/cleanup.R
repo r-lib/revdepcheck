@@ -4,6 +4,6 @@ cleanup_library <- function(state, worker) {
   package <- worker$package
   if (is.null(pkgdir) || is.null(package)) return()
 
-  libdir <- check_dir(pkgdir, "pkg", package)
+  libdir <- dir_find(pkgdir, "pkg", package)
   unlink(libdir, recursive = TRUE)
 }
