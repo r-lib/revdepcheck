@@ -16,5 +16,6 @@ Details of reverse dependency check results
 }
 \seealso{
 Other revdep check functions: \code{\link{revdep_emails}},
-  \code{\link{revdep_report}}, \code{\link{revdep_results}}
+  \code{\link{revdep_report_summary}},
+  \code{\link{revdep_results}}
 }
