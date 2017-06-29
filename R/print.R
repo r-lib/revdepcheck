@@ -54,6 +54,7 @@ print.revdepcheck_details <- function(x, ...) {
 }
 
 #' @importFrom rcmdcheck check_details
+#' @importFrom utils tail
 
 print_install_out <- function(x) {
   details <- check_details(x)
