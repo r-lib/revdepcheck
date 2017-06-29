@@ -5,6 +5,7 @@
 #' running in another session.
 #'
 #' @inheritParams revdep_check
+#' @param file File to write output to. Default will write to console.
 #' @export
 #' @importFrom crayon black red yellow green
 #' @importFrom sessioninfo platform_info
@@ -109,7 +110,7 @@ report_platform <- function() {
 report_libraries <- function(pkg) {
   path <- file.path(pkg, "revdep", "checks", "libraries.csv")
 
-  df <- read.csv(path, stringsAsFactors = FALSE)
+  df <- utils::read.csv(path, stringsAsFactors = FALSE)
   names(df)[4] <- "\u0394"
 
   df

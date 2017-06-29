@@ -11,6 +11,8 @@ revdep_report_problems(pkg = ".", file = "")
 }
 \arguments{
 \item{pkg}{Path to package}
+
+\item{file}{File to write output to. Default will write to console.}
 }
 \description{
 You can use these functions to get intermediate reports of a \code{\link[=revdep_check]{revdep_check()}}

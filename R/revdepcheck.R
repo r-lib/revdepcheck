@@ -121,7 +121,7 @@ revdep_install <- function(pkg = ".", quiet = FALSE) {
 
   # Record libraries
   lib <- library_compare(pkg)
-  write.csv(lib, file.path(pkg, "revdep", "checks", "libraries.csv"),
+  utils::write.csv(lib, file.path(pkg, "revdep", "checks", "libraries.csv"),
     row.names = FALSE, quote = FALSE)
 
   invisible()

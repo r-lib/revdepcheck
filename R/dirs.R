@@ -66,6 +66,7 @@ dir_find <- function(pkgdir,
 
 dir_setup <- function(pkgdir) {
   dir_create(dir_find(pkgdir, "root"))
+  dir_create(dir_find(pkgdir, "checks"))
 }
 
 #' @export
