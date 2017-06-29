@@ -36,7 +36,7 @@ revdep_check <- function(pkg = ".", dependencies = c("Depends", "Imports",
 
   ## Resume also works from an empty table
   if (length(db_todo(pkg)) > 0)
-    revdep_resume(pkg, quiet = quiet, timeout = timeout, num_workers = num_workers)
+    revdep_run_check(pkg, quiet = quiet, timeout = timeout, num_workers = num_workers)
 
   revdep_clean(pkg)
 }
@@ -45,25 +45,29 @@ revdep_setup <- function(pkg = ".",
                          dependencies = c("Depends", "Imports",
                                           "Suggests", "LinkingTo"),
                          bioc = TRUE) {
-
   pkg <- pkg_check(pkg)
+  pkgname <- pkg_name(pkg)
 
+  status("SETUP")
+
+  message("Creating directories and database")
   dir_setup(pkg)
-
   db_setup(pkg)              # Make sure it exists
   db_clean(pkg)              # Delete all records
 
   "!DEBUG getting reverse dependencies for `basename(pkg)`"
-  pkgname <- pkg_name(pkg)
-  message("Determining revdeps for ", pkgname)
+  message("Computing revdeps")
   revdeps <- cran_revdeps(pkgname, dependencies, bioc = bioc)
   db_todo_add(pkg, revdeps)
+
+  invisible()
 }
 
 revdep_install <- function(pkg = ".", quiet = FALSE) {
   pkg <- pkg_check(pkg)
+  pkgname <- pkg_name(pkg)
 
-  message(rule(center = "INSTALL", line_color = "black"))
+  status("INSTALL", "2 versions")
 
   dir_create(dir_find(pkg, "old"))
   dir_create(dir_find(pkg, "new"))
@@ -72,42 +76,45 @@ revdep_install <- function(pkg = ".", quiet = FALSE) {
   ## We instruct crancache to only use the cache of CRAN packages
   ## (to avoid installing locally installed newer versions.
   "!DEBUG Installing CRAN (old) version"
-  message("Installing CRAN version of package")
+  message("Installing CRAN version of ", pkgname)
   package_name <- pkg_name(pkg)[[1]]
 
   with_envvar(
-    c(CRANCACHE_REPOS = "cran,bioc"),
+    c(CRANCACHE_REPOS = "cran,bioc", CRANCACHE_QUIET = "yes"),
     with_libpaths(
       dir_find(pkg, "old"),
-      install_packages(package_name, quiet = quiet)
+      install_packages(pkgname, quiet = quiet)
     )
   )
 
   ## Now the new version
   "!DEBUG Installing new version from `pkg`"
-  message("Installing DEV version of package")
+  message("Installing DEV version of ", pkgname)
   with_envvar(
-    c(CRANCACHE_REPOS = "cran,bioc"),
+    c(CRANCACHE_REPOS = "cran,bioc", CRANCACHE_QUIET = "yes"),
     with_libpaths(
       dir_find(pkg, "new"),
       install_local(pkg, quiet = quiet)
     )
   )
+
+  invisible()
 }
 
 pkglib_exists <- function(pkgdir) {
   file.exists(dir_find(pkgdir, "old")) && file.exists(dir_find(pkgdir, "new"))
 }
 
-revdep_resume <- function(pkg = ".", quiet = TRUE,
+revdep_run_check <- function(pkg = ".", quiet = TRUE,
                           timeout = as.difftime(10, units = "mins"),
                           num_workers = 1, bioc = TRUE) {
 
   pkg <- pkg_check(pkg)
   pkgname <- pkg_name(pkg)
-  message(center = rule(center = "REVDEP CHECKS", line_color = "black"))
 
   todo <- db_todo(pkg)
+  status("CHECK", paste0(length(todo), " packages"))
+
 
   state <- list(
     options = list(
@@ -122,14 +129,9 @@ revdep_resume <- function(pkg = ".", quiet = TRUE,
       stringsAsFactors = FALSE)
   )
 
-  if (length(todo)) {
-    message("Starting checks")
-    run_event_loop(state)
-  } else {
-    message("All reverse dependencies were checked already")
-  }
+  run_event_loop(state)
 
-  invisible(revdep_results(pkg))
+  invisible()
 }
 
 check_existing_checks <- function(pkg) {
@@ -138,7 +140,8 @@ check_existing_checks <- function(pkg) {
 
 revdep_clean <- function(pkg = ".") {
   pkg <- pkg_check(pkg)
-  message(center = rule(center = "REVDEP CHECKS", line_color = "black"))
+
+  status("CLEAN")
 
   # Delete local installs
   unlink(dir_find(pkg, "library"), recursive = TRUE)
@@ -153,6 +156,8 @@ revdep_clean <- function(pkg = ".") {
 
   unlink(file.path(rcheck, "00_pkg_src"), recursive = TRUE)
   unlink(file.path(rcheck, package), recursive = TRUE)
+
+  invisible()
 }
 
 #' @export
@@ -167,6 +172,8 @@ revdep_reset <- function(pkg = ".") {
   unlink(dir_find(pkg, "lib"), recursive = TRUE)
   unlink(dir_find(pkg, "checks"), recursive = TRUE)
   unlink(dir_find(pkg, "db"), recursive = TRUE)
+
+  invisible()
 }
 
 
@@ -207,4 +214,11 @@ revdep_add_broken <- function(pkg = ".") {
 
   }
 
+}
+
+
+#' @importFrom crayon bold
+
+status <- function(title, info = "") {
+  cat_line(rule(left = bold(title), right = info))
 }
