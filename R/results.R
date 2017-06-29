@@ -1,22 +1,9 @@
-
-#' Summary of reverse dependency check results
-#'
-#' @family revdep check functions
-#' @export
-
 revdep_results <- function(pkg = ".", revdeps = NULL) {
   res <- db_results(pkg, revdeps)
   class(res) <- "revdepcheck_results"
   res
 }
 
-#' Details of reverse dependency check results
-#'
-#' @param pkg Path to the revdep-checked package tree.
-#' @param revdep Name of the reverse dependency.
-#'
-#' @family revdep check functions
-#' @export
 #' @importFrom rcmdcheck compare_checks
 
 revdep_details <- function(pkg = ".", revdep) {
@@ -29,9 +16,12 @@ revdep_details <- function(pkg = ".", revdep) {
   res
 }
 
+#' List packages remaining in the todo list
+#'
+#' @inheritParams revdep_check
 #' @export
 
-revdep_list_packages <- function(pkg = ".") {
+revdep_todo <- function(pkg = ".") {
   db_list(pkg)
 }
 

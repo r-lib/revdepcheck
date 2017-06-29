@@ -170,6 +170,15 @@ revdep_reset <- function(pkg = ".") {
 }
 
 
+#' Manually add packages to check
+#'
+#' Use `revdep_add()` to add a single package to the to do list. Use
+#' `revdep_add_broken()` to add all broken packages from the last check
+#' (this is useful if you think you've fixed the underlying problem in
+#' your package)
+#'
+#' @inheritParams revdep_check
+#' @param packages Character vector of package names to add
 #' @export
 
 revdep_add <- function(pkg = ".", packages) {
@@ -178,6 +187,7 @@ revdep_add <- function(pkg = ".", packages) {
 }
 
 #' @export
+#' @rdname revdep_add
 
 revdep_add_broken <- function(pkg = ".") {
   pkg <- pkg_check(pkg)

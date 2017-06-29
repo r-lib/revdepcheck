@@ -1,6 +1,10 @@
 
 #' Markdown report of reverse dependency check results
-#' @family revdep check functions
+#'
+#' @inheritParams revdep_check
+#' @param revdeps Optionally, supply a character vector of package names
+#'   to report on.  If omitted, reports on all revdeps.
+#'
 #' @export
 #' @importFrom crayon black red yellow green
 #' @importFrom sessioninfo platform_info
@@ -36,6 +40,9 @@ revdep_report_summary <- function(pkg = ".", revdeps = NULL) {
 
   invisible()
 }
+
+#' @export
+#' @rdname revdep_report_summary
 
 revdep_report_problems <- function(pkg = ".", revdeps = NULL) {
   packages <- revdep_results(pkg, revdeps)

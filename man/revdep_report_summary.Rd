@@ -2,14 +2,19 @@
 % Please edit documentation in R/report.R
 \name{revdep_report_summary}
 \alias{revdep_report_summary}
+\alias{revdep_report_problems}
 \title{Markdown report of reverse dependency check results}
 \usage{
 revdep_report_summary(pkg = ".", revdeps = NULL)
+
+revdep_report_problems(pkg = ".", revdeps = NULL)
+}
+\arguments{
+\item{pkg}{Path to package}
+
+\item{revdeps}{Optionally, supply a character vector of package names
+to report on.  If omitted, reports on all revdeps.}
 }
 \description{
 Markdown report of reverse dependency check results
-}
-\seealso{
-Other revdep check functions: \code{\link{revdep_details}},
-  \code{\link{revdep_emails}}, \code{\link{revdep_results}}
 }
