@@ -26,25 +26,40 @@ revdep_check <- function(pkg = ".", dependencies = c("Depends", "Imports",
 
   pkg <- pkg_check(pkg)
 
+  did_something <- FALSE
   ## Creates and initializes database, including computing revdeps
-  if (!db_exists(pkg))
+  if (!db_exists(pkg)) {
     revdep_setup(pkg, dependencies = dependencies, bioc = bioc)
+    did_something <- TRUE
+  }
 
   has_todo <- length(db_todo(pkg)) > 0
 
   ## Install CRAN and dev versions
-  if (!pkglib_exists(pkg) && has_todo)
+  if (!pkglib_exists(pkg) && has_todo) {
     revdep_install(pkg, quiet = quiet)
+    did_something <- TRUE
+  }
 
   ## Run checks
-  if (has_todo)
+  if (has_todo) {
     revdep_run_check(pkg, quiet = quiet, timeout = timeout, num_workers = num_workers)
+    did_something <- TRUE
+  }
 
-  if (pkglib_exists(pkg))
+  if (pkglib_exists(pkg)) {
     revdep_clean(pkg)
+    did_something <- TRUE
+  }
 
-  if (!report_exists(pkg))
+  if (!report_exists(pkg)) {
     revdep_report(pkg)
+    did_something <- TRUE
+  }
+
+  if (!did_something) {
+    message("Nothing happened. Do you need to run revdep_reset()?")
+  }
 }
 
 revdep_setup <- function(pkg = ".",
