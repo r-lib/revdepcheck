@@ -17,7 +17,6 @@
 #' @importFrom remotes install_local
 #' @importFrom withr with_libpaths with_envvar
 #' @importFrom crancache install_packages
-#' @importFrom curl curl
 
 revdep_check <- function(pkg = ".", dependencies = c("Depends", "Imports",
                                       "Suggests", "LinkingTo"),
