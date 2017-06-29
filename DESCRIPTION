@@ -1,8 +1,12 @@
 Package: revdepcheck
 Title: Automated Reverse Dependency Checking
 Version: 1.0.0.9000
-Author: Gábor Csárdi
-Maintainer: Gábor Csárdi <csardi.gabor@gmail.com>
+Authors@R: c(
+    person("Gábor", "Csárdi", , "csardi.gabor@gmail.com", c("cre", "aut", "cph")),
+    person("Hadley", "Wickham", role = "aut"),
+    person("RConsortium", role = "cph"),
+    person("RStudio", role = "cph")
+  )
 Description: Automated, isolated reserve dependency checking, with automatic
     comparison of the results to the current CRAN checks.
 License: MIT + file LICENSE
