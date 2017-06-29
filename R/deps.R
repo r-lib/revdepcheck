@@ -1,5 +1,4 @@
 
-#' @importFrom tools package_dependencies
 #' @importFrom remotes bioc_install_repos
 #' @importFrom crancache available_packages
 
@@ -11,16 +10,14 @@ cran_revdeps <- function(package, dependencies, bioc) {
     c("CRAN-cloud" = "https://cloud.r-project.org")
   )
 
-  package_dependencies(
-    package,
-    recursive = FALSE,
-    reverse = TRUE,
-    db = available_packages(repos = repos),
-    which = dependencies
-  )[[1]]
-}
+  allpkgs <- available_packages()
+  alldeps <- allpkgs[, dependencies, drop = FALSE]
+  alldeps[is.na(alldeps)] <- ""
+  deps <- apply(alldeps, 1, paste, collapse = ",")
+  rd <- grepl(paste0("\\b", package, "\\b"), deps)
 
-#' @importFrom tools package_dependencies
+  allpkgs[rd, "Package"]
+}
 
 cran_deps <- function(package) {
   allpkgs <- available_packages()
@@ -39,12 +36,17 @@ cran_deps <- function(package) {
 }
 
 parse_deps <- function(deps) {
-  deps <- lapply(strsplit(deps, ","), str_trim)
-  deps <- lapply(deps, function(x) lapply(strsplit(x, "\\("), str_trim))
-  deps <- lapply(
-    deps,
-    function(x) lapply(x, sub, pattern = "\\)$", replacement = "")
-  )
-  deps <- lapply(deps, function(x) vapply(x, "[", "", 1))
-  lapply(deps, setdiff, y = c("R", base_packages()))
+  deps[is.na(deps)] <- ""
+  deps <- gsub("\\s+", "", deps)
+  deps <- gsub("\\([^)]+\\)", "", deps)
+  notempty <- nzchar(deps)
+  res <- replicate(length(deps), character())
+  deps <- deps[notempty]
+  deps <- strsplit(deps, ",", fixed = TRUE)
+
+  base <- base_packages()
+  deps <- lapply(deps, setdiff, y = c("R", base))
+
+  res[notempty] <- deps
+  res
 }
