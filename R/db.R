@@ -86,9 +86,15 @@ db_clean <- function(package) {
 #' @importFrom DBI dbGetQuery
 #' @importFrom RSQLite dbExistsTable
 
+db_exists <- function(package) {
+  if (!file.exists(check_dir(package, "db"))) return(FALSE)
+  if (!dbExistsTable(db(package), "revdeps")) return(FALSE)
+
+  TRUE
+}
+
 db_list <- function(package) {
-  if (!file.exists(check_dir(package, "db"))) return(character())
-  if (!dbExistsTable(db(package), "revdeps")) return(character())
+  if (!db_exists(package)) return(character())
   pkgs <- dbGetQuery(
     db(package),
     "SELECT DISTINCT package, which FROM revdeps"

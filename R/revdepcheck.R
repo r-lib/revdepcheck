@@ -7,7 +7,7 @@
 
 revdep_check <- function(pkg = ".", dependencies = c("Depends", "Imports",
                                       "Suggests", "LinkingTo"),
-                         overwrite = FALSE, quiet = TRUE,
+                         quiet = TRUE,
                          timeout = as.difftime(10, units = "mins"),
                          num_workers = 1, bioc = TRUE) {
 
@@ -15,37 +15,26 @@ revdep_check <- function(pkg = ".", dependencies = c("Depends", "Imports",
   stopifnot(is_package_dir(pkg))
 
   ## Creates and initializes database, including computing revdeps
-  revdep_setup(pkg, overwrite = overwrite, dependencies = dependencies, bioc = bioc)
+  if (!db_exists(pkg))
+    revdep_setup(pkg, dependencies = dependencies, bioc = bioc)
 
   ## Install CRAN and dev versions
-  revdep_install(pkg, quiet = quiet)
+  if (!pkglib_exists(pkg))
+    revdep_install(pkg, quiet = quiet)
 
   ## Resume also works from an empty table
-  revdep_resume(pkg, quiet = quiet, timeout = timeout, num_workers = num_workers)
+  if (length(db_todo(pkg)) > 0)
+    revdep_resume(pkg, quiet = quiet, timeout = timeout, num_workers = num_workers)
+
+
 }
 
 #' @export
 
-revdep_setup <- function(pkg, overwrite = FALSE,
+revdep_setup <- function(pkg,
                          dependencies = c("Depends", "Imports",
                                           "Suggests", "LinkingTo"),
                          bioc = TRUE) {
-  if (!overwrite && check_existing_checks(pkg)) {
-    if (!interactive()) {
-      stop("Reverse dependency results already exist, call\n",
-         "  revdep_check() with `overwrite = TRUE`, or use\n",
-         "  revdep_resume()", call. = FALSE)
-    } else {
-      choice <- menu(
-        title = "Reverse dependency results already exist",
-        c("Overwrite", "Resume")
-      )
-
-      if (choice == 2) {
-        return()
-      }
-    }
-  }
 
   db_setup(pkg)              # Make sure it exists
   db_clean(pkg)              # Delete all records
@@ -88,6 +77,13 @@ revdep_install <- function(pkg, quiet = FALSE) {
       install_local(pkg, quiet = quiet)
     )
   )
+}
+
+pkglib_exists <- function(pkgdir) {
+  pkg <- get_package_name(pkgdir)
+
+  file.exists(file.path(pkgdir, "revdep", "library", pkg, "old")) &&
+    file.exists(file.path(pkgdir, "revdep", "library", pkg, "new"))
 }
 
 #' @export
