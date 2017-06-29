@@ -5,16 +5,14 @@
 \alias{revdep_report_problems}
 \title{Markdown report of reverse dependency check results}
 \usage{
-revdep_report_summary(pkg = ".", revdeps = NULL)
+revdep_report_summary(pkg = ".")
 
-revdep_report_problems(pkg = ".", revdeps = NULL)
+revdep_report_problems(pkg = ".")
 }
 \arguments{
 \item{pkg}{Path to package}
-
-\item{revdeps}{Optionally, supply a character vector of package names
-to report on.  If omitted, reports on all revdeps.}
 }
 \description{
-Markdown report of reverse dependency check results
+You can use these functions to get intermediate reports of a \code{\link[=revdep_check]{revdep_check()}}
+running in another session.
 }

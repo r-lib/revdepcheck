@@ -1,41 +1,34 @@
 
 #' Markdown report of reverse dependency check results
 #'
-#' @inheritParams revdep_check
-#' @param revdeps Optionally, supply a character vector of package names
-#'   to report on.  If omitted, reports on all revdeps.
+#' You can use these functions to get intermediate reports of a [revdep_check()]
+#' running in another session.
 #'
+#' @inheritParams revdep_check
 #' @export
 #' @importFrom crayon black red yellow green
 #' @importFrom sessioninfo platform_info
 
-revdep_report_summary <- function(pkg = ".", revdeps = NULL) {
+revdep_report_summary <- function(pkg = ".") {
+  pkg <- pkg_check(pkg)
+
   cat_header("Platform")
-  cat_line()
-  platform <- platform_info()
-  platform_df <- data.frame(field = names(platform), value = unlist(platform))
-  cat_kable(platform_df)
+  cat_kable(report_platform())
 
   cat_header("Libraries")
-  cat_line()
-  cat_kable(library_compare(pkg))
+  cat_kable(report_libraries(pkg))
 
   cat_header("Revdeps")
-  cat_line()
-
-  packages <- revdep_results(pkg, revdeps)
-  broken <- vapply(packages, is_broken, logical(1))
-
-  n_todo <- length(db_todo(pkg))
-  n_ok <- sum(!broken)
-  n_broken <- sum(broken)
-
-  cat_bullet("BROKEN: ", red(as.character(n_broken)))
-  cat_bullet("OK: ", green(as.character(n_ok)))
-  if (n_todo > 0) {
-    cat_bullet("TODO: ", yellow(as.character(n_todo)))
+  status <- report_status(pkg)
+  cat_bullet("OK: ", green(as.character(status$ok)))
+  cat_bullet("BROKEN: ", red(as.character(status$broken)))
+  if (status$todo > 0) {
+    cat_bullet("TODO: ", yellow(as.character(status$todo)))
   }
+  cat_bullet("TOTAL: ", status$ok + status$broken + status$todo)
+
   cat_line()
+  packages <- revdep_results(pkg, NULL)
   print(packages)
 
   invisible()
@@ -44,8 +37,8 @@ revdep_report_summary <- function(pkg = ".", revdeps = NULL) {
 #' @export
 #' @rdname revdep_report_summary
 
-revdep_report_problems <- function(pkg = ".", revdeps = NULL) {
-  packages <- revdep_results(pkg, revdeps)
+revdep_report_problems <- function(pkg = ".") {
+  packages <- revdep_results(pkg, NULL)
   broken <- vapply(packages, is_broken, logical(1))
 
   lapply(packages[broken], failure_details)
@@ -88,6 +81,36 @@ format_details_bullet <- function(x, max_lines = 20) {
   )
 }
 
+
+# Helpers -----------------------------------------------------------------
+
+report_platform <- function() {
+  platform <- platform_info()
+  data.frame(field = names(platform), value = unlist(platform))
+}
+
+report_libraries <- function(pkg) {
+  path <- file.path(pkg, "revdep", "checks", "libraries.csv")
+
+  df <- read.csv(path, stringsAsFactors = FALSE)
+  names(df)[4] <- "\u0394"
+
+  df
+}
+
+report_status <- function(pkg = ".") {
+  packages <- revdep_results(pkg, NULL)
+  broken <- vapply(packages, is_broken, logical(1))
+
+  list(
+    todo = length(db_todo(pkg)),
+    ok = sum(!broken),
+    broken = sum(broken)
+  )
+}
+
+# Styling -----------------------------------------------------------------
+
 #' @importFrom knitr kable
 #' @importFrom crayon bold
 
@@ -98,5 +121,8 @@ cat_kable <- function(x, ...) {
 }
 cat_header <- function(..., level = 1) {
   cat(bold(paste0(strrep("#", level), " ", ...)), "\n", sep = "")
+  cat_line()
 }
 cat_bullet <- function(...) cat_line("* ", ...)
+
+

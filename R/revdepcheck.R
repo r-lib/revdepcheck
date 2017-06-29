@@ -98,6 +98,11 @@ revdep_install <- function(pkg = ".", quiet = FALSE) {
     )
   )
 
+  # Record libraries
+  lib <- library_compare(pkg)
+  write.csv(lib, file.path(pkg, "revdep", "checks", "libraries.csv"),
+    row.names = FALSE, quote = FALSE)
+
   invisible()
 }
 
@@ -130,6 +135,10 @@ revdep_run_check <- function(pkg = ".", quiet = TRUE,
   )
 
   run_event_loop(state)
+
+  status <- report_status(pkg)
+  cat_line(green("OK: "), status$ok)
+  cat_line(red("BROKEN: "), status$broken)
 
   invisible()
 }
