@@ -40,7 +40,7 @@ check_dir <- function(pkgdir,
 
   what <- match.arg(what)
 
-  pkg <- get_package_name(pkgdir)
+  pkg <- pkg_name(pkgdir)
 
   create_dir(file.path(pkgdir, "revdep"))
   create_dir(file.path(pkgdir, "revdep", "library"))

@@ -11,8 +11,7 @@ revdep_check <- function(pkg = ".", dependencies = c("Depends", "Imports",
                          timeout = as.difftime(10, units = "mins"),
                          num_workers = 1, bioc = TRUE) {
 
-  pkg <- normalizePath(pkg, mustWork = FALSE)
-  stopifnot(is_package_dir(pkg))
+  pkg <- pkg_check(pkg)
 
   ## Creates and initializes database, including computing revdeps
   if (!db_exists(pkg))
@@ -31,16 +30,18 @@ revdep_check <- function(pkg = ".", dependencies = c("Depends", "Imports",
 
 #' @export
 
-revdep_setup <- function(pkg,
+revdep_setup <- function(pkg = ".",
                          dependencies = c("Depends", "Imports",
                                           "Suggests", "LinkingTo"),
                          bioc = TRUE) {
+
+  pkg <- pkg_check(pkg)
 
   db_setup(pkg)              # Make sure it exists
   db_clean(pkg)              # Delete all records
 
   "!DEBUG getting reverse dependencies for `basename(pkg)`"
-  pkgname <- get_package_name(pkg)
+  pkgname <- pkg_name(pkg)
   message("Determining revdeps for ", pkgname)
   revdeps <- cran_revdeps(pkgname, dependencies, bioc = bioc)
   db_todo_add(pkg, revdeps)
@@ -48,7 +49,8 @@ revdep_setup <- function(pkg,
 
 #' @export
 
-revdep_install <- function(pkg, quiet = FALSE) {
+revdep_install <- function(pkg = ".", quiet = FALSE) {
+  pkg <- pkg_check(pkg)
 
   message(rule(center = "INSTALL", line_color = "black"))
 
@@ -57,7 +59,7 @@ revdep_install <- function(pkg, quiet = FALSE) {
   ## (to avoid installing locally installed newer versions.
   "!DEBUG Installing CRAN (old) version"
   message("Installing CRAN version of package")
-  package_name <- get_package_name(pkg)[[1]]
+  package_name <- pkg_name(pkg)[[1]]
 
   with_envvar(
     c(CRANCACHE_REPOS = "cran,bioc"),
@@ -80,7 +82,7 @@ revdep_install <- function(pkg, quiet = FALSE) {
 }
 
 pkglib_exists <- function(pkgdir) {
-  pkg <- get_package_name(pkgdir)
+  pkg <- pkg_name(pkgdir)
 
   file.exists(file.path(pkgdir, "revdep", "library", pkg, "old")) &&
     file.exists(file.path(pkgdir, "revdep", "library", pkg, "new"))
@@ -92,8 +94,8 @@ revdep_resume <- function(pkg = ".", quiet = TRUE,
                           timeout = as.difftime(10, units = "mins"),
                           num_workers = 1, bioc = TRUE) {
 
-  pkg <- normalizePath(pkg, mustWork = FALSE)
-  pkgname <- get_package_name(pkg)
+  pkg <- pkg_check(pkg)
+  pkgname <- pkg_name(pkg)
   message(center = rule(center = "REVDEP CHECKS", line_color = "black"))
 
   todo <- db_todo(pkg)
@@ -128,6 +130,7 @@ check_existing_checks <- function(pkg) {
 #' @export
 
 revdep_clean <- function(pkg = ".") {
+  pkg <- pkg_check(pkg)
   message(center = rule(center = "REVDEP CHECKS", line_color = "black"))
 
   # Delete local installs
@@ -150,12 +153,15 @@ revdep_clean <- function(pkg = ".") {
 #' @export
 
 revdep_add <- function(pkg = ".", packages) {
+  pkg <- pkg_check(pkg)
   db_todo_add(pkg, packages)
 }
 
 #' @export
 
 revdep_add_broken <- function(pkg = ".") {
+  pkg <- pkg_check(pkg)
+
   packages <- revdep_results(pkg, db_list(pkg))
   broken <- vapply(packages, is_broken, integer(1))
 

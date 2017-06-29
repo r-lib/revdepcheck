@@ -36,7 +36,7 @@ deps_install_opts <- function(pkgdir, pkgname, quiet = FALSE) {
 
   ## We don't want to install the revdep checked package again,
   ## that's in a separate library
-  packages <- setdiff(packages, get_package_name(pkgdir))
+  packages <- setdiff(packages, pkg_name(pkgdir))
 
   ## We do this, because if a package is not available,
   ## utils::install.packages does not install anything, just gives a

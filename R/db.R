@@ -66,7 +66,7 @@ db_metadata_init <- function(package) {
 
   dbExecute(db, sqlInterpolate(db, q, name = "dbversion", val = db_version))
   dbExecute(db, sqlInterpolate(db, q, name = "package",
-                                 val = get_package_name(package)))
+                                 val = pkg_name(package)))
 }
 
 #' @importFrom DBI dbExecute

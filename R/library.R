@@ -12,7 +12,7 @@ library_compare <- function(pkg) {
   lib_cmp[["\u0394"]] <- ifelse(same(lib_cmp$new, lib_cmp$old), "", "*")
 
   # Move tested package to top
-  pkgname <- get_package_name(pkg)
+  pkgname <- pkg_name(pkg)
 
   idx <- which(lib_cmp$package == pkgname)
   lib_cmp[union(idx, seq_len(nrow(lib_cmp))), , drop = FALSE]
