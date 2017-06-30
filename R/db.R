@@ -122,6 +122,7 @@ db_todo_add <- function(pkgdir, packages) {
   db <- db(pkgdir)
 
   df <- data.frame(package = packages, stringsAsFactors = FALSE)
+  row.names(df) <- NULL
   dbWriteTable(db, "todo", df, append = TRUE)
 
   invisible(pkgdir)
