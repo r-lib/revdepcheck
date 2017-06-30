@@ -22,9 +22,11 @@ deps_install_opts <- function(pkgdir, pkgname, quiet = FALSE) {
   ## automatically
   repos <- c(
     bioc_install_repos(),
-    getOption("repos"),
-    c("CRAN-cloud" = "https://cloud.r-project.org")
+    getOption("repos")
   )
+  if (! "CRAN" %in% names(repos) || repos["CRAN"] == "@CRAN@") {
+    repos["CRAN"] <- "https://cloud.r-project.org"
+  }
 
   ## We have to do this "manually", because some of the dependencies
   ## might be also dependencies of crancache, so they will be already
