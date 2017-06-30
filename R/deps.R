@@ -21,8 +21,8 @@ cran_revdeps <- function(package, dependencies, bioc) {
   allpkgs[rd, "Package"]
 }
 
-cran_deps <- function(package) {
-  allpkgs <- available_packages()
+cran_deps <- function(package, repos) {
+  allpkgs <- available_packages(repos = repos)
   current <- deps <- package
   dependencies <- c("Depends", "Imports", "LinkingTo", "Suggests")
   while (TRUE) {
