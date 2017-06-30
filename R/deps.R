@@ -6,9 +6,11 @@ cran_revdeps <- function(package, dependencies, bioc) {
   stopifnot(is_string(package))
   repos <- c(
     if (bioc) bioc_install_repos(),
-    getOption("repos"),
-    c("CRAN-cloud" = "https://cloud.r-project.org")
+    getOption("repos")
   )
+  if (! "CRAN" %in% names(repos) || repos["CRAN"] == "@CRAN@") {
+    repos["CRAN"] <- "https://cloud.r-project.org"
+  }
 
   allpkgs <- available_packages(repos = repos)
   alldeps <- allpkgs[, dependencies, drop = FALSE]
