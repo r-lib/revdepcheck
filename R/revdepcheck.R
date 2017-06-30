@@ -104,7 +104,10 @@ revdep_install <- function(pkg = ".", quiet = FALSE) {
     c(CRANCACHE_REPOS = "cran,bioc", CRANCACHE_QUIET = "yes"),
     with_libpaths(
       dir_find(pkg, "old"),
-      install_packages(pkgname, quiet = quiet)
+      with_options(
+        list(warn = 2),
+        install_packages(pkgname, quiet = quiet)
+      )
     )
   )
 
@@ -115,7 +118,10 @@ revdep_install <- function(pkg = ".", quiet = FALSE) {
     c(CRANCACHE_REPOS = "cran,bioc", CRANCACHE_QUIET = "yes"),
     with_libpaths(
       dir_find(pkg, "new"),
-      install_local(pkg, quiet = quiet)
+      with_options(
+        list(warn = 2),
+        install_local(pkg, quiet = quiet)
+      )
     )
   )
 
