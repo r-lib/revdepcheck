@@ -132,7 +132,7 @@ get_timeout <- function(state) {
     FUN.VALUE = numeric(1),
     timeout = state$options$timeout
   )
-  max(min(ts, 1000), 0)
+  max(min(ts, 200), 0)
 }
 
 get_process_waiting_time <- function(worker, timeout) {
