@@ -42,7 +42,7 @@ Imports:
 Remotes:
     r-lib/boxes,
     r-lib/callr,
-    r-lib/crancache@0185576111,
+    r-lib/crancache,
     gaborcsardi/progress,
     r-lib/rcmdcheck,
     r-lib/remotes
