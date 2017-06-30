@@ -10,7 +10,7 @@ cran_revdeps <- function(package, dependencies, bioc) {
     c("CRAN-cloud" = "https://cloud.r-project.org")
   )
 
-  allpkgs <- available_packages()
+  allpkgs <- available_packages(repos = repos)
   alldeps <- allpkgs[, dependencies, drop = FALSE]
   alldeps[is.na(alldeps)] <- ""
   deps <- apply(alldeps, 1, paste, collapse = ",")
