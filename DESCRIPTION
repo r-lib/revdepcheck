@@ -28,6 +28,8 @@ Imports:
     desc,
     DBI,
     jsonlite,
+    glue,
+    gmailr,
     knitr,
     prettyunits,
     processx,
@@ -38,7 +40,9 @@ Imports:
     sessioninfo,
     tools,
     utils,
-    withr
+    whoami,
+    withr,
+    yaml
 Remotes:
     r-lib/boxes,
     r-lib/callr,

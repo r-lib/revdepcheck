@@ -1,0 +1,29 @@
+Dear {your_name},
+
+This is an automated email to let you know that:
+
+* A new version of {my_package}, {my_version}, is ready to go to CRAN.
+* {your_package} uses {my_package} and has problems with the new version.
+* We plan to submit {my_package} to CRAN on {release_date}.
+
+I need your help to keep {your_package} and {my_package} working together smoothly. In the next {rel_release_date}, can you please:
+
+1. Read about the changes to {my_package} at {my_news_url}.
+   This page includes a list of breaking changes, the reasoning behind
+   them, and to how to update your code.
+
+2. Carefully inspect the failing checks listed at the bottom of this email.
+
+3. For each failing check, either update your package, or tell me
+   that I have a bug. If you have made changes to your package, please
+   submit an update to CRAN before {release_date}.
+
+If you have discovered a bug in {my_package}, please file an issue (ideally with a small reprex that illustrates the problem) at {my_issues_url}. If you're not sure whether or not you've found a bug, please an issue and we'll help you figure it out.
+
+Thanks,
+
+{my_name}
+
+== CHECK RESULTS ========================================
+
+{your_results}

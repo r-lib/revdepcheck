@@ -6,3 +6,4 @@
 ^appveyor.yml$
 ^revdep$
 ^\.travis\.yml$
+^\.httr-oauth$

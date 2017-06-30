@@ -230,9 +230,10 @@ db_results <- function(pkg, revdeps) {
 
   lapply_with_names(packages, function(p) {
     version <- res$old$version[match(p, res$old$package)]
+    maintainer <- res$old$maintainer[match(p, res$old$package)]
     oldcheck <- checkFromJSON(res$old$result[match(p, res$old$package)])
     newcheck <- checkFromJSON(res$new$result[match(p, res$new$package)])
-    try_compare_checks(oldcheck, newcheck, p, version)
+    try_compare_checks(oldcheck, newcheck, p, version, maintainer)
   })
 }
 

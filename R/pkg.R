@@ -15,5 +15,13 @@ pkg_check <- function(pkgdir) {
 }
 
 pkg_name <- function(pkgdir) {
-  read.dcf(file.path(pkgdir, "DESCRIPTION"))[, "Package"]
+  read.dcf(file.path(pkgdir, "DESCRIPTION"))[, "Package"][[1]]
+}
+
+pkg_version <- function(pkgdir) {
+  read.dcf(file.path(pkgdir, "DESCRIPTION"))[, "Version"][[1]]
+}
+
+pkg_bug_reports <- function(pkgdir) {
+  read.dcf(file.path(pkgdir, "DESCRIPTION"))[, "BugReports"][[1]]
 }

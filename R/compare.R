@@ -1,7 +1,7 @@
 
 #' @importFrom rcmdcheck compare_checks
 
-try_compare_checks <- function(old, new, package, version) {
+try_compare_checks <- function(old, new, package, version, maintainer) {
   if (inherits(old, "error") || inherits(new, "error")) {
     structure(
       list(
@@ -9,14 +9,21 @@ try_compare_checks <- function(old, new, package, version) {
         new = new,
         cmp = NULL,
         package = package,
-        version = version
+        version = version,
+        maintainer = maintainer
       ),
       class = "rcmdcheck_error"
     )
 
   } else {
     tryCatch(
-      compare_checks(old, new),
+      {
+        check <- compare_checks(old, new)
+        check$package <- package
+        check$version <- version
+        check$maintainer <- maintainer
+        check
+      },
       error = function(e) {
         structure(
           list(
@@ -24,7 +31,8 @@ try_compare_checks <- function(old, new, package, version) {
             new = new,
             cmp = NULL,
             package = package,
-            version = version
+            version = version,
+            maintainer = maintainer
           ),
           class = "rcmdcheck_error"
         )
