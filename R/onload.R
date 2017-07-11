@@ -1,4 +1,6 @@
 
 .onLoad <- function(libname, pkgname) {
-  debugme::debugme()
+   if (requireNamespace("debugme", quietly = TRUE)) {
+     debugme::debugme()
+   }
 }
