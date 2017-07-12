@@ -136,3 +136,9 @@ deps_install_done <- function(state, worker) {
 
   state
 }
+
+# Not used by other methods, but simplifies debugging
+deps_install <- function(pkgdir, pkgname, quiet = FALSE, new_session = FALSE) {
+  px_opts <- deps_install_opts(pkgdir, pkgname, quiet = FALSE)
+  execute_r(px_opts, new_session = new_session)
+}
