@@ -7,7 +7,7 @@ check_proc <- function(pkgdir, pkgname, version = c("old", "new")) {
   dir <- dir_find(pkgdir, "check", pkgname)
   tarball <- with_envvar(
     c(CRANCACHE_REPOS = "cran,bioc", CRANCACHE_QUIET = "yes"),
-    crancache::download_packages(pkgname, dir, repos = get_repos(bioc = TRUE))[,2]
+    crancache::download_packages(pkgname, dir, repos = get_repos(bioc = TRUE), quiet = TRUE)[,2]
   )
 
   out <- file.path(dir, version)
