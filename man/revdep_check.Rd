@@ -7,7 +7,7 @@
 \usage{
 revdep_check(pkg = ".", dependencies = c("Depends", "Imports", "Suggests",
   "LinkingTo"), quiet = TRUE, timeout = as.difftime(10, units = "mins"),
-  num_workers = 1, bioc = TRUE)
+  num_workers = 1, bioc = TRUE, warm_cache = FALSE)
 
 revdep_reset(pkg = ".")
 }
@@ -24,6 +24,10 @@ complete.}
 \item{num_workers}{Number of parallel workers to use}
 
 \item{bioc}{Also check revdeps in BioConductor?}
+
+\item{warm_cache}{Warm the CRAN cache before performing the check?
+Useful for fetching all dependencies (and, on Linux, also compiling them)
+in a first run.}
 }
 \description{
 \code{revdep_check()} is designed to work even if interrupted. If for some reason

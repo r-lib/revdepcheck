@@ -12,6 +12,9 @@
 #'   complete.
 #' @param num_workers Number of parallel workers to use
 #' @param bioc Also check revdeps in BioConductor?
+#' @param warm_cache Warm the CRAN cache before performing the check?
+#'   Useful for fetching all dependencies (and, on Linux, also compiling them)
+#'   in a first run.
 #'
 #' @export
 #' @importFrom remotes install_local
@@ -22,7 +25,7 @@ revdep_check <- function(pkg = ".", dependencies = c("Depends", "Imports",
                                       "Suggests", "LinkingTo"),
                          quiet = TRUE,
                          timeout = as.difftime(10, units = "mins"),
-                         num_workers = 1, bioc = TRUE) {
+                         num_workers = 1, bioc = TRUE, warm_cache = FALSE) {
 
   pkg <- pkg_check(pkg)
 
@@ -43,6 +46,8 @@ revdep_check <- function(pkg = ".", dependencies = c("Depends", "Imports",
 
   ## Run checks
   if (has_todo) {
+    if (warm_cache) revdep_warm_cache(pkg)
+
     revdep_run_check(pkg, quiet = quiet, timeout = timeout, num_workers = num_workers)
     did_something <- TRUE
   }
@@ -135,6 +140,30 @@ revdep_install <- function(pkg = ".", quiet = FALSE) {
 
 pkglib_exists <- function(pkgdir) {
   file.exists(dir_find(pkgdir, "old")) && file.exists(dir_find(pkgdir, "new"))
+}
+
+#' @importFrom crancache install_packages
+
+revdep_warm_cache <- function(pkg) {
+  "!DEBUG warming up revdep cache"
+  todo <- db_todo(pkg)
+  args <- deps_opts(todo)
+
+  package <- args$package
+  '!DEBUG package = `paste(package, collapse = ", ")`'
+  repos <- args$repos
+  '!DEBUG repos = `paste(repos, collapse = ", ")`'
+
+
+  withr::with_temp_libpaths({
+    # Installing in chunks of size 10 for eager caching
+    package_chunks <- split_size(package, 10)
+    lapply(package_chunks, install_packages, repos = repos, dependencies = FALSE)
+  })
+}
+
+split_size <- function(x, n) {
+  split(x, trunc(seq(0, by = 1 / n, length.out = length(x))))
 }
 
 #' @importFrom prettyunits vague_dt
