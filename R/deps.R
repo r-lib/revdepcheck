@@ -4,13 +4,7 @@
 
 cran_revdeps <- function(package, dependencies, bioc) {
   stopifnot(is_string(package))
-  repos <- c(
-    if (bioc) bioc_install_repos(),
-    getOption("repos")
-  )
-  if (! "CRAN" %in% names(repos) || repos["CRAN"] == "@CRAN@") {
-    repos["CRAN"] <- "https://cloud.r-project.org"
-  }
+  repos <- get_repos(bioc)
 
   allpkgs <- available_packages(repos = repos)
   alldeps <- allpkgs[, dependencies, drop = FALSE]
@@ -19,6 +13,16 @@ cran_revdeps <- function(package, dependencies, bioc) {
   rd <- grepl(paste0("\\b", package, "\\b"), deps)
 
   allpkgs[rd, "Package"]
+}
+
+get_repos <- function(bioc) {
+  repos <- c(
+    if (bioc) bioc_install_repos(),
+    getOption("repos")
+  )
+  if (! "CRAN" %in% names(repos) || repos["CRAN"] == "@CRAN@") {
+    repos["CRAN"] <- "https://cloud.r-project.org"
+  }
 }
 
 cran_deps <- function(package, repos) {

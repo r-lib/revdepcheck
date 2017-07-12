@@ -106,7 +106,7 @@ revdep_install <- function(pkg = ".", quiet = FALSE) {
       dir_find(pkg, "old"),
       with_options(
         list(warn = 2),
-        install_packages(pkgname, quiet = quiet)
+        install_packages(pkgname, quiet = quiet, repos = get_repos(bioc = TRUE))
       )
     )
   )
