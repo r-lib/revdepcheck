@@ -142,7 +142,7 @@ pkglib_exists <- function(pkgdir) {
   file.exists(dir_find(pkgdir, "old")) && file.exists(dir_find(pkgdir, "new"))
 }
 
-#' @importFrom crancache install_packages
+#' @importFrom crancache install_packages download_packages
 
 revdep_warm_cache <- function(pkg) {
   "!DEBUG warming up revdep cache"
@@ -154,12 +154,28 @@ revdep_warm_cache <- function(pkg) {
   repos <- args$repos
   '!DEBUG repos = `paste(repos, collapse = ", ")`'
 
+  temp_lib <- tempfile("revdepcheck-lib")
+  dir.create(temp_lib)
+  temp_path <- tempfile("revdepcheck-temp")
+  dir.create(temp_path)
 
-  withr::with_temp_libpaths({
+  withr::with_libpaths(temp_lib, {
     # Installing in chunks of size 10 for eager caching
     package_chunks <- split_size(package, 10)
-    lapply(package_chunks, install_packages, repos = repos, dependencies = FALSE)
+    lapply(
+      package_chunks, install_packages,
+      repos = repos, dependencies = FALSE
+    )
+
+    todo_chunks <- split_size(todo, 10)
+    lapply(
+      todo_chunks, download_packages,
+      destdir = temp_path, repos = repos, dependencies = FALSE, type = "source"
+    )
   })
+
+  unlink(temp_path, recursive = TRUE)
+  unlink(temp_lib, recursive = TRUE)
 }
 
 split_size <- function(x, n) {
