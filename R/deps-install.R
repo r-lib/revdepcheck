@@ -19,7 +19,10 @@ deps_install_opts <- function(pkgdir, pkgname, quiet = FALSE) {
   }
 
   args <- c(
-    deps_opts(pkgdir, pkgname),
+    ## We don't want to install the revdep checked package again,
+    ## that's in a separate library, hence the `exclude` argument
+    deps_opts(pkgname, exclude = pkg_name(pkgdir)),
+
     list(
       libdir = dir_find(pkgdir, "pkg", pkgname),
       quiet = quiet
@@ -37,7 +40,7 @@ deps_install_opts <- function(pkgdir, pkgname, quiet = FALSE) {
   )
 }
 
-deps_opts <- function(pkgdir, pkgname) {
+deps_opts <- function(pkgname, exclude = character()) {
   ## We set repos, so that dependencies from BioConductor are installed
   ## automatically
   repos <- get_repos(bioc = TRUE)
@@ -50,9 +53,7 @@ deps_opts <- function(pkgdir, pkgname) {
   '!DEBUG Querying dependencies of `paste(pkgname, collapse = ", ")`'
   packages <- cran_deps(pkgname, repos)
 
-  ## We don't want to install the revdep checked package again,
-  ## that's in a separate library
-  packages <- setdiff(packages, pkg_name(pkgdir))
+  packages <- setdiff(packages, exclude)
 
   ## We do this, because if a package is not available,
   ## utils::install.packages does not install anything, just gives a
