@@ -18,37 +18,12 @@ deps_install_opts <- function(pkgdir, pkgname, quiet = FALSE) {
     )
   }
 
-  ## We set repos, so that dependencies from BioConductor are installed
-  ## automatically
-  repos <- get_repos(bioc = TRUE)
-
-  ## We have to do this "manually", because some of the dependencies
-  ## might be also dependencies of crancache, so they will be already
-  ## installed in another library directory, and also loaded.
-  ## But we want to install everything into the package's specific library,
-  ## because this is the only library used for the check.
-  "!DEBUG Querying dependencies of `pkgname`"
-  packages <- cran_deps(pkgname, repos)
-
-  ## We don't want to install the revdep checked package again,
-  ## that's in a separate library
-  packages <- setdiff(packages, pkg_name(pkgdir))
-
-  ## We do this, because if a package is not available,
-  ## utils::install.packages does not install anything, just gives a
-  ## warning
-  "!DEBUG dropping unavailable dependencies for `pkgname`"
-  available <- with_envvar(
-    c(CRANCACHE_REPOS = "cran,bioc", CRANCACHE_QUIET = "yes"),
-    rownames(available_packages(repos = repos))
-  )
-  packages <- intersect(available, packages)
-
-  args <- list(
-    libdir = dir_find(pkgdir, "pkg", pkgname),
-    package = packages,
-    quiet = quiet,
-    repos = repos
+  args <- c(
+    deps_opts(pkgdir, pkgname),
+    list(
+      libdir = dir_find(pkgdir, "pkg", pkgname),
+      quiet = quiet
+    )
   )
 
   ## CRANCACHE_REPOS makes sure that we only use cached CRAN packages,
@@ -58,7 +33,40 @@ deps_install_opts <- function(pkgdir, pkgname, quiet = FALSE) {
     args = args,
     system_profile = FALSE,
     user_profile = FALSE,
-    env = c(CRANCACHE_REPOS = "cran,bioc", CRANCACHE_QUIET = "yes")
+    env = c(CRANCACHE_REPOS = "cran,bioc", CRANCACHE_QUIET = if (quiet) "yes" else "no")
+  )
+}
+
+deps_opts <- function(pkgdir, pkgname) {
+  ## We set repos, so that dependencies from BioConductor are installed
+  ## automatically
+  repos <- get_repos(bioc = TRUE)
+
+  ## We have to do this "manually", because some of the dependencies
+  ## might be also dependencies of crancache, so they will be already
+  ## installed in another library directory, and also loaded.
+  ## But we want to install everything into the package's specific library,
+  ## because this is the only library used for the check.
+  '!DEBUG Querying dependencies of `paste(pkgname, collapse = ", ")`'
+  packages <- cran_deps(pkgname, repos)
+
+  ## We don't want to install the revdep checked package again,
+  ## that's in a separate library
+  packages <- setdiff(packages, pkg_name(pkgdir))
+
+  ## We do this, because if a package is not available,
+  ## utils::install.packages does not install anything, just gives a
+  ## warning
+  "!DEBUG dropping unavailable dependencies"
+  available <- with_envvar(
+    c(CRANCACHE_REPOS = "cran,bioc", CRANCACHE_QUIET = "yes"),
+    rownames(available_packages(repos = repos))
+  )
+  packages <- intersect(packages, available)
+
+  list(
+    package = packages,
+    repos = repos
   )
 }
 
