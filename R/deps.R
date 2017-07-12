@@ -23,6 +23,7 @@ get_repos <- function(bioc) {
   if (! "CRAN" %in% names(repos) || repos["CRAN"] == "@CRAN@") {
     repos["CRAN"] <- "https://cloud.r-project.org"
   }
+  repos
 }
 
 cran_deps <- function(package, repos) {
