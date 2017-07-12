@@ -20,13 +20,7 @@ deps_install_opts <- function(pkgdir, pkgname, quiet = FALSE) {
 
   ## We set repos, so that dependencies from BioConductor are installed
   ## automatically
-  repos <- c(
-    bioc_install_repos(),
-    getOption("repos")
-  )
-  if (! "CRAN" %in% names(repos) || repos["CRAN"] == "@CRAN@") {
-    repos["CRAN"] <- "https://cloud.r-project.org"
-  }
+  repos <- get_repos(bioc = TRUE)
 
   ## We have to do this "manually", because some of the dependencies
   ## might be also dependencies of crancache, so they will be already
