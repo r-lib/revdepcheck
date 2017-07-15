@@ -62,6 +62,8 @@ revdep_report_problems <- function(pkg = ".", file = "") {
 }
 
 failure_details <- function(x, file = "") {
+  if (inherits(x, "rcmdcheck_error")) return(failure_details_error(x, file))
+
   old <- x$old[[1]]
   cat_header(old$package, file = file)
   cat_line("Version: ", old$version, file = file)
@@ -118,6 +120,24 @@ format_details_bullet <- function(x, max_lines = 20) {
     paste0(pad, details, "\n", collapse = ""),
     "\n"
   )
+}
+
+failure_details_error <- function(x, file) {
+  cat_header(x$package, file = file)
+
+  cat_header(level = 2, "Old stdout", file = file)
+  cat(x$old$stdout, sep = "\n", file = file)
+
+  cat_header(level = 2, "Old stderr", file = file)
+  cat(x$old$stderr, sep = "\n", file = file)
+
+  cat_header(level = 2, "New stdout", file = file)
+  cat(x$new$stdout, sep = "\n", file = file)
+
+  cat_header(level = 2, "New stderr", file = file)
+  cat(x$new$stderr, sep = "\n", file = file)
+
+  invisible()
 }
 
 

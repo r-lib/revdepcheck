@@ -26,6 +26,8 @@ revdep_todo <- function(pkg = ".") {
 }
 
 is_broken <- function(x) {
+  if (inherits(x, "rcmdcheck_error")) return(TRUE)
+
   # TODO: use better code from rcmdcheck
   n_broken_type <- function(x, type) {
     recs <- x$cmp[x$cmp$type == type, , drop = FALSE]
