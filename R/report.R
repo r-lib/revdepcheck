@@ -180,6 +180,7 @@ report_revdeps <- function(pkg = ".") {
 
   probs <- map_lgl(packages, problems)
   pkgname <- map_chr(packages, function(x) x$new$package %||% NA_character_)
+  pkgname[is.na(pkgname)] <- names(packages)[is.na(pkgname)]
 
   data.frame(
     problems = probs,
