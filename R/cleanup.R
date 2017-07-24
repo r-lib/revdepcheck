@@ -16,7 +16,6 @@ cleanup_chkres <- function(state, worker, iam_old) {
   check_dir <- dir_find(pkgdir, "check", package)
   rcheck <- file.path(
     check_dir,
-    package,
     if (iam_old) "old" else "new",
     paste0(package, ".Rcheck")
   )
