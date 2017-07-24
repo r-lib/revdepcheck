@@ -121,6 +121,8 @@ check_done <- function(state, worker) {
     )
   }
 
+  cleanup_chkres(state, worker, iam_old)
+
   status <- if (isTRUE(worker$killed)) {
     "TIMEOUT"
   } else if (!inherits(chkres, "rcmdcheck")) {
