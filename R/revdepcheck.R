@@ -221,6 +221,9 @@ revdep_clean <- function(pkg = ".") {
   unlink(file.path(rcheck, "00_pkg_src"), recursive = TRUE)
   unlink(file.path(rcheck, package), recursive = TRUE)
 
+  sources <- dir(file.path(check_dir, package), pattern = "\\.tar.gz$", full.names = TRUE)
+  unlink(sources)
+
   db_metadata_set(pkg, "todo", "report")
   invisible()
 }
