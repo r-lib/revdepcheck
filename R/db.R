@@ -9,6 +9,9 @@ db <- function(package) {
   if (exists(package, envir = dbenv) &&
       dbIsValid(con <- dbenv[[package]])) {
     con
+  } else if (package == ":memory:") {
+    dbenv[[package]] <- dbConnect(SQLite(), ":memory:")
+    dbenv[[package]]
   } else {
     dbenv[[package]] <- dbConnect(SQLite(), dir_find(package, "db"))
     dbenv[[package]]
@@ -56,17 +59,39 @@ db_setup <- function(package) {
   dbExecute(db, "CREATE INDEX idx_revdeps_package ON revdeps(package)")
 
   dbExecute(db, "CREATE TABLE todo (package TEXT)")
+
+  invisible(db)
+}
+
+db_metadata_init <- function(package) {
+  db_metadata_set(package, "dbversion", db_version)
+
+  if (package != ":memory:")
+    db_metadata_set(package, "package", pkg_name(package))
 }
 
 #' @importFrom DBI dbExecute sqlInterpolate
 
-db_metadata_init <- function(package) {
+db_metadata_set <- function(package, name, value) {
   db <- db(package)
-  q <- "INSERT INTO metadata VALUES (?name, ?val)"
+  sql <- sqlInterpolate(
+    db,
+    "INSERT INTO metadata VALUES (?name, ?value)",
+    name = name,
+    value = value
+  )
+  dbExecute(db, sql)
+}
 
-  dbExecute(db, sqlInterpolate(db, q, name = "dbversion", val = db_version))
-  dbExecute(db, sqlInterpolate(db, q, name = "package",
-                                 val = pkg_name(package)))
+#' @importFrom DBI dbGetQuery sqlInterpolate
+
+db_metadata_get <- function(package, name) {
+  db <- db(package)
+  sql <- sqlInterpolate(db,
+    "SELECT value FROM metadata WHERE name = ?name",
+    name = name
+  )
+  dbGetQuery(db, sql)[[1]]
 }
 
 #' @importFrom DBI dbExecute
