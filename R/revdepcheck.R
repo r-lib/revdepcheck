@@ -46,7 +46,10 @@ revdep_check <- function(pkg = ".",
   }
 
   if (!did_something) {
-    message("Nothing happened. Do you need to run revdep_reset()?")
+    message(
+      "* See results of previous run in 'revdep/README.md'\n",
+      "* Reset for another run with `revdep_reset()`"
+    )
   }
 
   invisible()
