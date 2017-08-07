@@ -57,7 +57,7 @@ revdep_email <- function(pkg = ".") {
     list(
       your_package = x$package,
       your_version = x$version,
-      your_results = your_results,
+      your_results = glue::collapse(your_results),
       your_name = paste(maintainer$given, maintainer$family),
       your_email = maintainer$email
     )
