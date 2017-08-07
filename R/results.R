@@ -4,6 +4,14 @@ revdep_results <- function(pkg = ".", revdeps = NULL) {
   res
 }
 
+#' Display details of a single revdepcheck
+#'
+#' Use this to see nicely formatted results of processed packages while
+#' [revdep_check()] is running in another process.
+#'
+#' @export
+#' @param pkg Path to package
+#' @param revdep Name of revdep package.
 #' @importFrom rcmdcheck compare_checks
 
 revdep_details <- function(pkg = ".", revdep) {
