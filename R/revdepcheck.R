@@ -26,62 +26,57 @@ revdep_check <- function(pkg = ".",
                          bioc = TRUE) {
 
   pkg <- pkg_check(pkg)
+  dir_setup(pkg)
+  if (!db_exists(pkg)) {
+    db_setup(pkg)
+  }
 
   did_something <- FALSE
-  ## Creates and initializes database, including computing revdeps
-  if (!db_exists(pkg)) {
-    revdep_setup(pkg, dependencies = dependencies, bioc = bioc)
-    did_something <- TRUE
-  }
-
-  has_todo <- length(db_todo(pkg)) > 0
-
-  ## Install CRAN and dev versions
-  if (!pkglib_exists(pkg) && has_todo) {
-    revdep_install(pkg, quiet = quiet)
-    did_something <- TRUE
-  }
-
-  ## Run checks
-  if (has_todo) {
-    revdep_run_check(pkg, quiet = quiet, timeout = timeout, num_workers = num_workers)
-    did_something <- TRUE
-  }
-
-  if (pkglib_exists(pkg)) {
-    revdep_clean(pkg)
-    did_something <- TRUE
-  }
-
-  if (!report_exists(pkg)) {
-    revdep_report(pkg)
+  repeat {
+    stage <- db_metadata_get(pkg, "todo") %||% "init"
+    switch(stage,
+      init =    revdep_init(pkg, dependencies = dependencies, bioc = bioc),
+      install = revdep_install(pkg, quiet = quiet),
+      run =     revdep_run(pkg, quiet = quiet, timeout = timeout, num_workers = num_workers),
+      clean =   revdep_clean(pkg),
+      report =  revdep_report(pkg),
+      done =    break
+    )
     did_something <- TRUE
   }
 
   if (!did_something) {
     message("Nothing happened. Do you need to run revdep_reset()?")
   }
+
+  invisible()
 }
 
-revdep_setup <- function(pkg = ".",
-                         dependencies = c("Depends", "Imports",
-                                          "Suggests", "LinkingTo"),
-                         bioc = TRUE) {
+revdep_setup <- function(pkg = ".") {
   pkg <- pkg_check(pkg)
-  pkgname <- pkg_name(pkg)
-
   status("SETUP")
 
   message("Creating directories and database")
-  dir_setup(pkg)
-  db_setup(pkg)              # Make sure it exists
+
+  invisible()
+}
+
+
+revdep_init <- function(pkg = ".",
+                         dependencies = c("Depends", "Imports",
+                                          "Suggests", "LinkingTo"),
+                         bioc = TRUE) {
+
+  pkg <- pkg_check(pkg)
+  pkgname <- pkg_name(pkg)
   db_clean(pkg)              # Delete all records
 
   "!DEBUG getting reverse dependencies for `basename(pkg)`"
-  message("Computing revdeps")
+  status("INIT", "Computing revdeps")
   revdeps <- cran_revdeps(pkgname, dependencies, bioc = bioc)
   db_todo_add(pkg, revdeps)
 
+  db_metadata_set(pkg, "todo", "install")
   invisible()
 }
 
@@ -131,18 +126,15 @@ revdep_install <- function(pkg = ".", quiet = FALSE) {
   utils::write.csv(lib, file.path(pkg, "revdep", "checks", "libraries.csv"),
     row.names = FALSE, quote = FALSE)
 
+  db_metadata_set(pkg, "todo", "run")
   invisible()
-}
-
-pkglib_exists <- function(pkgdir) {
-  file.exists(dir_find(pkgdir, "old")) && file.exists(dir_find(pkgdir, "new"))
 }
 
 #' @importFrom prettyunits vague_dt
 
-revdep_run_check <- function(pkg = ".", quiet = TRUE,
-                          timeout = as.difftime(10, units = "mins"),
-                          num_workers = 1, bioc = TRUE) {
+revdep_run <- function(pkg = ".", quiet = TRUE,
+                       timeout = as.difftime(10, units = "mins"),
+                       num_workers = 1, bioc = TRUE) {
 
   pkg <- pkg_check(pkg)
   pkgname <- pkg_name(pkg)
@@ -172,6 +164,7 @@ revdep_run_check <- function(pkg = ".", quiet = TRUE,
   cat_line(red("BROKEN: "), status$broken)
   cat_line("Total time: ", vague_dt(end - start, format = "short"))
 
+  db_metadata_set(pkg, "todo", "clean")
   invisible()
 }
 
@@ -198,6 +191,7 @@ revdep_clean <- function(pkg = ".") {
   unlink(file.path(rcheck, "00_pkg_src"), recursive = TRUE)
   unlink(file.path(rcheck, package), recursive = TRUE)
 
+  db_metadata_set(pkg, "todo", "report")
   invisible()
 }
 
@@ -213,6 +207,9 @@ revdep_report <- function(pkg = ".") {
 
   message("Writing problems to 'revdep/problems.md'")
   revdep_report_problems(pkg, file = file.path(root, "problems.md"))
+
+  db_metadata_set(pkg, "todo", "done")
+  invisible()
 }
 
 report_exists <- function(pkg) {

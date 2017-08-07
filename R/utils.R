@@ -1,5 +1,5 @@
 
-`%||%` <- function(l, r) if (is.null(l)) r else l
+`%||%` <- function(l, r) if (length(l) == 0) r else l
 
 is_string <- function(x) {
   is.character(x) && length(x) == 1 && !is.na(x)
