@@ -8,7 +8,7 @@
 #'
 #' @section Steps:
 #'
-#' `revdep_check()` proceeds in five steps:
+#' `revdep_check()` proceeds in four steps:
 #'
 #' 1.  **Init**: create the `revdep/` subdirectory if it doesn't already exist,
 #'     and save the list of reverse dependencies to check.
@@ -19,8 +19,6 @@
 #' 1.  **Run**: run `R CMD check` twice for each reverse dependency, once
 #'     for the CRAN version and one for the local version. The checks are
 #'     run in parallel using `num_worker` processes.
-#'
-#' 1.  **Clean**: delete intermediate files that are no longer needed
 #'
 #' 1.  **Report**: generate reports showing differences between the check
 #'     results for the CRAN and local versions of your package. The focus of
@@ -68,7 +66,6 @@ revdep_check <- function(pkg = ".",
       init =    revdep_init(pkg, dependencies = dependencies, bioc = bioc),
       install = revdep_install(pkg, quiet = quiet),
       run =     revdep_run(pkg, quiet = quiet, timeout = timeout, num_workers = num_workers),
-      clean =   revdep_clean(pkg),
       report =  revdep_report(pkg),
       done =    break
     )
@@ -196,33 +193,6 @@ revdep_run <- function(pkg = ".", quiet = TRUE,
   cat_line(green("OK: "), status$ok)
   cat_line(red("BROKEN: "), status$broken)
   cat_line("Total time: ", vague_dt(end - start, format = "short"))
-
-  db_metadata_set(pkg, "todo", "clean")
-  invisible()
-}
-
-check_existing_checks <- function(pkg) {
-  length(db_list(pkg)) != 0
-}
-
-revdep_clean <- function(pkg = ".") {
-  pkg <- pkg_check(pkg)
-
-  status("CLEAN")
-
-  # Delete all sources/binaries cached by R CMD check
-  check_dir <- dir_find(pkg, "checks")
-  package <- dir(check_dir)
-  rcheck <- c(
-    file.path(check_dir, package, "new", paste0(package, ".Rcheck")),
-    file.path(check_dir, package, "old", paste0(package, ".Rcheck"))
-  )
-
-  unlink(file.path(rcheck, "00_pkg_src"), recursive = TRUE)
-  unlink(file.path(rcheck, package), recursive = TRUE)
-
-  sources <- dir(file.path(check_dir, package), pattern = "\\.tar.gz$", full.names = TRUE)
-  unlink(sources)
 
   db_metadata_set(pkg, "todo", "report")
   invisible()

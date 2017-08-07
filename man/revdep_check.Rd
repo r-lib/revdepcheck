@@ -36,7 +36,7 @@ ok but now fail.
 \section{Steps}{
 
 
-\code{revdep_check()} proceeds in five steps:
+\code{revdep_check()} proceeds in four steps:
 \enumerate{
 \item \strong{Init}: create the \code{revdep/} subdirectory if it doesn't already exist,
 and save the list of reverse dependencies to check.
@@ -45,7 +45,6 @@ versions of your package, including all dependencies.
 \item \strong{Run}: run \code{R CMD check} twice for each reverse dependency, once
 for the CRAN version and one for the local version. The checks are
 run in parallel using \code{num_worker} processes.
-\item \strong{Clean}: delete intermediate files that are no longer needed
 \item \strong{Report}: generate reports showing differences between the check
 results for the CRAN and local versions of your package. The focus of
 the report is on new failures. The reports are saved in \code{revdep/}.
