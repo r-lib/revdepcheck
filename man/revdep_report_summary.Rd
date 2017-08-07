@@ -10,7 +10,7 @@ revdep_report_summary(pkg = ".", file = "")
 revdep_report_problems(pkg = ".", file = "")
 }
 \arguments{
-\item{pkg}{Path to package}
+\item{pkg}{Path to package.}
 
 \item{file}{File to write output to. Default will write to console.}
 }

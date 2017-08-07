@@ -10,7 +10,7 @@ revdep_email(pkg = ".")
 revdep_email_draft(pkg, data = email_data(pkg))
 }
 \arguments{
-\item{pkg}{Path to package}
+\item{pkg}{Path to package.}
 
 \item{data}{Optionally, supply a named list to provide your own parameters
 to fill in the template}

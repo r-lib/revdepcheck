@@ -7,7 +7,7 @@
 revdep_maintainers(pkg = ".")
 }
 \arguments{
-\item{pkg}{Path to package}
+\item{pkg}{Path to package.}
 }
 \description{
 List maintainers of all reverse dependencies

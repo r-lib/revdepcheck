@@ -7,7 +7,7 @@
 revdep_todo(pkg = ".")
 }
 \arguments{
-\item{pkg}{Path to package}
+\item{pkg}{Path to package.}
 }
 \description{
 List packages remaining in the todo list

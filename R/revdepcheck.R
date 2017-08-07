@@ -1,17 +1,47 @@
 #' Run revdep checks
 #'
-#' `revdep_check()` is designed to work even if interrupted. If for some reason
-#' you need to stop the checks, or the session dies, just rerun `revdep_check()`
-#' and it will resume from where it last stopped. To completed reset the
-#' results of a previous run, use `revdep_reset()`.
+#' `revdep_check()` runs `R CMD check` on all reverse dependencies of your
+#' package. To avoid false positives, it runs `R CMD check` twice: once for
+#' released version on CRAN and once for the local development version. It
+#' then reports the differences so you can see what checks were previously
+#' ok but now fail.
 #'
-#' @param pkg Path to package
-#' @param dependencies Which types of revdeps to check
+#' @section Steps:
+#'
+#' `revdep_check()` proceeds in five steps:
+#'
+#' 1.  **Init**: create the `revdep/` subdirectory if it doesn't already exist,
+#'     and save the list of reverse dependencies to check.
+#'
+#' 1.  **Install**: install the CRAN (released) and local (development)
+#'     versions of your package, including all dependencies.
+#'
+#' 1.  **Run**: run `R CMD check` twice for each reverse dependency, once
+#'     for the CRAN version and one for the local version. The checks are
+#'     run in parallel using `num_worker` processes.
+#'
+#' 1.  **Clean**: delete intermediate files that are no longer needed
+#'
+#' 1.  **Report**: generate reports showing differences between the check
+#'     results for the CRAN and local versions of your package. The focus of
+#'     the report is on new failures. The reports are saved in `revdep/`.
+#'
+#' `revdep_check()` is designed to seamlessly resume in the case of failure:
+#' just re-run `revdep_check()` and it will start from where it left off.
+#' If you want to start again from scratch, run `revdep_reset()`.
+#'
+#'
+#' @param pkg Path to package.
+#' @param dependencies Which types of revdeps should be checked. For CRAN
+#'   release, we recommend using the default.
 #' @param quiet Suppress output from internal processes?
 #' @param timeout Maximum time to wait (in seconds) for `R CMD check` to
-#'   complete.
+#'   complete. Default is 10 minutes.
 #' @param num_workers Number of parallel workers to use
-#' @param bioc Also check revdeps in BioConductor?
+#' @param bioc Also check revdeps that live in BioConductor?
+#'
+#' @seealso Use [revdep_details()] in another process to see the details of
+#'   a problem.
 #'
 #' @export
 #' @importFrom remotes install_local

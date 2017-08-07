@@ -10,7 +10,7 @@ revdep_add(pkg = ".", packages)
 revdep_add_broken(pkg = ".")
 }
 \arguments{
-\item{pkg}{Path to package}
+\item{pkg}{Path to package.}
 
 \item{packages}{Character vector of package names to add}
 }
