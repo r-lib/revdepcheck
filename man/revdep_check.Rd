@@ -32,10 +32,12 @@ package. To avoid false positives, it runs \code{R CMD check} twice: once for
 released version on CRAN and once for the local development version. It
 then reports the differences so you can see what checks were previously
 ok but now fail.
+
+Once your package has been successfully submitted to CRAN, you should
+run \code{revdep_reset()}. This deletes all files used for checking, freeing
+up disk space and leaving you in a clean state for the next release.
 }
-\section{Steps}{
-
-
+\details{
 \code{revdep_check()} proceeds in four steps:
 \enumerate{
 \item \strong{Init}: create the \code{revdep/} subdirectory if it doesn't already exist,
@@ -54,7 +56,6 @@ the report is on new failures. The reports are saved in \code{revdep/}.
 just re-run \code{revdep_check()} and it will start from where it left off.
 If you want to start again from scratch, run \code{revdep_reset()}.
 }
-
 \seealso{
 Use \code{\link[=revdep_details]{revdep_details()}} in another process to see the details of
 a problem.

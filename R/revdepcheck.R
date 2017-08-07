@@ -1,13 +1,17 @@
 #' Run revdep checks
 #'
+#' @description
 #' `revdep_check()` runs `R CMD check` on all reverse dependencies of your
 #' package. To avoid false positives, it runs `R CMD check` twice: once for
 #' released version on CRAN and once for the local development version. It
 #' then reports the differences so you can see what checks were previously
 #' ok but now fail.
 #'
-#' @section Steps:
+#' Once your package has been successfully submitted to CRAN, you should
+#' run `revdep_reset()`. This deletes all files used for checking, freeing
+#' up disk space and leaving you in a clean state for the next release.
 #'
+#' @details
 #' `revdep_check()` proceeds in four steps:
 #'
 #' 1.  **Init**: create the `revdep/` subdirectory if it doesn't already exist,
@@ -27,7 +31,6 @@
 #' `revdep_check()` is designed to seamlessly resume in the case of failure:
 #' just re-run `revdep_check()` and it will start from where it left off.
 #' If you want to start again from scratch, run `revdep_reset()`.
-#'
 #'
 #' @param pkg Path to package.
 #' @param dependencies Which types of revdeps should be checked. For CRAN
