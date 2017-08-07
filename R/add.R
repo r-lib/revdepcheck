@@ -13,7 +13,10 @@
 revdep_add <- function(pkg = ".", packages) {
   pkg <- pkg_check(pkg)
   db_todo_add(pkg, packages)
-  db_metadata_set(pkg, "todo", "run")
+
+  # If you're re-checking packages, it's because the package has
+  # changed, so you'll want to re-install it
+  db_metadata_set(pkg, "todo", "install")
   invisible()
 }
 
