@@ -1,7 +1,10 @@
 #' List maintainers of all reverse dependencies
 #'
+#' @export
 #' @inheritParams revdep_check
-revdep_maintainers <- function(pkg) {
+revdep_maintainers <- function(pkg = ".") {
+  pkg <- pkg_check(pkg)
+
   m <- unique(db_maintainers(pkg)[[1]])
   structure(m, class = "maintainers")
 }
