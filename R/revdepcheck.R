@@ -18,11 +18,12 @@
 #' @importFrom withr with_libpaths with_envvar
 #' @importFrom crancache install_packages
 
-revdep_check <- function(pkg = ".", dependencies = c("Depends", "Imports",
-                                      "Suggests", "LinkingTo"),
+revdep_check <- function(pkg = ".",
+                         dependencies = c("Depends", "Imports", "Suggests", "LinkingTo"),
                          quiet = TRUE,
                          timeout = as.difftime(10, units = "mins"),
-                         num_workers = 1, bioc = TRUE) {
+                         num_workers = 1,
+                         bioc = TRUE) {
 
   pkg <- pkg_check(pkg)
 
