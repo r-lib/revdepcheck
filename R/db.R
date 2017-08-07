@@ -13,7 +13,7 @@ db <- function(package) {
     dbenv[[package]] <- dbConnect(SQLite(), ":memory:")
     dbenv[[package]]
   } else {
-    if (!file.exists(dir_find("."))) {
+    if (!file.exists(dir_find(pkg))) {
       stop("Please start by running `revdep_check()`", call. = FALSE)
     }
 
