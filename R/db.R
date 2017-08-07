@@ -74,6 +74,13 @@ db_metadata_init <- function(package) {
 
 db_metadata_set <- function(package, name, value) {
   db <- db(package)
+
+  sql <- sqlInterpolate(
+    db, "DELETE FROM metadata WHERE name = ?name",
+    name = name
+  )
+  dbExecute(db, sql)
+
   sql <- sqlInterpolate(
     db,
     "INSERT INTO metadata VALUES (?name, ?value)",
