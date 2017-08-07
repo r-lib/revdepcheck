@@ -248,6 +248,8 @@ revdep_reset <- function(pkg = ".") {
 revdep_add <- function(pkg = ".", packages) {
   pkg <- pkg_check(pkg)
   db_todo_add(pkg, packages)
+  db_metadata_set(pkg, "todo", "run")
+  invisible()
 }
 
 #' @export
