@@ -210,9 +210,6 @@ revdep_clean <- function(pkg = ".") {
 
   status("CLEAN")
 
-  # Delete local installs
-  unlink(dir_find(pkg, "lib"), recursive = TRUE)
-
   # Delete all sources/binaries cached by R CMD check
   check_dir <- dir_find(pkg, "checks")
   package <- dir(check_dir)
