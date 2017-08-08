@@ -105,7 +105,7 @@ checking_now <- function(state) {
   pkg_tasks <- split(tasks_abbr, pkgs)
   pkg_sum <- vapply(pkg_tasks, paste, collapse = "", FUN.VALUE = character(1))
 
-  width <- getOption("width") - 35 # conservative estimate
+  width <- getOption("width") - 38 # conservative estimate
   str <- paste0(names(pkg_tasks), " [", pkg_sum, "]", collapse = ", ")
   paste0("(", length(pkgs), ") ", str_trunc(str, width))
 }
