@@ -28,17 +28,26 @@ revdep_report_summary <- function(pkg = ".", file = "") {
 
   cat_header("Revdeps", file = file)
   revdeps <- report_revdeps(pkg)
-  problems <- revdeps$problems
-  revdeps$problems <- NULL
-  revdeps_broken <- revdeps[problems, ]
 
-  cat_header("Broken (", nrow(revdeps_broken), ")", level = 2, file = file)
-  cat_kable(revdeps_broken, file = file)
+  status <- revdeps$status
+  revdeps$status <- NULL
+  broken <- status == "-"
+  failed <- !(status %in% c("+", "-"))
 
-  cat_header("All (", nrow(revdeps), ")", level = 2, file = file)
-  cat_kable(revdeps, file = file)
+  revdep_report_section("Couldn't check", revdeps[failed, ], file = file)
+  revdep_report_section("Broken", revdeps[broken, ], file = file)
+  revdep_report_section("All", revdeps, file = file)
 
   invisible()
+}
+
+revdep_report_section <- function(title, rows, file) {
+  if (nrow(rows) == 0) {
+    return()
+  }
+
+  cat_header(title, " (", nrow(rows), ")", level = 2, file = file)
+  cat_kable(rows, file = file)
 }
 
 #' @export
@@ -62,38 +71,37 @@ revdep_report_problems <- function(pkg = ".", file = "") {
 }
 
 failure_details <- function(x, file = "") {
-  old <- x$old[[1]]
-  cat_header(old$package, file = file)
-  cat_line("Version: ", old$version, file = file)
+  cat_header(x$package, file = file)
+  cat_line("Version: ", x$versions[[1]], file = file)
   cat_line(file = file)
 
-  cmp <- x$cmp
-  old <- unique(cmp$hash[cmp$which == "old"])
-  new <- unique(cmp$hash[cmp$which == "new"])
+  rows <- x$cmp
+  cat_failure_section("Newly broken", rows[rows$change == +1, ], file = file)
+  cat_failure_section("Newly fixed",  rows[rows$change == -1, ], file = file)
+  cat_failure_section("In both",      rows[rows$change ==  0, ], file = file)
 
-  broke <- setdiff(new, old)
-  if (length(broke) > 0) {
-    cat_header("Newly broken", level = 2, file = file)
-    out <- cmp$output[cmp$hash %in% broke & cmp$which == "new"]
-    cat(format_details_bullets(out), sep = "", file = file)
+  if (x$status == "i") {
+    cat_header("Installation", level = 2, file = file)
+    cat_header("Devel", level = 3, file = file)
+    cat_line("```", file = file)
+    cat_line(x$new$install_out, file = file)
+    cat_line("```", file = file)
+    cat_header("CRAN", level = 3, file = file)
+    cat_line("```", file = file)
+    cat_line(x$old[[1]]$install_out, file = file)
+    cat_line("```", file = file)
   }
-
-  fixed <- setdiff(old, new)
-  if (length(fixed) > 0) {
-    cat_header("Newly fixed", level = 2, file = file)
-    out <- cmp$output[cmp$hash %in% fixed & cmp$which == "old"]
-    cat(format_details_bullets(out), sep = "", file = file)
-  }
-
-  both <- intersect(old, new)
-  if (length(both) > 0) {
-    cat_header("In both", level = 2, file = file)
-    out <- cmp$output[cmp$hash %in% both & cmp$which == "new"]
-    cat(format_details_bullets(out), sep = "", file = file)
-  }
-
 
   invisible()
+}
+
+cat_failure_section <- function(title, rows, file) {
+  if (nrow(rows) == 0) {
+    return()
+  }
+
+  cat_header(title, level = 2, file = file)
+  cat(format_details_bullets(rows$output), sep = "", file = file)
 }
 
 format_details_bullets <- function(x, max_lines = 20) {
@@ -110,7 +118,9 @@ format_details_bullet <- function(x, max_lines = 20) {
   if (n > max_lines) {
     details <- c("...", details[(n - max_lines):n])
   }
-  details <- c("```", details, "```")
+  if (n > 0) {
+    details <- c("```", details, "```")
+  }
 
   pad <- strrep(" ", 4)
   paste0(
@@ -149,17 +159,14 @@ report_status <- function(pkg = ".") {
 }
 
 report_revdeps <- function(pkg = ".") {
-  packages <- revdep_results(pkg, NULL)
+  comparisons <- revdep_results(pkg, NULL)
 
-  # Hacked out of rcmdcheck
   make_summary <- function(x, type) {
-    recs <- x$cmp[x$cmp$type == type, , drop = FALSE]
-    old <- unique(recs$hash[recs$which == "old"])
-    new <- unique(recs$hash[recs$which == "new"])
+    rows <- x$cmp[x$cmp$type == type, , drop = FALSE]
 
-    both <- length(intersect(old, new))
-    fixed <- length(setdiff(old, new))
-    broke <- length(setdiff(new, old))
+    both <- sum(rows$change == 0)
+    fixed <- sum(rows$change == -1)
+    broke <- sum(rows$change == 1)
 
     paste0(
       if (both) both else "",
@@ -168,26 +175,20 @@ report_revdeps <- function(pkg = ".") {
     )
   }
 
-  problems <- function(x) {
-    old <- unique(x$cmp$hash[x$cmp$which == "old"])
-    new <- unique(x$cmp$hash[x$cmp$which == "new"])
-    length(setdiff(new, old)) > 0
-  }
-
   problem_link <- function(pkg) {
-    paste0("[", pkg, "](problems.md#", pkg, ")")
+    paste0("[", pkg, "](problems.md#", tolower(pkg), ")")
   }
 
-  probs <- map_lgl(packages, problems)
-  pkgname <- map_chr(packages, function(x) x$new$package %||% NA_character_)
+  status <-  map_chr(comparisons, "[[", "status")
+  pkgname <- map_chr(comparisons, "[[", "package")
 
   data.frame(
-    problems = probs,
-    package = ifelse(probs, problem_link(pkgname), pkgname),
-    version = map_chr(packages, function(x) x$new$version %||% NA_character_),
-    error = map_chr(packages, make_summary, "error"),
-    warning = map_chr(packages, make_summary, "warning"),
-    note = map_chr(packages, make_summary, "note"),
+    status = status,
+    package = ifelse(status != "+", problem_link(pkgname), pkgname),
+    version = map_chr(comparisons, function(x) x$versions[[1]]),
+    error = map_chr(comparisons, make_summary, "error"),
+    warning = map_chr(comparisons, make_summary, "warning"),
+    note = map_chr(comparisons, make_summary, "note"),
     stringsAsFactors = FALSE,
     check.names = FALSE
   )
