@@ -62,10 +62,10 @@ revdep_report_problems <- function(pkg = ".", file = "") {
     on.exit(options(opts), add = TRUE)
   }
 
-  packages <- revdep_results(pkg, NULL)
-  broken <- vapply(packages, is_broken, logical(1))
+  comparisons <- revdep_results(pkg, NULL)
+  n_issues <- map_int(comparisons, function(x) sum(x$cmp$change %in% c(0, 1)))
 
-  lapply(packages[broken], failure_details, file = file)
+  lapply(comparisons[n_issues > 0], failure_details, file = file)
 
   invisible()
 }
@@ -179,12 +179,14 @@ report_revdeps <- function(pkg = ".") {
     paste0("[", pkg, "](problems.md#", tolower(pkg), ")")
   }
 
+  n_issues <- map_int(comparisons, function(x) sum(x$cmp$change %in% c(0, 1)))
+
   status <-  map_chr(comparisons, "[[", "status")
   pkgname <- map_chr(comparisons, "[[", "package")
 
   data.frame(
     status = status,
-    package = ifelse(status != "+", problem_link(pkgname), pkgname),
+    package = ifelse(n_issues > 0, problem_link(pkgname), pkgname),
     version = map_chr(comparisons, function(x) x$versions[[1]]),
     error = map_chr(comparisons, make_summary, "error"),
     warning = map_chr(comparisons, make_summary, "warning"),
@@ -200,6 +202,9 @@ map_chr <- function(x, fun, ...) {
 }
 map_lgl <- function(x, fun, ...) {
   vapply(x, fun, ..., FUN.VALUE = logical(1), USE.NAMES = FALSE)
+}
+map_int <- function(x, fun, ...) {
+  vapply(x, fun, ..., FUN.VALUE = integer(1), USE.NAMES = FALSE)
 }
 
 # Styling -----------------------------------------------------------------
