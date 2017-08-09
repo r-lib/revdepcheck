@@ -20,7 +20,7 @@ fromJSON <- function(txt, ...) {
 }
 
 checkFromJSON <- function(txt, ...) {
-  if (is.null(txt)) {
+  if (identical(txt, NA_character_)) {
     return()
   }
 
