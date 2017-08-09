@@ -24,12 +24,11 @@ print.revdepcheck_results <- function(x, ...) {
 
 revdep_details <- function(pkg = ".", revdep) {
   assert_that(is_string(revdep))
-  record <- db_details(pkg, revdep)
-  old <- checkFromJSON(record$old$result[[1]])
-  new <- checkFromJSON(record$new$result[[1]])
-  res <- compare_checks(old, new)
-  class(res) <- "revdepcheck_details"
-  res
+
+  structure(
+    db_results(pkg, revdep)[[1]],
+    class = "revdepcheck_details"
+  )
 }
 
 #' @export
@@ -37,42 +36,32 @@ revdep_details <- function(pkg = ".", revdep) {
 #' @importFrom crayon cyan
 
 print.revdepcheck_details <- function(x, ...) {
-  package <- x$package %||% x$new$package
-  version <- x$version %||% x$new$version
-
   ## Header
-  cat(rule(
+  cat_rule(
     left = cyan("Reverse dependency check"),
-    right = cyan(package, version),
+    right = cyan(x$package, x$versions[[1]]),
     line_color = "cyan",
     line = 2
-  ))
-  cat("\n")
+  )
 
   ## First a summary
-  cat("\n")
-  cat(rule(left = "Summary"))
-  cat("\n")
-  x2 <- x
-  class(x2) <- "rcmdcheck_comparison"
-  print(x2, header = FALSE)
+  cat_line()
+  print(structure(x, class = "rcmdcheck_comparison"), header = FALSE)
 
   ## Old version
-  cat(rule(left = "Before"))
-  cat("\n")
+  cat_rule(left = "Before")
   if (inherits(x$old, "error")) {
-    cat(red("<Error before the package check started>"))
+    cat_line(red("<Error before the package check started>"))
   } else {
     print(x$old[[1]], header = FALSE)
     print_install_out(x$old[[1]])
   }
+  cat_line()
 
   ## New version
-  cat("\n")
-  cat(rule(left = "After"))
-  cat("\n")
+  cat_rule(left = "After")
   if (inherits(x$new, "error")) {
-    cat(red("<Error before the package check started>"))
+    cat_line(red("<Error before the package check started>"))
   } else {
     print(x$new, header = FALSE)
     print_install_out(x$new)

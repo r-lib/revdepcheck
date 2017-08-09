@@ -215,6 +215,10 @@ cat_line <- function(..., file = "") {
   cat(..., "\n", sep = "", file = file)
 }
 
+cat_rule <- function(..., file = "") {
+  cat_line(rule(...), file = file)
+}
+
 cat_kable <- function(x, ..., file = "") {
   cat(kable(x, row.names = FALSE), sep = "\n", file = file)
   cat_line(file = file)
