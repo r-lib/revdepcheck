@@ -34,7 +34,7 @@ print.maintainers <- function(x, ...) {
 
 revdep_email <- function(pkg = ".") {
   # Find all broken packages
-  packages <- revdep_results(pkg, NULL)
+  packages <- db_results(pkg, NULL)
 
   broken <- vapply(packages, is_broken, logical(1))
   packages_broken <- packages[broken]

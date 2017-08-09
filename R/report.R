@@ -62,7 +62,7 @@ revdep_report_problems <- function(pkg = ".", file = "") {
     on.exit(options(opts), add = TRUE)
   }
 
-  comparisons <- revdep_results(pkg, NULL)
+  comparisons <- db_results(pkg, NULL)
   n_issues <- map_int(comparisons, function(x) sum(x$cmp$change %in% c(0, 1)))
 
   lapply(comparisons[n_issues > 0], failure_details, file = file)
@@ -148,7 +148,7 @@ report_libraries <- function(pkg) {
 }
 
 report_status <- function(pkg = ".") {
-  packages <- revdep_results(pkg, NULL)
+  packages <- db_results(pkg, NULL)
   broken <- vapply(packages, is_broken, logical(1))
 
   list(
@@ -159,7 +159,7 @@ report_status <- function(pkg = ".") {
 }
 
 report_revdeps <- function(pkg = ".") {
-  comparisons <- revdep_results(pkg, NULL)
+  comparisons <- db_results(pkg, NULL)
 
   make_summary <- function(x, type) {
     rows <- x$cmp[x$cmp$type == type, , drop = FALSE]

@@ -1,7 +1,21 @@
-revdep_results <- function(pkg = ".", revdeps = NULL) {
-  res <- db_results(pkg, revdeps)
-  class(res) <- "revdepcheck_results"
-  res
+#' Display revdep results
+#'
+#' Use this to see nicely formatted results of processed packages while
+#' [revdep_check()] is running in another process. `revdep_summary()`
+#' displays summary results for all complete checks. `revdep_details()`
+#' shows you the details for one
+#'
+#' @export
+#' @param pkg Path to package
+#' @param revdep Name of revdep package.
+
+revdep_details <- function(pkg = ".", revdep) {
+  assert_that(is_string(revdep))
+
+  structure(
+    db_results(pkg, revdep)[[1]],
+    class = "revdepcheck_details"
+  )
 }
 
 #' @export
@@ -11,23 +25,13 @@ print.revdepcheck_results <- function(x, ...) {
   invisible(x)
 }
 
-
-#' Display details of a single revdepcheck
-#'
-#' Use this to see nicely formatted results of processed packages while
-#' [revdep_check()] is running in another process.
-#'
 #' @export
-#' @param pkg Path to package
-#' @param revdep Name of revdep package.
-#' @importFrom rcmdcheck compare_checks
+#' @rdname revdep_details
 
-revdep_details <- function(pkg = ".", revdep) {
-  assert_that(is_string(revdep))
-
+revdep_summary <- function(pkg = ".") {
   structure(
-    db_results(pkg, revdep)[[1]],
-    class = "revdepcheck_details"
+    db_results(pkg, NULL),
+    class = "revdepcheck_results"
   )
 }
 

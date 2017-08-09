@@ -2,9 +2,12 @@
 % Please edit documentation in R/results.R
 \name{revdep_details}
 \alias{revdep_details}
-\title{Display details of a single revdepcheck}
+\alias{revdep_summary}
+\title{Display revdep results}
 \usage{
 revdep_details(pkg = ".", revdep)
+
+revdep_summary(pkg = ".")
 }
 \arguments{
 \item{pkg}{Path to package}
@@ -13,5 +16,7 @@ revdep_details(pkg = ".", revdep)
 }
 \description{
 Use this to see nicely formatted results of processed packages while
-\code{\link[=revdep_check]{revdep_check()}} is running in another process.
+\code{\link[=revdep_check]{revdep_check()}} is running in another process. \code{revdep_summary()}
+displays summary results for all complete checks. \code{revdep_details()}
+shows you the details for one
 }

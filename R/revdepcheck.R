@@ -41,8 +41,8 @@
 #' @param num_workers Number of parallel workers to use
 #' @param bioc Also check revdeps that live in BioConductor?
 #'
-#' @seealso Use [revdep_details()] in another process to see the details of
-#'   a problem.
+#' @seealso To see more details of problems during a run, call
+#'   [revdep_summary()] and [revdep_details()] in another process.
 #'
 #' @export
 #' @importFrom remotes install_local

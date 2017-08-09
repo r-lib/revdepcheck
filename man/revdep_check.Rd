@@ -57,6 +57,6 @@ just re-run \code{revdep_check()} and it will start from where it left off.
 If you want to start again from scratch, run \code{revdep_reset()}.
 }
 \seealso{
-Use \code{\link[=revdep_details]{revdep_details()}} in another process to see the details of
-a problem.
+To see more details of problems during a run, call
+\code{\link[=revdep_summary]{revdep_summary()}} and \code{\link[=revdep_details]{revdep_details()}} in another process.
 }
