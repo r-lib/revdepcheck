@@ -21,11 +21,15 @@ rcmdcheck_error <- function(package, old, new) {
 }
 
 rcmdcheck_status <- function(x) UseMethod("rcmdcheck_status")
+#' @export
 rcmdcheck_status.rcmdcheck_error <- function(x) "?"
+#' @export
 rcmdcheck_status.rcmdcheck_comparison <- function(x) x$status
 
 rcmdcheck_version <- function(x) UseMethod("rcmdcheck_version")
+#' @export
 rcmdcheck_version.rcmdcheck_error <- function(x) "?"
+#' @export
 rcmdcheck_version.rcmdcheck_comparison <- function(x) x$versions[[1]]
 
 is_broken <- function(x) {
@@ -34,6 +38,7 @@ is_broken <- function(x) {
 
 #' @importFrom clisymbols symbol
 #' @importFrom crayon make_style bgRed white
+#' @export
 
 summary.rcmdcheck_error <- function(object, ...) {
   pale <- make_style("darkgrey")
