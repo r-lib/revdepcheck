@@ -250,26 +250,13 @@ db_get_results <- function(pkg, revdeps) {
 db_results <- function(pkg, revdeps) {
   res <- db_get_results(pkg, revdeps)
 
-  oldpackages <- res$old$package
-  newpackages <- res$new$package
+  packages <- union(res$old$package, res$new$package)
 
-  onlynew <- setdiff(newpackages, oldpackages)
-  onlyold <- setdiff(oldpackages, newpackages)
-  if (length(onlynew) || length(onlyold)) {
-    warning(
-      "Some packages were not checked with both versions: ",
-      paste(sQuote(c(onlynew, onlyold)), collapse = ", ")
-    )
-  }
+  lapply_with_names(packages, function(package) {
+    oldcheck <- checkFromJSON(res$old$result[match(package, res$old$package)])
+    newcheck <- checkFromJSON(res$new$result[match(package, res$new$package)])
 
-  packages <- intersect(oldpackages, newpackages)
-
-  lapply_with_names(packages, function(p) {
-    version <- res$old$version[match(p, res$old$package)]
-    maintainer <- res$old$maintainer[match(p, res$old$package)]
-    oldcheck <- checkFromJSON(res$old$result[match(p, res$old$package)])
-    newcheck <- checkFromJSON(res$new$result[match(p, res$new$package)])
-    try_compare_checks(oldcheck, newcheck, p, version, maintainer)
+    try_compare_checks(package, oldcheck, newcheck)
   })
 }
 

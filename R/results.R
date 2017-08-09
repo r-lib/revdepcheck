@@ -34,19 +34,6 @@ revdep_todo <- function(pkg = ".") {
 }
 
 is_broken <- function(x) {
-  # TODO: use better code from rcmdcheck
-  n_broken_type <- function(x, type) {
-    recs <- x$cmp[x$cmp$type == type, , drop = FALSE]
-    old <- unique(recs$hash[recs$which == "old"])
-    new <- unique(recs$hash[recs$which == "new"])
-
-    length(setdiff(new, old))
-  }
-
-  n_broken <- n_broken_type(x, "error") +
-    n_broken_type(x, "warning") +
-    n_broken_type(x, "note")
-
-  n_broken > 0
+  rcmdcheck_status(x) != "+"
 }
 

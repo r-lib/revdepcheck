@@ -34,6 +34,10 @@
 run_event_loop <- function(state) {
   "!DEBUG running event loop"
 
+  if (nrow(state$packages) == 0) {
+    return()
+  }
+
   ## Kill all child processes if we quit from this function
   on.exit(remove_workers(state), add = TRUE)
 
