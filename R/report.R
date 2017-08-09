@@ -181,13 +181,13 @@ report_revdeps <- function(pkg = ".") {
 
   n_issues <- map_int(comparisons, function(x) sum(x$cmp$change %in% c(0, 1)))
 
-  status <-  map_chr(comparisons, "[[", "status")
+  status <-  map_chr(comparisons, rcmdcheck_status)
   pkgname <- map_chr(comparisons, "[[", "package")
 
   data.frame(
     status = status,
     package = ifelse(n_issues > 0, problem_link(pkgname), pkgname),
-    version = map_chr(comparisons, function(x) x$versions[[1]]),
+    version = map_chr(comparisons, rcmdcheck_version),
     error = map_chr(comparisons, make_summary, "error"),
     warning = map_chr(comparisons, make_summary, "warning"),
     note = map_chr(comparisons, make_summary, "note"),
@@ -195,7 +195,6 @@ report_revdeps <- function(pkg = ".") {
     check.names = FALSE
   )
 }
-
 
 map_chr <- function(x, fun, ...) {
   vapply(x, fun, ..., FUN.VALUE = character(1), USE.NAMES = FALSE)

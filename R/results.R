@@ -34,6 +34,6 @@ revdep_todo <- function(pkg = ".") {
 }
 
 is_broken <- function(x) {
-  x$status != "+"
+  rcmdcheck_status(x) != "+"
 }
 
