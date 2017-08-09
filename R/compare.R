@@ -28,6 +28,10 @@ rcmdcheck_version <- function(x) UseMethod("rcmdcheck_version")
 rcmdcheck_version.rcmdcheck_error <- function(x) "?"
 rcmdcheck_version.rcmdcheck_comparison <- function(x) x$versions[[1]]
 
+is_broken <- function(x) {
+  rcmdcheck_status(x) != "+"
+}
+
 #' @importFrom clisymbols symbol
 #' @importFrom crayon make_style bgRed white
 

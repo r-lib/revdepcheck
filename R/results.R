@@ -32,11 +32,6 @@ revdep_details <- function(pkg = ".", revdep) {
   res
 }
 
-is_broken <- function(x) {
-  rcmdcheck_status(x) != "+"
-}
-
-
 #' @export
 #' @importFrom boxes rule
 #' @importFrom crayon cyan
