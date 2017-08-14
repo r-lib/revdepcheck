@@ -78,7 +78,7 @@ revdep_check <- function(pkg = ".",
   if (!did_something) {
     message(
       "* See results of previous run in 'revdep/README.md'\n",
-      "* Reset for another run with `revdep_reset()`"
+      "* Reset for another run with `revdepcheck::revdep_reset()`"
     )
   }
 
