@@ -3,11 +3,14 @@
 \name{revdep_report_summary}
 \alias{revdep_report_summary}
 \alias{revdep_report_problems}
+\alias{revdep_report_cran}
 \title{Markdown report of reverse dependency check results}
 \usage{
 revdep_report_summary(pkg = ".", file = "")
 
 revdep_report_problems(pkg = ".", file = "")
+
+revdep_report_cran(pkg = ".")
 }
 \arguments{
 \item{pkg}{Path to package.}

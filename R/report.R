@@ -130,6 +130,60 @@ format_details_bullet <- function(x, max_lines = 20) {
   )
 }
 
+#' @export
+#' @rdname revdep_report_summary
+#' @importFrom utils available.packages
+
+revdep_report_cran <- function(pkg = ".") {
+  opts <- options("crayon.enabled" = FALSE)
+  on.exit(options(opts), add = TRUE)
+
+  comparisons <- db_results(pkg, NULL)
+
+  status <- map_chr(comparisons, "[[", "status")
+  package <- map_chr(comparisons, "[[", "package")
+  on_cran <- package %in% rownames(available.packages(type = "source"))
+
+  broke <- status == "-"
+  failed <- !(status %in% c("+", "-"))
+
+  cat_line("## revdepcheck results")
+  cat_line()
+  cat_line(
+    "We checked ", length(comparisons), " reverse dependencies ",
+    "(", sum(on_cran), " from CRAN + ", sum(!on_cran), " from BioConductor) ",
+    "by running R CMD check twice, once with the CRAN version installed, ",
+    "and once with this version installed. ",
+    "We saw ", sum(broke), " new problems. ",
+    "We failed to check ", sum(failed), " packages. ",
+    if (any(status != "+")) "Issues are summarised below."
+  )
+  cat_line()
+
+  if (any(broke)) {
+    cat_line("### New problems")
+    cat_line("(This reports the first line of each new failure)")
+    cat_line()
+
+    issues <- lapply(comparisons[broke], "[[", "cmp")
+    new <- lapply(issues, function(x) x$output[x$change == 1])
+    first_line <- lapply(new, function(x) map_chr(strsplit(x, "\n"), "[[", 1))
+    collapsed <- map_chr(first_line, function(x) paste0("  ", x, "\n", collapse = ""))
+
+    cat(paste0("* ", package[broke], "\n", collapsed, "\n", collapse = ""))
+  }
+
+  if (any(failed)) {
+    cat_line("### Failed to check")
+    cat_line()
+    desc <- unname(c(i = "failed to install", t = "check timed out")[status])
+    cat(paste0("* ", format(package[failed]), " (", desc[failed], ")\n"), sep = "")
+  }
+
+  invisible()
+}
+
+
 
 # Helpers -----------------------------------------------------------------
 
