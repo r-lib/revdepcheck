@@ -21,7 +21,7 @@ revdep_details <- function(pkg = ".", revdep) {
 #' @export
 
 print.revdepcheck_results <- function(x, ...) {
-  for (package in x) summary(package)
+  for (package in x) print(summary(package))
   invisible(x)
 }
 
