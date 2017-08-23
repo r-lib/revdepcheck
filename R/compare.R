@@ -41,7 +41,6 @@ is_broken <- function(x) {
 #' @export
 
 summary.rcmdcheck_error <- function(object, ...) {
-  pale <- make_style("darkgrey")
   header <- paste(white(bgRed("E")), object$package, object$version)
 
   counts <- function(x) {
@@ -56,11 +55,20 @@ summary.rcmdcheck_error <- function(object, ...) {
   rhs <- counts(object$new)
   comp <- paste0(lhs, "/", rhs, "  ")
 
+  structure(
+    list(header = header, comp = comp),
+    class = "rcmdcheck_error_summary"
+  )
+}
+
+#' @export
+print.rcmdcheck_error_summary <- function(x, ...) {
+  pale <- make_style("darkgrey")
   cat_line(pale(paste0(
-    col_align(header, width = 40),
+    col_align(x$header, width = 40),
     " ", symbol$line, symbol$line, " ",
-    "E: ", red(comp[1]), " | ",
-    "W: ", red(comp[2]), " | ",
-    "N: ", red(comp[3])
+    "E: ", red(x$comp[1]), " | ",
+    "W: ", red(x$comp[2]), " | ",
+    "N: ", red(x$comp[3])
   )))
 }
