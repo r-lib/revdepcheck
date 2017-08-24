@@ -142,7 +142,7 @@ revdep_report_cran <- function(pkg = ".") {
 
   status <- map_chr(comparisons, "[[", "status")
   package <- map_chr(comparisons, "[[", "package")
-  on_cran <- package %in% rownames(available.packages(type = "source"))
+  on_cran <- map_lgl(comparisons, on_cran)
 
   broke <- status == "-"
   failed <- !(status %in% c("+", "-"))
@@ -183,7 +183,10 @@ revdep_report_cran <- function(pkg = ".") {
   invisible()
 }
 
-
+on_cran <- function(x) {
+  desc <- desc::desc(text = x$new$description)
+  identical(desc$get("Repository")[[1]], "CRAN")
+}
 
 # Helpers -----------------------------------------------------------------
 
