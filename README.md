@@ -42,6 +42,8 @@ revdep_check(num_workers = 4)
 revdep_reset()
 ```
 
+If you're using RStudio, we recommend running `revdep_check()` in a new terminal. That way, while it runs in a background tab, you can easily use your `revdep_details(revdep = "pkg")` to see what's gone wrong with "pkg".
+
 ## License
 
 MIT ©
