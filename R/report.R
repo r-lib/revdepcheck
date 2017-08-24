@@ -144,20 +144,24 @@ revdep_report_cran <- function(pkg = ".") {
   package <- map_chr(comparisons, "[[", "package")
   on_cran <- map_lgl(comparisons, on_cran)
 
-  broke <- status == "-"
-  failed <- !(status %in% c("+", "-"))
+  broke <- status == "-" & on_cran
+  failed <- !(status %in% c("+", "-")) & on_cran
 
   cat_line("## revdepcheck results")
   cat_line()
   cat_line(
-    "We checked ", length(comparisons), " reverse dependencies ",
-    "(", sum(on_cran), " from CRAN + ", sum(!on_cran), " from BioConductor) ",
-    "by running R CMD check twice, once with the CRAN version installed, ",
-    "and once with this version installed. ",
-    "We saw ", sum(broke), " new problems. ",
-    "We failed to check ", sum(failed), " packages. ",
-    if (any(status != "+")) "Issues are summarised below."
+    "We checked ", length(comparisons), " reverse dependencies",
+    if (any(!on_cran))
+      paste0(" (", sum(on_cran), " from CRAN + ", sum(!on_cran), " from BioConductor)"),
+    ", comparing R CMD check results across CRAN and dev versions of this package."
   )
+  cat_line()
+  cat_line(" * We saw ", sum(broke), " new problems")
+  cat_line(" * We failed to check ", sum(failed), " packages")
+  if (any(broke | failed)) {
+      cat_line()
+      cat_line("Issues with CRAN packages are summarised below.")
+  }
   cat_line()
 
   if (any(broke)) {
