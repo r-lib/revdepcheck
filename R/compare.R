@@ -13,6 +13,7 @@ rcmdcheck_error <- function(package, old, new) {
   structure(
     list(
       package = package,
+      status = "E",
       old = old,
       new = new
     ),
