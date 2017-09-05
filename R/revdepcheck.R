@@ -172,6 +172,10 @@ revdep_run <- function(pkg = ".", quiet = TRUE,
   pkg <- pkg_check(pkg)
   pkgname <- pkg_name(pkg)
 
+  if (!inherits(timeout, "difftime")) {
+    timeout <- as.difftime(timeout, units = "secs")
+  }
+
   todo <- db_todo(pkg)
   status("CHECK", paste0(length(todo), " packages"))
   start <- Sys.time()
