@@ -237,7 +237,8 @@ report_revdeps <- function(pkg = ".") {
   }
 
   problem_link <- function(pkg) {
-    paste0("[", pkg, "](problems.md#", tolower(pkg), ")")
+    slug <- gsub("[.]", "", tolower(pkg))
+    paste0("[", pkg, "](problems.md#", slug, ")")
   }
 
   n_issues <- map_int(comparisons, function(x) sum(x$cmp$change %in% c(0, 1)))
