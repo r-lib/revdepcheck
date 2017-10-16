@@ -5,11 +5,16 @@
 \alias{revdep_email_draft}
 \title{Notify revdep maintainers about problems}
 \usage{
-revdep_email(pkg = ".")
+revdep_email(type = c("broken", "failed"), pkg = ".")
 
-revdep_email_draft(pkg, data = email_data(pkg))
+revdep_email_draft(type = "broken", pkg = ".", data = email_data(pkg))
 }
 \arguments{
+\item{type}{Type of problems to notify about; either "broken" (i.e. there
+is a new \code{R CMD check} failure that did not currently occur) or
+"failed" (i.e. the check failure either during installation or because
+of a timeout).}
+
 \item{pkg}{Path to package.}
 
 \item{data}{Optionally, supply a named list to provide your own parameters

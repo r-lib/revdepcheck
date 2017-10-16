@@ -28,50 +28,43 @@ print.maintainers <- function(x, ...) {
 #' file created in your working directory.
 #'
 #' @inheritParams revdep_check
+#' @param type Type of problems to notify about; either "broken" (i.e. there
+#'   is a new `R CMD check` failure that did not currently occur) or
+#'   "failed" (i.e. the check failure either during installation or because
+#'   of a timeout).
 #' @param data Optionally, supply a named list to provide your own parameters
 #'   to fill in the template
 #' @export
 
-revdep_email <- function(pkg = ".") {
-  # Find all broken packages
+revdep_email <- function(type = c("broken", "failed"), pkg = ".") {
+  type <- match.arg(type)
+
   packages <- db_results(pkg, NULL)
+  status <- vapply(packages, rcmdcheck_status, character(1), USE.NAMES = FALSE)
 
-  broken <- vapply(packages, is_broken, logical(1))
-  packages_broken <- packages[broken]
+  cond <- switch(type,
+    broken = status == "-",
+    failed = status %in% c("i", "t")
+  )
+  revdep_email_by_type(pkg, packages[cond], type)
 
-  if (length(packages_broken) == 0) {
-    message("All packages are OK :)")
+  invisible()
+}
+
+revdep_email_by_type <- function(pkg, packages, type = "broken") {
+  if (length(packages) == 0) {
+    message("All ok :D")
     return(invisible())
   }
 
-  # Generate email templates
-  data_base <- email_data(pkg)
-  data_package <- lapply(packages_broken, function(x) {
-    cmp <- x$cmp
-    old <- unique(cmp$hash[cmp$which == "old"])
-    new <- unique(cmp$hash[cmp$which == "new"])
-    broke <- setdiff(new, old)
-
-    out <- cmp$output[cmp$hash %in% broke & cmp$which == "new"]
-    your_results <- crayon::strip_style(format_details_bullets(out))
-
-    maintainer <- as.list(unlist(utils::as.person(x$maintainer)[[1]]))
-
-    list(
-      your_package = x$package,
-      your_version = x$version,
-      your_results = glue::collapse(your_results),
-      your_name = paste(maintainer$given, maintainer$family),
-      your_email = maintainer$email
-    )
-  })
-  data_package <- lapply(data_package, function(x) utils::modifyList(data_base, x))
+  2# Generate email templates
+  package_data <- package_data(pkg = pkg, packages = packages)
 
   # Show draft email (using first package) and check we're good
-  revdep_email_draft(data = data_package[[1]])
+  revdep_email_draft(pkg = pkg, type = type, data = package_data[[1]])
 
   ready <- utils::menu(
-    title = paste0("Ready to send ", length(data_package), " emails?"),
+    title = paste0("Ready to send ", length(package_data), " emails?"),
     c("Yes", "No")
   )
 
@@ -80,17 +73,16 @@ revdep_email <- function(pkg = ".") {
   }
 
   # Construct and send each email
-  for (i in seq_along(data_package)) {
-    data <- data_package[[i]]
+  for (i in seq_along(package_data)) {
+    data <- package_data[[i]]
 
-    body <- email_build(data)
+    body <- email_build(type = type, data = data)
     to <- data$your_email
     subject <- glue_data(data, "{your_package} and upcoming CRAN release of {my_package}")
 
     email_send(to, body, subject, draft = FALSE)
   }
 
-  invisible()
 }
 
 #' @export
@@ -113,6 +105,31 @@ revdep_email_draft <- function(type = "broken", pkg = ".", data = email_data(pkg
 
 
 # Internal --------------------------------------------------------------
+
+package_data <- function(packages, pkg = ".") {
+  data_base <- email_data(pkg)
+  data_package <- lapply(packages, function(x) {
+    cmp <- x$cmp
+    old <- unique(cmp$hash[cmp$which == "old"])
+    new <- unique(cmp$hash[cmp$which == "new"])
+    broke <- setdiff(new, old)
+
+    out <- cmp$output[cmp$hash %in% broke & cmp$which == "new"]
+    your_results <- crayon::strip_style(format_details_bullets(out))
+
+    desc <- desc::desc(text = x$new$description)
+    maintainer <- as.list(unlist(utils::as.person(desc$get_maintainer())[[1]]))
+
+    list(
+      your_package = x$package,
+      your_version = desc$get_version(),
+      your_results = glue::collapse(your_results),
+      your_name = paste(maintainer$given, maintainer$family),
+      your_email = maintainer$email
+    )
+  })
+  lapply(data_package, function(x) utils::modifyList(data_base, x))
+}
 
 #' @importFrom gmailr mime send_message
 
