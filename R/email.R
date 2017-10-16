@@ -96,7 +96,7 @@ revdep_email <- function(pkg = ".") {
 #' @export
 #' @rdname revdep_email
 
-revdep_email_draft <- function(pkg, data = email_data(pkg)) {
+revdep_email_draft <- function(pkg = ".", data = email_data(pkg)) {
   cat_line(rule("Draft email"))
 
   data <- lapply(data, bold)
@@ -162,6 +162,7 @@ email_data <- function(pkg = ".") {
     data <- list(
       release_date = NULL,
       rel_release_date = NULL,
+      release_version = NULL,
       my_news_url = NULL
     )
     yaml <- as.yaml(data)
@@ -186,6 +187,7 @@ email_data_defaults <- function(pkg = ".") {
 
     release_date = red("--release_date--"),
     rel_release_date = red("--rel_release_date---"),
+    release_version = red("--release_version--"),
 
     your_package = green("your_package"),
     your_version = green("your_version"),
