@@ -59,9 +59,9 @@ run_event_loop <- function(state) {
 
   while (1) {
     "!DEBUG event loop iteration, `length(state$workers)` workers"
-    state$progress_bar$tick(0, tokens = list(packages = checking_now(state)))
     check_for_timeouts(state)
     if (are_we_done(state)) break;
+    state$progress_bar$tick(0, tokens = list(packages = checking_now(state)))
     events <- poll(state)
     state <- handle_events(state, events)
     task  <- schedule_next_task(state)
