@@ -96,11 +96,11 @@ revdep_email <- function(pkg = ".") {
 #' @export
 #' @rdname revdep_email
 
-revdep_email_draft <- function(pkg = ".", data = email_data(pkg)) {
+revdep_email_draft <- function(type = "broken", pkg = ".", data = email_data(pkg)) {
   cat_line(rule("Draft email"))
 
   data <- lapply(data, bold)
-  cat(email_build(data = data))
+  cat(email_build(type = type, data = data))
 
   cat_line()
   cat_line()
@@ -141,10 +141,15 @@ email_send <- function(to, body, subject, draft = TRUE) {
 
 #' @importFrom glue glue_data
 
-email_build <- function(data = email_data(".")) {
-  template_path <- system.file("templates", "email.txt", package = "revdepcheck")
-  template <- paste(readLines(template_path), collapse = "\n")
+email_build <- function(type = "broken", data = email_data(".")) {
+  name <- paste0("email-", type, ".txt")
+  template_path <- system.file(
+    "templates", name,
+    package = "revdepcheck",
+    mustWork = TRUE
+  )
 
+  template <- paste(readLines(template_path), collapse = "\n")
   glue_data(data, template)
 }
 
@@ -158,16 +163,6 @@ email_data <- function(pkg = ".") {
 
   yaml_path <- file.path(pkg, "revdep", "email.yml")
   if (!file.exists(yaml_path)) {
-    message("Creating 'revdep/email.yml'")
-    data <- list(
-      release_date = NULL,
-      rel_release_date = NULL,
-      release_version = NULL,
-      my_news_url = NULL
-    )
-    yaml <- as.yaml(data)
-    writeLines(yaml, yaml_path)
-
     return(defaults)
   }
 
