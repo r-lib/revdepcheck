@@ -32,14 +32,16 @@ print.maintainers <- function(x, ...) {
 #'   is a new `R CMD check` failure that did not currently occur) or
 #'   "failed" (i.e. the check failure either during installation or because
 #'   of a timeout).
+#' @param packages A character vector of package names. Use this if some emails
+#'   failed to send in the previous round. If omitted uses all packages.
 #' @param data Optionally, supply a named list to provide your own parameters
 #'   to fill in the template
 #' @export
 
-revdep_email <- function(type = c("broken", "failed"), pkg = ".") {
+revdep_email <- function(type = c("broken", "failed"), pkg = ".", packages = NULL) {
   type <- match.arg(type)
 
-  packages <- db_results(pkg, NULL)
+  packages <- db_results(pkg, packages)
   status <- vapply(packages, rcmdcheck_status, character(1), USE.NAMES = FALSE)
 
   cond <- switch(type,
@@ -57,7 +59,7 @@ revdep_email_by_type <- function(pkg, packages, type = "broken") {
     return(invisible())
   }
 
-  2# Generate email templates
+  # Generate email templates
   package_data <- package_data(pkg = pkg, packages = packages)
 
   # Show draft email (using first package) and check we're good
@@ -72,6 +74,8 @@ revdep_email_by_type <- function(pkg, packages, type = "broken") {
     return(invisible())
   }
 
+  ok <- logical(length(package_data))
+
   # Construct and send each email
   for (i in seq_along(package_data)) {
     data <- package_data[[i]]
@@ -80,9 +84,18 @@ revdep_email_by_type <- function(pkg, packages, type = "broken") {
     to <- data$your_email
     subject <- glue_data(data, "{your_package} and upcoming CRAN release of {my_package}")
 
-    email_send(to, body, subject, draft = FALSE)
+    ok[[i]] <- email_send(to, body, subject, draft = FALSE)
   }
 
+  if (any(!ok)) {
+    failed <- package_data[!ok]
+    pkgs <- map_chr(failed, function(x) x$your_package)
+
+    message("Failed to send:")
+    cat(deparse(pkgs), sep = "\n")
+  }
+
+  invisible()
 }
 
 #' @export
