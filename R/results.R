@@ -36,7 +36,7 @@ revdep_summary <- function(pkg = ".") {
 }
 
 #' @export
-#' @importFrom boxes rule
+#' @importFrom cli rule
 #' @importFrom crayon cyan
 
 print.revdepcheck_details <- function(x, ...) {
@@ -44,7 +44,7 @@ print.revdepcheck_details <- function(x, ...) {
   cat_rule(
     left = cyan("Reverse dependency check"),
     right = cyan(x$package, x$versions[[1]]),
-    line_color = "cyan",
+    line_col = "cyan",
     line = 2
   )
 
