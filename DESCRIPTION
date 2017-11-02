@@ -20,7 +20,7 @@ Suggests:
     testthat
 Imports:
     assertthat,
-    boxes,
+    cli,
     callr,
     clisymbols,
     crancache,
@@ -43,7 +43,7 @@ Imports:
     withr,
     yaml
 Remotes:
-    r-lib/boxes,
+    r-lib/cli,
     r-lib/callr,
     r-lib/crancache,
     gaborcsardi/progress,
