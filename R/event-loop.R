@@ -66,7 +66,8 @@ run_event_loop <- function(state) {
     state <- handle_events(state, events)
     task  <- schedule_next_task(state)
     state <- do_task(state, task)
-    gc()
+    if (package_version(getNamespaceVersion(asNamespace("processx"))) <=
+        "3.0.0") gc()
   }
 
   "!DEBUG event loop is done"
