@@ -18,12 +18,17 @@ cran_revdeps <- function(package, dependencies = TRUE, bioc = FALSE) {
 
 get_repos <- function(bioc) {
   repos <- c(
-    if (bioc) bioc_install_repos(),
-    getOption("repos")
+    getOption("repos"),
+    if (bioc) bioc_install_repos()
   )
   if (! "CRAN" %in% names(repos) || repos["CRAN"] == "@CRAN@") {
     repos["CRAN"] <- "https://cloud.r-project.org"
   }
+
+  ## Drop duplicated repos (by name only)
+  names <- names(repos)
+  repos <- repos[!(nzchar(names) & duplicated(names))]
+
   repos
 }
 
