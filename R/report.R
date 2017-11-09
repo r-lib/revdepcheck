@@ -140,7 +140,7 @@ revdep_report_cran <- function(pkg = ".") {
 
   comparisons <- db_results(pkg, NULL)
 
-  status <- map_chr(comparisons, "[[", "status")
+  status <- map_chr(comparisons, function(x) x$status %||% "i")
   package <- map_chr(comparisons, "[[", "package")
   on_cran <- map_lgl(comparisons, on_cran)
 
@@ -237,7 +237,8 @@ report_revdeps <- function(pkg = ".") {
   }
 
   problem_link <- function(pkg) {
-    paste0("[", pkg, "](problems.md#", tolower(pkg), ")")
+    slug <- gsub("[.]", "", tolower(pkg))
+    paste0("[", pkg, "](problems.md#", slug, ")")
   }
 
   n_issues <- map_int(comparisons, function(x) sum(x$cmp$change %in% c(0, 1)))

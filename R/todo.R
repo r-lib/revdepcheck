@@ -27,7 +27,7 @@ revdep_add <- function(pkg = ".", packages) {
 revdep_add_broken <- function(pkg = ".") {
   pkg <- pkg_check(pkg)
 
-  packages <- db_results(pkg, db_list(pkg))
+  packages <- db_results(pkg, NULL)
   broken <- vapply(packages, is_broken, logical(1))
 
   to_add <- names(broken[broken])
@@ -35,11 +35,12 @@ revdep_add_broken <- function(pkg = ".") {
     message("No broken packages to re-test")
   } else {
     message(
-      "Re-checking broken packages: ",
-      str_trunc(paste(to_add, collapse = ","), 100)
+      "Adding broken packages TODO list: \n",
+      paste("*", to_add, "\n", collapse = ""),
+      "\n",
+      "Run revdepcheck::revdep_check() to check"
     )
     revdep_add(pkg, to_add)
-
   }
 
 }

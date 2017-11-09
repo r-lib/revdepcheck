@@ -59,14 +59,15 @@ run_event_loop <- function(state) {
 
   while (1) {
     "!DEBUG event loop iteration, `length(state$workers)` workers"
-    state$progress_bar$tick(0, tokens = list(packages = checking_now(state)))
     check_for_timeouts(state)
     if (are_we_done(state)) break;
+    state$progress_bar$tick(0, tokens = list(packages = checking_now(state)))
     events <- poll(state)
     state <- handle_events(state, events)
     task  <- schedule_next_task(state)
     state <- do_task(state, task)
-    gc()
+    if (package_version(getNamespaceVersion(asNamespace("processx"))) <=
+        "3.0.0") gc()
   }
 
   "!DEBUG event loop is done"
@@ -156,11 +157,18 @@ handle_event <- function(state, which) {
   "!DEBUG handle event, package `state$workers[[which]]$package`"
   proc <- state$workers[[which]]$process
 
-  ## Read out stdout and stderr
-  state$workers[[which]]$stdout <-
-    c(state$workers[[which]]$stdout, out <- proc$read_output_lines())
-  state$workers[[which]]$stderr <-
-    c(state$workers[[which]]$stderr, err <- proc$read_error_lines())
+  ## Read out stdout and stderr. If process is done, then read out all
+  if (proc$is_alive()) {
+    state$workers[[which]]$stdout <-
+      c(state$workers[[which]]$stdout, out <- proc$read_output_lines(n = 10000))
+    state$workers[[which]]$stderr <-
+      c(state$workers[[which]]$stderr, err <- proc$read_error_lines(n = 10000))
+  } else {
+    state$workers[[which]]$stdout <-
+      c(state$workers[[which]]$stdout, out <- proc$read_all_output_lines())
+    state$workers[[which]]$stderr <-
+      c(state$workers[[which]]$stderr, err <- proc$read_all_error_lines())
+  }
 
   ## If there is still output, then wait a bit more
   if (proc$is_incomplete_output() || proc$is_incomplete_error()) {

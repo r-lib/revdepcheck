@@ -5,10 +5,12 @@ check_proc <- function(pkgdir, pkgname, version = c("old", "new")) {
   version <- match.arg(version)
 
   dir <- dir_find(pkgdir, "check", pkgname)
-  tarball <- with_envvar(
-    c(CRANCACHE_REPOS = "cran,bioc", CRANCACHE_QUIET = "yes"),
-    crancache::download_packages(pkgname, dir, repos = get_repos(bioc = TRUE), quiet = TRUE)[,2]
-  )
+  tarball <- dir(dir, pattern = "\\.tar\\.gz$", full.names = TRUE)
+  if (length(tarball) > 1) {
+    stop("Internal error, multiple source packages?")
+  } else if (length(tarball) == 0) {
+    stop("Internal error, no source package, download failed?")
+  }
 
   out <- file.path(dir, version)
   unlink(out, recursive = TRUE)

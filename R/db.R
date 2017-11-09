@@ -149,7 +149,7 @@ db_list <- function(package) {
 db_todo <- function(pkgdir) {
   db <- db(pkgdir)
 
-  dbGetQuery(db, "SELECT package FROM todo")[[1]]
+  dbGetQuery(db, "SELECT DISTINCT package FROM todo")[[1]]
 }
 
 #' @importFrom DBI dbWriteTable
