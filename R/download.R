@@ -1,13 +1,14 @@
 download_opts <- function(pkgdir, pkgname) {
   dir <- dir_find(pkgdir, "check", pkgname)
 
-  func <- function(pkgname, dir) {
-    crancache::download_packages(pkgname, dir, repos = get_repos(bioc = TRUE))[,2]
+  func <- function(pkgname, dir, repos) {
+    dest <- crancache::download_packages(pkgname, dir, repos = repos)[,2]
+    file.copy(dest, dir)
   }
 
   r_process_options(
     func = func,
-    args = list(pkgname = pkgname, dir = dir),
+    args = list(pkgname = pkgname, dir = dir, repos = get_repos(bioc = TRUE)),
     system_profile = FALSE,
     user_profile = FALSE,
     env = c(CRANCACHE_REPOS = "cran,bioc", CRANCACHE_QUIET = "yes")
