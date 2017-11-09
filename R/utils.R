@@ -87,3 +87,10 @@ execute_r <- function(px_opts, new_session = FALSE) {
 str_trim <- function(x) {
   sub("\\s+$", "", sub("^\\s+", "", x))
 }
+
+cut_into_lines <- function(x) {
+  x <- do.call(paste0, as.list(x))
+  x <- gsub("\r\n", "\n", x, fixed = TRUE)
+  x <- strsplit(x, "\n", fixed = TRUE)[[1]]
+  if (length(x)) x else ""
+}

@@ -160,15 +160,17 @@ handle_event <- function(state, which) {
   ## Read out stdout and stderr. If process is done, then read out all
   if (proc$is_alive()) {
     state$workers[[which]]$stdout <-
-      c(state$workers[[which]]$stdout, out <- proc$read_output_lines(n = 10000))
+      c(state$workers[[which]]$stdout, out <- proc$read_output(n = 10000))
     state$workers[[which]]$stderr <-
-      c(state$workers[[which]]$stderr, err <- proc$read_error_lines(n = 10000))
+      c(state$workers[[which]]$stderr, err <- proc$read_error(n = 10000))
   } else {
     state$workers[[which]]$stdout <-
-      c(state$workers[[which]]$stdout, out <- proc$read_all_output_lines())
+      c(state$workers[[which]]$stdout, out <- proc$read_all_output())
     state$workers[[which]]$stderr <-
-      c(state$workers[[which]]$stderr, err <- proc$read_all_error_lines())
+      c(state$workers[[which]]$stderr, err <- proc$read_all_error())
   }
+
+  "!DEBUG read out `nchar(out)`/`nchar(err)` characters"
 
   ## If there is still output, then wait a bit more
   if (proc$is_incomplete_output() || proc$is_incomplete_error()) {
@@ -178,6 +180,10 @@ handle_event <- function(state, which) {
   ## Otherwise update the state, and the DB
   worker <- state$workers[[which]]
   state$workers[which] <- list(NULL)
+
+  ## Cut stdout and stderr to lines
+  worker$stdout <- cut_into_lines(worker$stdout)
+  worker$stderr <- cut_into_lines(worker$stderr)
 
   if (worker$task$name == "deps_install") {
     deps_install_done(state, worker)
