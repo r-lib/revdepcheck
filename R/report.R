@@ -200,7 +200,7 @@ report_platform <- function() {
 }
 
 report_libraries <- function(pkg) {
-  path <- file.path(pkg, "revdep", "checks", "libraries.csv")
+  path <- file.path(dir_find(pkg, "checks"), "libraries.csv")
 
   df <- utils::read.csv(path, stringsAsFactors = FALSE)
   names(df)[4] <- "\u0394"
