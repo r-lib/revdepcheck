@@ -34,7 +34,7 @@ Imports:
     prettyunits,
     processx,
     progress,
-    rcmdcheck (>= 1.2.1.9002),
+    rcmdcheck (>= 1.2.1.9003),
     remotes (>= 1.0.0.9000),
     RSQLite,
     sessioninfo,
