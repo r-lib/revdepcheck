@@ -1,6 +1,5 @@
 #' @importFrom processx process
 #' @importFrom callr r r_process r_process_options
-#' @importFrom crancache available_packages
 #' @importFrom withr with_envvar
 
 deps_install_opts <- function(pkgdir, pkgname, quiet = FALSE) {

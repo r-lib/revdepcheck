@@ -56,6 +56,8 @@ revdep_check <- function(pkg = ".",
                          num_workers = 1,
                          bioc = TRUE) {
 
+  memoise::forget(available_packages)
+
   pkg <- pkg_check(pkg)
   dir_setup(pkg)
   if (!db_exists(pkg)) {

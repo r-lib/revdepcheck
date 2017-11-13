@@ -1,6 +1,7 @@
+available_packages <- memoise::memoise(crancache::available_packages)
+
 
 #' @importFrom remotes bioc_install_repos
-#' @importFrom crancache available_packages
 
 cran_revdeps <- function(package, dependencies = TRUE, bioc = FALSE) {
   stopifnot(is_string(package))
