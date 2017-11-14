@@ -25,7 +25,7 @@ Imports:
     clisymbols,
     crancache,
     crayon,
-    desc,
+    desc (>= 1.1.1.9001),
     DBI,
     jsonlite,
     glue,
@@ -46,6 +46,7 @@ Remotes:
     r-lib/cli,
     r-lib/callr,
     r-lib/crancache,
+    r-lib/desc,
     gaborcsardi/progress,
     r-lib/rcmdcheck,
     r-lib/remotes
