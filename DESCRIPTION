@@ -20,12 +20,12 @@ Suggests:
     testthat
 Imports:
     assertthat,
-    boxes,
+    cli,
     callr,
     clisymbols,
     crancache,
     crayon,
-    desc,
+    desc (>= 1.1.1.9002),
     DBI,
     jsonlite,
     glue,
@@ -34,19 +34,19 @@ Imports:
     prettyunits,
     processx,
     progress,
-    rcmdcheck (>= 1.2.1.9000),
+    rcmdcheck (>= 1.2.1.9003),
     remotes (>= 1.0.0.9000),
     RSQLite,
     sessioninfo,
-    tools,
     utils,
     whoami,
     withr,
     yaml
 Remotes:
-    r-lib/boxes,
+    r-lib/cli,
     r-lib/callr,
     r-lib/crancache,
+    r-lib/desc,
     gaborcsardi/progress,
     r-lib/rcmdcheck,
     r-lib/remotes

@@ -5,10 +5,12 @@ check_proc <- function(pkgdir, pkgname, version = c("old", "new")) {
   version <- match.arg(version)
 
   dir <- dir_find(pkgdir, "check", pkgname)
-  tarball <- with_envvar(
-    c(CRANCACHE_REPOS = "cran,bioc", CRANCACHE_QUIET = "yes"),
-    crancache::download_packages(pkgname, dir, repos = get_repos(bioc = TRUE), quiet = TRUE)[,2]
-  )
+  tarball <- dir(dir, pattern = "\\.tar\\.gz$", full.names = TRUE)
+  if (length(tarball) > 1) {
+    stop("Internal error, multiple source packages?")
+  } else if (length(tarball) == 0) {
+    stop("Internal error, no source package, download failed?")
+  }
 
   out <- file.path(dir, version)
   unlink(out, recursive = TRUE)
@@ -121,6 +123,8 @@ check_done <- function(state, worker) {
     )
   }
 
+  cleanup_chkres(state, worker, iam_old)
+
   status <- if (isTRUE(worker$killed)) {
     "TIMEOUT"
   } else if (!inherits(chkres, "rcmdcheck")) {
@@ -154,7 +158,10 @@ check_done <- function(state, worker) {
 
   if (new_state == "done") {
     clear_line()
-    print(revdep_results(state$options$pkgdir, worker$package))
+
+    comparison <- db_results(state$options$pkgdir, worker$package)[[1]]
+    print(summary(comparison))
+
     state$progress_bar$tick(tokens = list(packages = checking_now(state)))
   }
 

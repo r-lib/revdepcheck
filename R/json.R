@@ -20,6 +20,10 @@ fromJSON <- function(txt, ...) {
 }
 
 checkFromJSON <- function(txt, ...) {
+  if (identical(txt, NA_character_)) {
+    return()
+  }
+
   check <- fromJSON(txt, ...)
   check$errors   <- as.character(check$errors)
   check$warnings <- as.character(check$warnings)

@@ -34,6 +34,10 @@
 run_event_loop <- function(state) {
   "!DEBUG running event loop"
 
+  if (nrow(state$packages) == 0) {
+    return()
+  }
+
   ## Kill all child processes if we quit from this function
   on.exit(remove_workers(state), add = TRUE)
 
@@ -55,14 +59,15 @@ run_event_loop <- function(state) {
 
   while (1) {
     "!DEBUG event loop iteration, `length(state$workers)` workers"
-    state$progress_bar$tick(0, tokens = list(packages = checking_now(state)))
     check_for_timeouts(state)
     if (are_we_done(state)) break;
+    state$progress_bar$tick(0, tokens = list(packages = checking_now(state)))
     events <- poll(state)
     state <- handle_events(state, events)
     task  <- schedule_next_task(state)
     state <- do_task(state, task)
-    gc()
+    if (package_version(getNamespaceVersion(asNamespace("processx"))) <=
+        "3.0.0") gc()
   }
 
   "!DEBUG event loop is done"
@@ -105,7 +110,7 @@ checking_now <- function(state) {
   pkg_tasks <- split(tasks_abbr, pkgs)
   pkg_sum <- vapply(pkg_tasks, paste, collapse = "", FUN.VALUE = character(1))
 
-  width <- getOption("width") - 35 # conservative estimate
+  width <- getOption("width") - 38 # conservative estimate
   str <- paste0(names(pkg_tasks), " [", pkg_sum, "]", collapse = ", ")
   paste0("(", length(pkgs), ") ", str_trunc(str, width))
 }
@@ -152,11 +157,20 @@ handle_event <- function(state, which) {
   "!DEBUG handle event, package `state$workers[[which]]$package`"
   proc <- state$workers[[which]]$process
 
-  ## Read out stdout and stderr
-  state$workers[[which]]$stdout <-
-    c(state$workers[[which]]$stdout, out <- proc$read_output_lines())
-  state$workers[[which]]$stderr <-
-    c(state$workers[[which]]$stderr, err <- proc$read_error_lines())
+  ## Read out stdout and stderr. If process is done, then read out all
+  if (proc$is_alive()) {
+    state$workers[[which]]$stdout <-
+      c(state$workers[[which]]$stdout, out <- proc$read_output(n = 10000))
+    state$workers[[which]]$stderr <-
+      c(state$workers[[which]]$stderr, err <- proc$read_error(n = 10000))
+  } else {
+    state$workers[[which]]$stdout <-
+      c(state$workers[[which]]$stdout, out <- proc$read_all_output())
+    state$workers[[which]]$stderr <-
+      c(state$workers[[which]]$stderr, err <- proc$read_all_error())
+  }
+
+  "!DEBUG read out `nchar(out)`/`nchar(err)` characters"
 
   ## If there is still output, then wait a bit more
   if (proc$is_incomplete_output() || proc$is_incomplete_error()) {
@@ -166,6 +180,10 @@ handle_event <- function(state, which) {
   ## Otherwise update the state, and the DB
   worker <- state$workers[[which]]
   state$workers[which] <- list(NULL)
+
+  ## Cut stdout and stderr to lines
+  worker$stdout <- cut_into_lines(worker$stdout)
+  worker$stderr <- cut_into_lines(worker$stderr)
 
   if (worker$task$name == "deps_install") {
     deps_install_done(state, worker)

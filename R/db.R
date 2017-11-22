@@ -9,7 +9,14 @@ db <- function(package) {
   if (exists(package, envir = dbenv) &&
       dbIsValid(con <- dbenv[[package]])) {
     con
+  } else if (package == ":memory:") {
+    dbenv[[package]] <- dbConnect(SQLite(), ":memory:")
+    dbenv[[package]]
   } else {
+    if (!file.exists(dir_find(package))) {
+      stop("Please start by running `revdep_check()`", call. = FALSE)
+    }
+
     dbenv[[package]] <- dbConnect(SQLite(), dir_find(package, "db"))
     dbenv[[package]]
   }
@@ -56,17 +63,46 @@ db_setup <- function(package) {
   dbExecute(db, "CREATE INDEX idx_revdeps_package ON revdeps(package)")
 
   dbExecute(db, "CREATE TABLE todo (package TEXT)")
+
+  invisible(db)
+}
+
+db_metadata_init <- function(package) {
+  db_metadata_set(package, "dbversion", db_version)
+
+  if (package != ":memory:")
+    db_metadata_set(package, "package", pkg_name(package))
 }
 
 #' @importFrom DBI dbExecute sqlInterpolate
 
-db_metadata_init <- function(package) {
+db_metadata_set <- function(package, name, value) {
   db <- db(package)
-  q <- "INSERT INTO metadata VALUES (?name, ?val)"
 
-  dbExecute(db, sqlInterpolate(db, q, name = "dbversion", val = db_version))
-  dbExecute(db, sqlInterpolate(db, q, name = "package",
-                                 val = pkg_name(package)))
+  sql <- sqlInterpolate(
+    db, "DELETE FROM metadata WHERE name = ?name",
+    name = name
+  )
+  dbExecute(db, sql)
+
+  sql <- sqlInterpolate(
+    db,
+    "INSERT INTO metadata VALUES (?name, ?value)",
+    name = name,
+    value = value
+  )
+  dbExecute(db, sql)
+}
+
+#' @importFrom DBI dbGetQuery sqlInterpolate
+
+db_metadata_get <- function(package, name) {
+  db <- db(package)
+  sql <- sqlInterpolate(db,
+    "SELECT value FROM metadata WHERE name = ?name",
+    name = name
+  )
+  dbGetQuery(db, sql)[[1]]
 }
 
 #' @importFrom DBI dbExecute
@@ -113,7 +149,7 @@ db_list <- function(package) {
 db_todo <- function(pkgdir) {
   db <- db(pkgdir)
 
-  dbGetQuery(db, "SELECT package FROM todo")[[1]]
+  dbGetQuery(db, "SELECT DISTINCT package FROM todo")[[1]]
 }
 
 #' @importFrom DBI dbWriteTable
@@ -214,31 +250,14 @@ db_get_results <- function(pkg, revdeps) {
 db_results <- function(pkg, revdeps) {
   res <- db_get_results(pkg, revdeps)
 
-  oldpackages <- res$old$package
-  newpackages <- res$new$package
+  packages <- union(res$old$package, res$new$package)
 
-  onlynew <- setdiff(newpackages, oldpackages)
-  onlyold <- setdiff(oldpackages, newpackages)
-  if (length(onlynew) || length(onlyold)) {
-    warning(
-      "Some packages were not checked with both versions: ",
-      paste(sQuote(c(onlynew, onlyold)), collapse = ", ")
-    )
-  }
+  lapply_with_names(packages, function(package) {
+    oldcheck <- checkFromJSON(res$old$result[match(package, res$old$package)])
+    newcheck <- checkFromJSON(res$new$result[match(package, res$new$package)])
 
-  packages <- intersect(oldpackages, newpackages)
-
-  lapply_with_names(packages, function(p) {
-    version <- res$old$version[match(p, res$old$package)]
-    maintainer <- res$old$maintainer[match(p, res$old$package)]
-    oldcheck <- checkFromJSON(res$old$result[match(p, res$old$package)])
-    newcheck <- checkFromJSON(res$new$result[match(p, res$new$package)])
-    try_compare_checks(oldcheck, newcheck, p, version, maintainer)
+    try_compare_checks(package, oldcheck, newcheck)
   })
-}
-
-db_details <- function(pkg, revdep) {
-  db_get_results(pkg, revdep)
 }
 
 db_maintainers <- function(pkg) {

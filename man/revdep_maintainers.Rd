@@ -4,10 +4,10 @@
 \alias{revdep_maintainers}
 \title{List maintainers of all reverse dependencies}
 \usage{
-revdep_maintainers(pkg)
+revdep_maintainers(pkg = ".")
 }
 \arguments{
-\item{pkg}{Path to package}
+\item{pkg}{Path to package.}
 }
 \description{
 List maintainers of all reverse dependencies

@@ -1,44 +1,92 @@
-revdep_results <- function(pkg = ".", revdeps = NULL) {
-  res <- db_results(pkg, revdeps)
-  class(res) <- "revdepcheck_results"
-  res
-}
-
-#' @importFrom rcmdcheck compare_checks
+#' Display revdep results
+#'
+#' Use this to see nicely formatted results of processed packages while
+#' [revdep_check()] is running in another process. `revdep_summary()`
+#' displays summary results for all complete checks. `revdep_details()`
+#' shows you the details for one
+#'
+#' @export
+#' @param pkg Path to package
+#' @param revdep Name of revdep package.
 
 revdep_details <- function(pkg = ".", revdep) {
   assert_that(is_string(revdep))
-  record <- db_details(pkg, revdep)
-  old <- checkFromJSON(record$old$result[[1]])
-  new <- checkFromJSON(record$new$result[[1]])
-  res <- compare_checks(old, new)
-  class(res) <- "revdepcheck_details"
-  res
+
+  structure(
+    db_results(pkg, revdep)[[1]],
+    class = "revdepcheck_details"
+  )
 }
 
-#' List packages remaining in the todo list
-#'
-#' @inheritParams revdep_check
 #' @export
 
-revdep_todo <- function(pkg = ".") {
-  db_list(pkg)
+print.revdepcheck_results <- function(x, ...) {
+  for (package in x) print(summary(package))
+  invisible(x)
 }
 
-is_broken <- function(x) {
-  # TODO: use better code from rcmdcheck
-  n_broken_type <- function(x, type) {
-    recs <- x$cmp[x$cmp$type == type, , drop = FALSE]
-    old <- unique(recs$hash[recs$which == "old"])
-    new <- unique(recs$hash[recs$which == "new"])
+#' @export
+#' @rdname revdep_details
 
-    length(setdiff(new, old))
+revdep_summary <- function(pkg = ".") {
+  structure(
+    db_results(pkg, NULL),
+    class = "revdepcheck_results"
+  )
+}
+
+#' @export
+#' @importFrom cli rule
+#' @importFrom crayon cyan
+
+print.revdepcheck_details <- function(x, ...) {
+  ## Header
+  cat_rule(
+    left = cyan("Reverse dependency check"),
+    right = cyan(x$package, x$versions[[1]]),
+    line_col = "cyan",
+    line = 2
+  )
+
+  ## First a summary
+  cat_line()
+  print(structure(x, class = "rcmdcheck_comparison"), header = FALSE)
+
+  ## Old version
+  cat_rule(left = "Before")
+  if (inherits(x$old, "error")) {
+    cat_line(red("<Error before the package check started>"))
+  } else {
+    print(x$old[[1]], header = FALSE)
+    print_install_out(x$old[[1]])
   }
+  cat_line()
 
-  n_broken <- n_broken_type(x, "error") +
-    n_broken_type(x, "warning") +
-    n_broken_type(x, "note")
-
-  n_broken > 0
+  ## New version
+  cat_rule(left = "After")
+  if (inherits(x$new, "error")) {
+    cat_line(red("<Error before the package check started>"))
+  } else {
+    print(x$new, header = FALSE)
+    print_install_out(x$new)
+  }
 }
 
+#' @importFrom rcmdcheck check_details
+#' @importFrom utils tail
+
+print_install_out <- function(x) {
+  details <- check_details(x)
+  if (any(grepl("Installation failed.*00install.out.*for details",
+                details$errors))) {
+    out <- strsplit(details$install_out, "\n")[[1]]
+    cat("\n", symbol$line, symbol$line, sep = "")
+    if (length(out) > 15) {
+      cat(" 'install.out' contents (last 13 lines):\n")
+      out <- c("...", tail(out, 13))
+    } else {
+      cat(" 'install.out' contents:\n")
+    }
+    cat(out, sep = "\n")
+  }
+}

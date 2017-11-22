@@ -41,23 +41,29 @@ dir_find <- function(pkgdir,
   pkgdir <- pkg_check(pkgdir)
   pkg <- pkg_name(pkgdir)
 
+  idx <- if (Sys.info()[["sysname"]] == "Darwin") {
+    function(x) paste0(x, ".noindex")
+  } else {
+    function(x) x
+  }
+
   switch(match.arg(what),
     root =  file.path(pkgdir, "revdep"),
     db =    file.path(pkgdir, "revdep", "data.sqlite"),
 
-    checks = file.path(pkgdir, "revdep", "checks"),
-    check = file.path(pkgdir, "revdep", "checks", package),
+    checks = file.path(pkgdir, "revdep", idx("checks")),
+    check = file.path(pkgdir, "revdep", idx("checks"), package),
 
-    lib =   file.path(pkgdir, "revdep", "library"),
-    pkg =   file.path(pkgdir, "revdep", "library", package),
-    old =   file.path(pkgdir, "revdep", "library", pkg, "old"),
-    new =   file.path(pkgdir, "revdep", "library", pkg, "new"),
+    lib =   file.path(pkgdir, "revdep", idx("library")),
+    pkg =   file.path(pkgdir, "revdep", idx("library"), package),
+    old =   file.path(pkgdir, "revdep", idx("library"), pkg, "old"),
+    new =   file.path(pkgdir, "revdep", idx("library"), pkg, "new"),
 
     ## Order is important here, because installs should go to the first
-    pkgold = c(file.path(pkgdir, "revdep", "library", package),
-               file.path(pkgdir, "revdep", "library", pkg, "old")),
-    pkgnew = c(file.path(pkgdir, "revdep", "library", package),
-               file.path(pkgdir, "revdep", "library", pkg, "new"))
+    pkgold = c(file.path(pkgdir, "revdep", idx("library"), package),
+               file.path(pkgdir, "revdep", idx("library"), pkg, "old")),
+    pkgnew = c(file.path(pkgdir, "revdep", idx("library"), package),
+               file.path(pkgdir, "revdep", idx("library"), pkg, "new"))
   )
 }
 

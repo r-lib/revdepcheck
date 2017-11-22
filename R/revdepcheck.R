@@ -1,86 +1,115 @@
 #' Run revdep checks
 #'
-#' `revdep_check()` is designed to work even if interrupted. If for some reason
-#' you need to stop the checks, or the session dies, just rerun `revdep_check()`
-#' and it will resume from where it last stopped. To completed reset the
-#' results of a previous run, use `revdep_reset()`.
+#' @description
+#' `revdep_check()` runs `R CMD check` on all reverse dependencies of your
+#' package. To avoid false positives, it runs `R CMD check` twice: once for
+#' released version on CRAN and once for the local development version. It
+#' then reports the differences so you can see what checks were previously
+#' ok but now fail.
 #'
-#' @param pkg Path to package
-#' @param dependencies Which types of revdeps to check
+#' Once your package has been successfully submitted to CRAN, you should
+#' run `revdep_reset()`. This deletes all files used for checking, freeing
+#' up disk space and leaving you in a clean state for the next release.
+#'
+#' @details
+#' `revdep_check()` proceeds in four steps:
+#'
+#' 1.  **Init**: create the `revdep/` subdirectory if it doesn't already exist,
+#'     and save the list of reverse dependencies to check.
+#'
+#' 1.  **Install**: install the CRAN (released) and local (development)
+#'     versions of your package, including all dependencies.
+#'
+#' 1.  **Run**: run `R CMD check` twice for each reverse dependency, once
+#'     for the CRAN version and one for the local version. The checks are
+#'     run in parallel using `num_worker` processes.
+#'
+#' 1.  **Report**: generate reports showing differences between the check
+#'     results for the CRAN and local versions of your package. The focus of
+#'     the report is on new failures. The reports are saved in `revdep/`.
+#'
+#' `revdep_check()` is designed to seamlessly resume in the case of failure:
+#' just re-run `revdep_check()` and it will start from where it left off.
+#' If you want to start again from scratch, run `revdep_reset()`.
+#'
+#' @param pkg Path to package.
+#' @param dependencies Which types of revdeps should be checked. For CRAN
+#'   release, we recommend using the default.
 #' @param quiet Suppress output from internal processes?
 #' @param timeout Maximum time to wait (in seconds) for `R CMD check` to
-#'   complete.
+#'   complete. Default is 10 minutes.
 #' @param num_workers Number of parallel workers to use
-#' @param bioc Also check revdeps in BioConductor?
+#' @param bioc Also check revdeps that live in BioConductor?
+#'
+#' @seealso To see more details of problems during a run, call
+#'   [revdep_summary()] and [revdep_details()] in another process.
 #'
 #' @export
 #' @importFrom remotes install_local
 #' @importFrom withr with_libpaths with_envvar
 #' @importFrom crancache install_packages
 
-revdep_check <- function(pkg = ".", dependencies = c("Depends", "Imports",
-                                      "Suggests", "LinkingTo"),
+revdep_check <- function(pkg = ".",
+                         dependencies = c("Depends", "Imports", "Suggests", "LinkingTo"),
                          quiet = TRUE,
                          timeout = as.difftime(10, units = "mins"),
-                         num_workers = 1, bioc = TRUE) {
+                         num_workers = 1,
+                         bioc = TRUE) {
 
   pkg <- pkg_check(pkg)
+  dir_setup(pkg)
+  if (!db_exists(pkg)) {
+    db_setup(pkg)
+  }
 
   did_something <- FALSE
-  ## Creates and initializes database, including computing revdeps
-  if (!db_exists(pkg)) {
-    revdep_setup(pkg, dependencies = dependencies, bioc = bioc)
-    did_something <- TRUE
-  }
-
-  has_todo <- length(db_todo(pkg)) > 0
-
-  ## Install CRAN and dev versions
-  if (!pkglib_exists(pkg) && has_todo) {
-    revdep_install(pkg, quiet = quiet)
-    did_something <- TRUE
-  }
-
-  ## Run checks
-  if (has_todo) {
-    revdep_run_check(pkg, quiet = quiet, timeout = timeout, num_workers = num_workers)
-    did_something <- TRUE
-  }
-
-  if (pkglib_exists(pkg)) {
-    revdep_clean(pkg)
-    did_something <- TRUE
-  }
-
-  if (!report_exists(pkg)) {
-    revdep_report(pkg)
+  repeat {
+    stage <- db_metadata_get(pkg, "todo") %||% "init"
+    switch(stage,
+      init =    revdep_init(pkg, dependencies = dependencies, bioc = bioc),
+      install = revdep_install(pkg, quiet = quiet),
+      run =     revdep_run(pkg, quiet = quiet, timeout = timeout, num_workers = num_workers),
+      report =  revdep_report(pkg),
+      done =    break
+    )
     did_something <- TRUE
   }
 
   if (!did_something) {
-    message("Nothing happened. Do you need to run revdep_reset()?")
+    message(
+      "* See results of previous run in 'revdep/README.md'\n",
+      "* Reset for another run with `revdepcheck::revdep_reset()`"
+    )
   }
+
+  invisible()
 }
 
-revdep_setup <- function(pkg = ".",
-                         dependencies = c("Depends", "Imports",
-                                          "Suggests", "LinkingTo"),
-                         bioc = TRUE) {
+revdep_setup <- function(pkg = ".") {
   pkg <- pkg_check(pkg)
-  pkgname <- pkg_name(pkg)
-
   status("SETUP")
 
   message("Creating directories and database")
-  dir_setup(pkg)
-  db_setup(pkg)              # Make sure it exists
+
+  invisible()
+}
+
+
+revdep_init <- function(pkg = ".",
+                         dependencies = c("Depends", "Imports",
+                                          "Suggests", "LinkingTo"),
+                         bioc = TRUE) {
+
+  pkg <- pkg_check(pkg)
+  pkgname <- pkg_name(pkg)
   db_clean(pkg)              # Delete all records
 
   "!DEBUG getting reverse dependencies for `basename(pkg)`"
-  message("Computing revdeps")
+  status("INIT", "Computing revdeps")
   revdeps <- cran_revdeps(pkgname, dependencies, bioc = bioc)
   db_todo_add(pkg, revdeps)
 
+  db_metadata_set(pkg, "todo", "install")
   invisible()
 }
 
@@ -127,24 +156,25 @@ revdep_install <- function(pkg = ".", quiet = FALSE) {
 
   # Record libraries
   lib <- library_compare(pkg)
-  utils::write.csv(lib, file.path(pkg, "revdep", "checks", "libraries.csv"),
+  utils::write.csv(lib, file.path(dir_find(pkg, "checks"), "libraries.csv"),
     row.names = FALSE, quote = FALSE)
 
+  db_metadata_set(pkg, "todo", "run")
   invisible()
-}
-
-pkglib_exists <- function(pkgdir) {
-  file.exists(dir_find(pkgdir, "old")) && file.exists(dir_find(pkgdir, "new"))
 }
 
 #' @importFrom prettyunits vague_dt
 
-revdep_run_check <- function(pkg = ".", quiet = TRUE,
-                          timeout = as.difftime(10, units = "mins"),
-                          num_workers = 1, bioc = TRUE) {
+revdep_run <- function(pkg = ".", quiet = TRUE,
+                       timeout = as.difftime(10, units = "mins"),
+                       num_workers = 1, bioc = TRUE) {
 
   pkg <- pkg_check(pkg)
   pkgname <- pkg_name(pkg)
+
+  if (!inherits(timeout, "difftime")) {
+    timeout <- as.difftime(timeout, units = "secs")
+  }
 
   todo <- db_todo(pkg)
   status("CHECK", paste0(length(todo), " packages"))
@@ -171,32 +201,7 @@ revdep_run_check <- function(pkg = ".", quiet = TRUE,
   cat_line(red("BROKEN: "), status$broken)
   cat_line("Total time: ", vague_dt(end - start, format = "short"))
 
-  invisible()
-}
-
-check_existing_checks <- function(pkg) {
-  length(db_list(pkg)) != 0
-}
-
-revdep_clean <- function(pkg = ".") {
-  pkg <- pkg_check(pkg)
-
-  status("CLEAN")
-
-  # Delete local installs
-  unlink(dir_find(pkg, "lib"), recursive = TRUE)
-
-  # Delete all sources/binaries cached by R CMD check
-  check_dir <- dir_find(pkg, "checks")
-  package <- dir(check_dir)
-  rcheck <- c(
-    file.path(check_dir, package, "new", paste0(package, ".Rcheck")),
-    file.path(check_dir, package, "old", paste0(package, ".Rcheck"))
-  )
-
-  unlink(file.path(rcheck, "00_pkg_src"), recursive = TRUE)
-  unlink(file.path(rcheck, package), recursive = TRUE)
-
+  db_metadata_set(pkg, "todo", "report")
   invisible()
 }
 
@@ -212,6 +217,9 @@ revdep_report <- function(pkg = ".") {
 
   message("Writing problems to 'revdep/problems.md'")
   revdep_report_problems(pkg, file = file.path(root, "problems.md"))
+
+  db_metadata_set(pkg, "todo", "done")
+  invisible()
 }
 
 report_exists <- function(pkg) {
@@ -234,47 +242,6 @@ revdep_reset <- function(pkg = ".") {
 
   invisible()
 }
-
-
-#' Manually add packages to check
-#'
-#' Use `revdep_add()` to add a single package to the to do list. Use
-#' `revdep_add_broken()` to add all broken packages from the last check
-#' (this is useful if you think you've fixed the underlying problem in
-#' your package)
-#'
-#' @inheritParams revdep_check
-#' @param packages Character vector of package names to add
-#' @export
-
-revdep_add <- function(pkg = ".", packages) {
-  pkg <- pkg_check(pkg)
-  db_todo_add(pkg, packages)
-}
-
-#' @export
-#' @rdname revdep_add
-
-revdep_add_broken <- function(pkg = ".") {
-  pkg <- pkg_check(pkg)
-
-  packages <- revdep_results(pkg, db_list(pkg))
-  broken <- vapply(packages, is_broken, integer(1))
-
-  to_add <- db_list(pkg)[broken]
-  if (length(to_add) == 0) {
-    message("No broken packages to re-test")
-  } else {
-    message(
-      "Re-checking broken packages: ",
-      str_trunc(paste(to_add, collapse = ","), 100)
-    )
-    revdep_add(pkg, to_add)
-
-  }
-
-}
-
 
 #' @importFrom crayon bold
 

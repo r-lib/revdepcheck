@@ -2,7 +2,7 @@
 #' @importFrom remotes bioc_install_repos
 #' @importFrom crancache available_packages
 
-cran_revdeps <- function(package, dependencies, bioc) {
+cran_revdeps <- function(package, dependencies = TRUE, bioc = FALSE) {
   stopifnot(is_string(package))
   repos <- get_repos(bioc)
 
@@ -12,17 +12,23 @@ cran_revdeps <- function(package, dependencies, bioc) {
   deps <- apply(alldeps, 1, paste, collapse = ",")
   rd <- grepl(paste0("\\b", package, "\\b"), deps)
 
-  allpkgs[rd, "Package"]
+  pkgs <- unname(allpkgs[rd, "Package"])
+  pkgs[order(tolower(pkgs))]
 }
 
 get_repos <- function(bioc) {
   repos <- c(
-    if (bioc) bioc_install_repos(),
-    getOption("repos")
+    getOption("repos"),
+    if (bioc) bioc_install_repos()
   )
   if (! "CRAN" %in% names(repos) || repos["CRAN"] == "@CRAN@") {
     repos["CRAN"] <- "https://cloud.r-project.org"
   }
+
+  ## Drop duplicated repos (by name only)
+  names <- names(repos)
+  repos <- repos[!(nzchar(names) & duplicated(names))]
+
   repos
 }
 

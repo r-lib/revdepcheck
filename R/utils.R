@@ -1,5 +1,5 @@
 
-`%||%` <- function(l, r) if (is.null(l)) r else l
+`%||%` <- function(l, r) if (length(l) == 0) r else l
 
 is_string <- function(x) {
   is.character(x) && length(x) == 1 && !is.na(x)
@@ -86,4 +86,11 @@ execute_r <- function(px_opts, new_session = FALSE) {
 
 str_trim <- function(x) {
   sub("\\s+$", "", sub("^\\s+", "", x))
+}
+
+cut_into_lines <- function(x) {
+  x <- do.call(paste0, as.list(x))
+  x <- gsub("\r\n", "\n", x, fixed = TRUE)
+  x <- strsplit(x, "\n", fixed = TRUE)[[1]]
+  if (length(x)) x else ""
 }

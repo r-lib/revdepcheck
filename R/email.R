@@ -1,7 +1,10 @@
 #' List maintainers of all reverse dependencies
 #'
+#' @export
 #' @inheritParams revdep_check
-revdep_maintainers <- function(pkg) {
+revdep_maintainers <- function(pkg = ".") {
+  pkg <- pkg_check(pkg)
+
   m <- unique(db_maintainers(pkg)[[1]])
   structure(m, class = "maintainers")
 }
@@ -25,50 +28,45 @@ print.maintainers <- function(x, ...) {
 #' file created in your working directory.
 #'
 #' @inheritParams revdep_check
+#' @param type Type of problems to notify about; either "broken" (i.e. there
+#'   is a new `R CMD check` failure that did not currently occur) or
+#'   "failed" (i.e. the check failure either during installation or because
+#'   of a timeout).
+#' @param packages A character vector of package names. Use this if some emails
+#'   failed to send in the previous round. If omitted uses all packages.
 #' @param data Optionally, supply a named list to provide your own parameters
 #'   to fill in the template
 #' @export
 
-revdep_email <- function(pkg = ".") {
-  # Find all broken packages
-  packages <- revdep_results(pkg, NULL)
+revdep_email <- function(type = c("broken", "failed"), pkg = ".", packages = NULL) {
+  type <- match.arg(type)
 
-  broken <- vapply(packages, is_broken, logical(1))
-  packages_broken <- packages[broken]
+  packages <- db_results(pkg, packages)
+  status <- vapply(packages, rcmdcheck_status, character(1), USE.NAMES = FALSE)
 
-  if (length(packages_broken) == 0) {
-    message("All packages are OK :)")
+  cond <- switch(type,
+    broken = status == "-",
+    failed = status %in% c("i", "t")
+  )
+  revdep_email_by_type(pkg, packages[cond], type)
+
+  invisible()
+}
+
+revdep_email_by_type <- function(pkg, packages, type = "broken") {
+  if (length(packages) == 0) {
+    message("All ok :D")
     return(invisible())
   }
 
   # Generate email templates
-  data_base <- email_data(pkg)
-  data_package <- lapply(packages_broken, function(x) {
-    cmp <- x$cmp
-    old <- unique(cmp$hash[cmp$which == "old"])
-    new <- unique(cmp$hash[cmp$which == "new"])
-    broke <- setdiff(new, old)
-
-    out <- cmp$output[cmp$hash %in% broke & cmp$which == "new"]
-    your_results <- crayon::strip_style(format_details_bullets(out))
-
-    maintainer <- as.list(unlist(utils::as.person(x$maintainer)[[1]]))
-
-    list(
-      your_package = x$package,
-      your_version = x$version,
-      your_results = your_results,
-      your_name = paste(maintainer$given, maintainer$family),
-      your_email = maintainer$email
-    )
-  })
-  data_package <- lapply(data_package, function(x) utils::modifyList(data_base, x))
+  package_data <- package_data(pkg = pkg, packages = packages)
 
   # Show draft email (using first package) and check we're good
-  revdep_email_draft(data = data_package[[1]])
+  revdep_email_draft(pkg = pkg, type = type, data = package_data[[1]])
 
   ready <- utils::menu(
-    title = paste0("Ready to send ", length(data_package), " emails?"),
+    title = paste0("Ready to send ", length(package_data), " emails?"),
     c("Yes", "No")
   )
 
@@ -76,15 +74,25 @@ revdep_email <- function(pkg = ".") {
     return(invisible())
   }
 
-  # Construct and send each email
-  for (i in seq_along(data_package)) {
-    data <- data_package[[i]]
+  ok <- logical(length(package_data))
 
-    body <- email_build(data)
+  # Construct and send each email
+  for (i in seq_along(package_data)) {
+    data <- package_data[[i]]
+
+    body <- email_build(type = type, data = data)
     to <- data$your_email
     subject <- glue_data(data, "{your_package} and upcoming CRAN release of {my_package}")
 
-    email_send(to, body, subject, draft = FALSE)
+    ok[[i]] <- email_send(to, body, subject, draft = FALSE)
+  }
+
+  if (any(!ok)) {
+    failed <- package_data[!ok]
+    pkgs <- map_chr(failed, function(x) x$your_package)
+
+    message("Failed to send:")
+    cat(deparse(pkgs), sep = "\n")
   }
 
   invisible()
@@ -93,11 +101,11 @@ revdep_email <- function(pkg = ".") {
 #' @export
 #' @rdname revdep_email
 
-revdep_email_draft <- function(pkg, data = email_data(pkg)) {
+revdep_email_draft <- function(type = "broken", pkg = ".", data = email_data(pkg)) {
   cat_line(rule("Draft email"))
 
   data <- lapply(data, bold)
-  cat(email_build(data = data))
+  cat(email_build(type = type, data = data))
 
   cat_line()
   cat_line()
@@ -110,6 +118,31 @@ revdep_email_draft <- function(pkg, data = email_data(pkg)) {
 
 
 # Internal --------------------------------------------------------------
+
+package_data <- function(packages, pkg = ".") {
+  data_base <- email_data(pkg)
+  data_package <- lapply(packages, function(x) {
+    cmp <- x$cmp
+    old <- unique(cmp$hash[cmp$which == "old"])
+    new <- unique(cmp$hash[cmp$which == "new"])
+    broke <- setdiff(new, old)
+
+    out <- cmp$output[cmp$hash %in% broke & cmp$which == "new"]
+    your_results <- crayon::strip_style(format_details_bullets(out))
+
+    desc <- desc::desc(text = x$new$description)
+    maintainer <- as.list(unlist(utils::as.person(desc$get_maintainer())[[1]]))
+
+    list(
+      your_package = x$package,
+      your_version = desc$get_version(),
+      your_results = glue::collapse(your_results),
+      your_name = paste(maintainer$given, maintainer$family),
+      your_email = maintainer$email
+    )
+  })
+  lapply(data_package, function(x) utils::modifyList(data_base, x))
+}
 
 #' @importFrom gmailr mime send_message
 
@@ -138,10 +171,15 @@ email_send <- function(to, body, subject, draft = TRUE) {
 
 #' @importFrom glue glue_data
 
-email_build <- function(data = email_data(".")) {
-  template_path <- system.file("templates", "email.txt", package = "revdepcheck")
-  template <- paste(readLines(template_path), collapse = "\n")
+email_build <- function(type = "broken", data = email_data(".")) {
+  name <- paste0("email-", type, ".txt")
+  template_path <- system.file(
+    "templates", name,
+    package = "revdepcheck",
+    mustWork = TRUE
+  )
 
+  template <- paste(readLines(template_path), collapse = "\n")
   glue_data(data, template)
 }
 
@@ -155,15 +193,6 @@ email_data <- function(pkg = ".") {
 
   yaml_path <- file.path(pkg, "revdep", "email.yml")
   if (!file.exists(yaml_path)) {
-    message("Creating 'revdep/email.yml'")
-    data <- list(
-      release_date = NULL,
-      rel_release_date = NULL,
-      my_news_url = NULL
-    )
-    yaml <- as.yaml(data)
-    writeLines(yaml, yaml_path)
-
     return(defaults)
   }
 
@@ -183,6 +212,7 @@ email_data_defaults <- function(pkg = ".") {
 
     release_date = red("--release_date--"),
     rel_release_date = red("--rel_release_date---"),
+    release_version = red("--release_version--"),
 
     your_package = green("your_package"),
     your_version = green("your_version"),

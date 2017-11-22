@@ -2,13 +2,17 @@ Dear {your_name},
 
 This is an automated email to let you know that:
 
-* A new version of {my_package}, {my_version}, is ready to go to CRAN.
+* A new version of {my_package} is ready to go to CRAN. {my_package} is
+  currently at version {my_version} and will become {release_version} upon release.
+
 * {your_package} uses {my_package} and has problems with the new version.
+
 * We plan to submit {my_package} to CRAN on {release_date}.
 
 I need your help to keep {your_package} and {my_package} working together smoothly. In the next {rel_release_date}, can you please:
 
-1. Read about the changes to {my_package} at {my_news_url}.
+1. Read about the changes to {my_package} at
+   {my_news_url}.
    This page includes a list of breaking changes, the reasoning behind
    them, and to how to update your code.
 

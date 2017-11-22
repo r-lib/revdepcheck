@@ -12,22 +12,51 @@ revdep_check(pkg = ".", dependencies = c("Depends", "Imports", "Suggests",
 revdep_reset(pkg = ".")
 }
 \arguments{
-\item{pkg}{Path to package}
+\item{pkg}{Path to package.}
 
-\item{dependencies}{Which types of revdeps to check}
+\item{dependencies}{Which types of revdeps should be checked. For CRAN
+release, we recommend using the default.}
 
 \item{quiet}{Suppress output from internal processes?}
 
 \item{timeout}{Maximum time to wait (in seconds) for \code{R CMD check} to
-complete.}
+complete. Default is 10 minutes.}
 
 \item{num_workers}{Number of parallel workers to use}
 
-\item{bioc}{Also check revdeps in BioConductor?}
+\item{bioc}{Also check revdeps that live in BioConductor?}
 }
 \description{
-\code{revdep_check()} is designed to work even if interrupted. If for some reason
-you need to stop the checks, or the session dies, just rerun \code{revdep_check()}
-and it will resume from where it last stopped. To completed reset the
-results of a previous run, use \code{revdep_reset()}.
+\code{revdep_check()} runs \code{R CMD check} on all reverse dependencies of your
+package. To avoid false positives, it runs \code{R CMD check} twice: once for
+released version on CRAN and once for the local development version. It
+then reports the differences so you can see what checks were previously
+ok but now fail.
+
+Once your package has been successfully submitted to CRAN, you should
+run \code{revdep_reset()}. This deletes all files used for checking, freeing
+up disk space and leaving you in a clean state for the next release.
+}
+\details{
+\code{revdep_check()} proceeds in four steps:
+\enumerate{
+\item \strong{Init}: create the \code{revdep/} subdirectory if it doesn't already exist,
+and save the list of reverse dependencies to check.
+\item \strong{Install}: install the CRAN (released) and local (development)
+versions of your package, including all dependencies.
+\item \strong{Run}: run \code{R CMD check} twice for each reverse dependency, once
+for the CRAN version and one for the local version. The checks are
+run in parallel using \code{num_worker} processes.
+\item \strong{Report}: generate reports showing differences between the check
+results for the CRAN and local versions of your package. The focus of
+the report is on new failures. The reports are saved in \code{revdep/}.
+}
+
+\code{revdep_check()} is designed to seamlessly resume in the case of failure:
+just re-run \code{revdep_check()} and it will start from where it left off.
+If you want to start again from scratch, run \code{revdep_reset()}.
+}
+\seealso{
+To see more details of problems during a run, call
+\code{\link[=revdep_summary]{revdep_summary()}} and \code{\link[=revdep_details]{revdep_details()}} in another process.
 }

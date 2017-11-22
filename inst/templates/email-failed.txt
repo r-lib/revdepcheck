@@ -1,0 +1,26 @@
+Dear {your_name},
+
+This is an automated email to let you know that:
+
+* A new version of {my_package} is ready to go to CRAN. {my_package} is
+  currently at version {my_version} and will become {release_version} upon release.
+
+* {your_package} uses {my_package}, but I could not automatically check it.
+
+* We plan to submit {my_package} to CRAN on {release_date}.
+
+I need your help to keep {your_package} and {my_package} working together smoothly. In the next {rel_release_date}, can you please run R CMD check on your package using the development version of {my_package}. You can see at list of changes at {my_news_url}.
+
+If you discover any failing checks, either update your package, or inform me that you have found a potential bug in {my_package}.
+
+* If you update your package, please submit an update to CRAN before {release_date}.
+
+* If you have discovered a bug in {my_package}, please file an issue (ideally
+  with a small reprex that illustrates the problem) at {my_issues_url}.
+
+* If you're not sure whether or not you've found a bug, please an issue and
+  we'll help you figure it out.
+
+Thanks,
+
+{my_name}
