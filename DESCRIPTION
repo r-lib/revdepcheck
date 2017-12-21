@@ -32,7 +32,7 @@ Imports:
     gmailr,
     knitr,
     prettyunits,
-    processx,
+    processx (>= 3.0.1),
     progress,
     rcmdcheck (>= 1.2.1.9003),
     remotes (>= 1.0.0.9000),
