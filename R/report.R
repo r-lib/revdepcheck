@@ -140,7 +140,7 @@ revdep_report_cran <- function(pkg = ".") {
 
   comparisons <- db_results(pkg, NULL)
 
-  status <- map_chr(comparisons, function(x) x$status %||% "i")
+  status <- map_chr(comparisons, function(x) x$status %|0|% "i")
   package <- map_chr(comparisons, "[[", "package")
   on_cran <- map_lgl(comparisons, on_cran)
 
