@@ -258,16 +258,6 @@ report_revdeps <- function(pkg = ".") {
   )
 }
 
-map_chr <- function(x, fun, ...) {
-  vapply(x, fun, ..., FUN.VALUE = character(1), USE.NAMES = FALSE)
-}
-map_lgl <- function(x, fun, ...) {
-  vapply(x, fun, ..., FUN.VALUE = logical(1), USE.NAMES = FALSE)
-}
-map_int <- function(x, fun, ...) {
-  vapply(x, fun, ..., FUN.VALUE = integer(1), USE.NAMES = FALSE)
-}
-
 # Styling -----------------------------------------------------------------
 
 #' @importFrom knitr kable
