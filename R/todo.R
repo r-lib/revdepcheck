@@ -49,6 +49,6 @@ revdep_add_broken <- function(pkg = ".") {
 #' @rdname revdep_add
 
 revdep_todo <- function(pkg = ".") {
-  db_list(pkg)
+  db_todo(pkg)
 }
 
