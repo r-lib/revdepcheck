@@ -10,26 +10,20 @@ Authors@R: c(
 Description: Automated, isolated reserve dependency checking, with automatic
     comparison of the results to the current CRAN checks.
 License: MIT + file LICENSE
-LazyData: true
 URL: https://github.com/r-lib/revdepcheck#readme
 BugReports: https://github.com/r-lib/revdepcheck/issues
-RoxygenNote: 6.0.1.9000
-Roxygen: list(markdown = TRUE)
-Suggests:
-    debugme,
-    testthat
-Imports:
+Imports: 
     assertthat,
-    cli,
     callr,
+    cli,
     clisymbols,
     crancache,
     crayon,
-    desc (>= 1.1.1.9002),
     DBI,
-    jsonlite,
+    desc (>= 1.1.1.9002),
     glue,
     gmailr,
+    jsonlite,
     knitr,
     prettyunits,
     processx (>= 3.0.1),
@@ -42,12 +36,19 @@ Imports:
     whoami,
     withr,
     yaml
-Remotes:
-    r-lib/cli,
+Suggests: 
+    debugme,
+    testthat
+Remotes: 
+    gaborcsardi/progress,
     r-lib/callr,
+    r-lib/cli,
     r-lib/crancache,
     r-lib/desc,
-    gaborcsardi/progress,
+    r-lib/processx,
     r-lib/rcmdcheck,
     r-lib/remotes
 Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 6.0.1.9000
