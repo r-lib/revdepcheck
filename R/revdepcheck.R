@@ -149,7 +149,7 @@ revdep_install <- function(pkg = ".", quiet = FALSE) {
       dir_find(pkg, "new"),
       with_options(
         list(warn = 2),
-        install_local(pkg, quiet = quiet)
+        install_local(pkg, quiet = quiet, repos = get_repos(bioc = TRUE))
       )
     )
   )
