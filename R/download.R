@@ -34,7 +34,26 @@ download_task <- function(state, task) {
   state
 }
 
+
+pkg_tarball <- function(pkgdir, pkgname) {
+  dir <- dir_find(pkgdir, "check", pkgname)
+  dir(dir, pattern = "\\.tar\\.gz$", full.names = TRUE)
+}
+
 download_done <- function(state, worker) {
+  pkgdir <- state$options$pkgdir
+  pkgname <- worker$task$args[[1]]
+
+  tarball <- pkg_tarball(pkgdir, pkgname)
+  if (!length(tarball)) {
+    n_attempts <- worker$task$args[[2]]
+    if (n_attempts > 20L) {
+      stop(sprintf("Failed downloading package %s", pkgname), call. = FALSE)
+    } else {
+      return(download_task(state, task("download", pkgname, n_attempts + 1L)))
+    }
+  }
+
   wpkg <- match(worker$package, state$packages$package)
   state$packages$state[wpkg] <- "downloaded"
   state

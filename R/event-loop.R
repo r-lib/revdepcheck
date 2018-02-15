@@ -250,7 +250,7 @@ schedule_next_task <- function(state) {
   if (any(ready)) {
     pkg <- state$packages$package[ready][1]
     "!DEBUG schedule downloading `pkg` with the old version"
-    return(task("download", pkg))
+    return(task("download", pkg, 1L))
   }
 
   ## todo -> deps_installing
