@@ -28,6 +28,7 @@ print.maintainers <- function(x, ...) {
 #' file created in your working directory.
 #'
 #' @inheritParams revdep_check
+#' @inheritParams revdep_report_summary
 #' @param type Type of problems to notify about; either "broken" (i.e. there
 #'   is a new `R CMD check` failure that did not currently occur) or
 #'   "failed" (i.e. the check failure either during installation or because
@@ -38,17 +39,17 @@ print.maintainers <- function(x, ...) {
 #'   to fill in the template
 #' @export
 
-revdep_email <- function(type = c("broken", "failed"), pkg = ".", packages = NULL) {
+revdep_email <- function(type = c("broken", "failed"), pkg = ".", packages = NULL,
+                         results = revdep_summary(pkg, revdep = packages)) {
   type <- match.arg(type)
 
-  packages <- db_results(pkg, packages)
-  status <- vapply(packages, rcmdcheck_status, character(1), USE.NAMES = FALSE)
+  status <- vapply(results, rcmdcheck_status, character(1), USE.NAMES = FALSE)
 
   cond <- switch(type,
     broken = status == "-",
     failed = status %in% c("i", "t")
   )
-  revdep_email_by_type(pkg, packages[cond], type)
+  revdep_email_by_type(pkg, results[cond], type)
 
   invisible()
 }

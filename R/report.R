@@ -6,11 +6,14 @@
 #'
 #' @inheritParams revdep_check
 #' @param file File to write output to. Default will write to console.
+#' @param results A list of objects of class `rcmdcheck_comparison` or
+#'   `rcmdcheck_error`, only necessary if you ran the revdepchecks externally.
 #' @export
 #' @importFrom crayon black red yellow green
 #' @importFrom sessioninfo platform_info
 
-revdep_report_summary <- function(pkg = ".", file = "") {
+revdep_report_summary <- function(pkg = ".", file = "",
+                                  results = revdep_summary(pkg)) {
   pkg <- pkg_check(pkg)
   if (is_string(file) && !identical(file, "")) {
     file <- file(file, encoding = "UTF-8", open = "w")
@@ -27,7 +30,7 @@ revdep_report_summary <- function(pkg = ".", file = "") {
   cat_kable(report_libraries(pkg), file = file)
 
   cat_header("Revdeps", file = file)
-  revdeps <- report_revdeps(pkg)
+  revdeps <- report_revdeps(pkg, results)
 
   status <- revdeps$status
   revdeps$status <- NULL
@@ -53,7 +56,8 @@ revdep_report_section <- function(title, rows, file) {
 #' @export
 #' @rdname revdep_report_summary
 
-revdep_report_problems <- function(pkg = ".", file = "") {
+revdep_report_problems <- function(pkg = ".", file = "",
+                                   results = revdep_summary(pkg)) {
   if (is_string(file) && !identical(file, "")) {
     file <- file(file, encoding = "UTF-8", open = "w")
     on.exit(close(file), add = TRUE)
@@ -62,10 +66,9 @@ revdep_report_problems <- function(pkg = ".", file = "") {
     on.exit(options(opts), add = TRUE)
   }
 
-  comparisons <- db_results(pkg, NULL)
-  n_issues <- map_int(comparisons, function(x) sum(x$cmp$change %in% c(0, 1)))
+  n_issues <- map_int(results, function(x) sum(x$cmp$change %in% c(0, 1)))
 
-  lapply(comparisons[n_issues > 0], failure_details, file = file)
+  lapply(results[n_issues > 0], failure_details, file = file)
 
   invisible()
 }
@@ -134,15 +137,13 @@ format_details_bullet <- function(x, max_lines = 20) {
 #' @rdname revdep_report_summary
 #' @importFrom utils available.packages
 
-revdep_report_cran <- function(pkg = ".") {
+revdep_report_cran <- function(pkg = ".", results = revdep_summary(pkg)) {
   opts <- options("crayon.enabled" = FALSE)
   on.exit(options(opts), add = TRUE)
 
-  comparisons <- db_results(pkg, NULL)
-
-  status <- map_chr(comparisons, function(x) x$status %||% "i")
-  package <- map_chr(comparisons, "[[", "package")
-  on_cran <- map_lgl(comparisons, on_cran)
+  status <- map_chr(results, function(x) x$status %||% "i")
+  package <- map_chr(results, "[[", "package")
+  on_cran <- map_lgl(results, on_cran)
 
   broke <- status == "-" & on_cran
   failed <- !(status %in% c("+", "-")) & on_cran
@@ -150,7 +151,7 @@ revdep_report_cran <- function(pkg = ".") {
   cat_line("## revdepcheck results")
   cat_line()
   cat_line(
-    "We checked ", length(comparisons), " reverse dependencies",
+    "We checked ", length(results), " reverse dependencies",
     if (any(!on_cran))
       paste0(" (", sum(on_cran), " from CRAN + ", sum(!on_cran), " from BioConductor)"),
     ", comparing R CMD check results across CRAN and dev versions of this package."
@@ -169,7 +170,7 @@ revdep_report_cran <- function(pkg = ".") {
     cat_line("(This reports the first line of each new failure)")
     cat_line()
 
-    issues <- lapply(comparisons[broke], "[[", "cmp")
+    issues <- lapply(results[broke], "[[", "cmp")
     new <- lapply(issues, function(x) x$output[x$change == 1])
     first_line <- lapply(new, function(x) map_chr(strsplit(x, "\n"), "[[", 1))
     collapsed <- map_chr(first_line, function(x) paste0("  ", x, "\n", collapse = ""))
@@ -219,9 +220,7 @@ report_status <- function(pkg = ".") {
   )
 }
 
-report_revdeps <- function(pkg = ".") {
-  comparisons <- db_results(pkg, NULL)
-
+report_revdeps <- function(pkg = ".", results) {
   make_summary <- function(x, type) {
     rows <- x$cmp[x$cmp$type == type, , drop = FALSE]
 
@@ -241,18 +240,18 @@ report_revdeps <- function(pkg = ".") {
     paste0("[", pkg, "](problems.md#", slug, ")")
   }
 
-  n_issues <- map_int(comparisons, function(x) sum(x$cmp$change %in% c(0, 1)))
+  n_issues <- map_int(results, function(x) sum(x$cmp$change %in% c(0, 1)))
 
-  status <-  map_chr(comparisons, rcmdcheck_status)
-  pkgname <- map_chr(comparisons, "[[", "package")
+  status <-  map_chr(results, rcmdcheck_status)
+  pkgname <- map_chr(results, "[[", "package")
 
   data.frame(
     status = status,
     package = ifelse(n_issues > 0, problem_link(pkgname), pkgname),
-    version = map_chr(comparisons, rcmdcheck_version),
-    error = map_chr(comparisons, make_summary, "error"),
-    warning = map_chr(comparisons, make_summary, "warning"),
-    note = map_chr(comparisons, make_summary, "note"),
+    version = map_chr(results, rcmdcheck_version),
+    error = map_chr(results, make_summary, "error"),
+    warning = map_chr(results, make_summary, "warning"),
+    note = map_chr(results, make_summary, "note"),
     stringsAsFactors = FALSE,
     check.names = FALSE
   )

@@ -6,16 +6,20 @@
 \alias{revdep_report_cran}
 \title{Markdown report of reverse dependency check results}
 \usage{
-revdep_report_summary(pkg = ".", file = "")
+revdep_report_summary(pkg = ".", file = "", results = revdep_summary(pkg))
 
-revdep_report_problems(pkg = ".", file = "")
+revdep_report_problems(pkg = ".", file = "",
+  results = revdep_summary(pkg))
 
-revdep_report_cran(pkg = ".")
+revdep_report_cran(pkg = ".", results = revdep_summary(pkg))
 }
 \arguments{
 \item{pkg}{Path to package.}
 
 \item{file}{File to write output to. Default will write to console.}
+
+\item{results}{A list of objects of class \code{rcmdcheck_comparison} or
+\code{rcmdcheck_error}, only necessary if you ran the revdepchecks externally.}
 }
 \description{
 You can use these functions to get intermediate reports of a \code{\link[=revdep_check]{revdep_check()}}

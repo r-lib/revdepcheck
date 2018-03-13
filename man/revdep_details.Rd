@@ -7,12 +7,12 @@
 \usage{
 revdep_details(pkg = ".", revdep)
 
-revdep_summary(pkg = ".")
+revdep_summary(pkg = ".", revdep = NULL)
 }
 \arguments{
 \item{pkg}{Path to package}
 
-\item{revdep}{Name of revdep package.}
+\item{revdep}{Name of revdep package(s).}
 }
 \description{
 Use this to see nicely formatted results of processed packages while

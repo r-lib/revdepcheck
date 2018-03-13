@@ -5,7 +5,8 @@
 \alias{revdep_email_draft}
 \title{Notify revdep maintainers about problems}
 \usage{
-revdep_email(type = c("broken", "failed"), pkg = ".", packages = NULL)
+revdep_email(type = c("broken", "failed"), pkg = ".", packages = NULL,
+  results = revdep_summary(pkg, revdep = packages))
 
 revdep_email_draft(type = "broken", pkg = ".", data = email_data(pkg))
 }
@@ -19,6 +20,9 @@ of a timeout).}
 
 \item{packages}{A character vector of package names. Use this if some emails
 failed to send in the previous round. If omitted uses all packages.}
+
+\item{results}{A list of objects of class \code{rcmdcheck_comparison} or
+\code{rcmdcheck_error}, only necessary if you ran the revdepchecks externally.}
 
 \item{data}{Optionally, supply a named list to provide your own parameters
 to fill in the template}

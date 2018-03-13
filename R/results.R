@@ -7,7 +7,7 @@
 #'
 #' @export
 #' @param pkg Path to package
-#' @param revdep Name of revdep package.
+#' @param revdep Name of revdep package(s).
 
 revdep_details <- function(pkg = ".", revdep) {
   assert_that(is_string(revdep))
@@ -28,9 +28,9 @@ print.revdepcheck_results <- function(x, ...) {
 #' @export
 #' @rdname revdep_details
 
-revdep_summary <- function(pkg = ".") {
+revdep_summary <- function(pkg = ".", revdep = NULL) {
   structure(
-    db_results(pkg, NULL),
+    db_results(pkg, revdep),
     class = "revdepcheck_results"
   )
 }
