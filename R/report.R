@@ -203,10 +203,14 @@ report_platform <- function() {
 report_libraries <- function(pkg) {
   path <- file.path(dir_find(pkg, "checks"), "libraries.csv")
 
-  df <- utils::read.csv(path, stringsAsFactors = FALSE)
-  names(df)[4] <- "\u0394"
+  if (!file.exists(path)) {
+    data.frame(Error = paste0(path, " not found."))
+  } else {
+    df <- utils::read.csv(path, stringsAsFactors = FALSE)
+    names(df)[4] <- "\u0394"
 
-  df
+    df
+  }
 }
 
 report_status <- function(pkg = ".") {
