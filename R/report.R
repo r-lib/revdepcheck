@@ -66,7 +66,7 @@ revdep_report_problems <- function(pkg = ".", file = "",
     on.exit(options(opts), add = TRUE)
   }
 
-  n_issues <- map_int(results, function(x) sum(x$cmp$change %in% c(0, 1)))
+  n_issues <- map_int(results, function(x) sum(x$cmp$change %in% 1))
 
   lapply(results[n_issues > 0], failure_details, file = file)
 
@@ -80,8 +80,6 @@ failure_details <- function(x, file = "") {
 
   rows <- x$cmp
   cat_failure_section("Newly broken", rows[rows$change == +1, ], file = file)
-  cat_failure_section("Newly fixed",  rows[rows$change == -1, ], file = file)
-  cat_failure_section("In both",      rows[rows$change ==  0, ], file = file)
 
   if (x$status == "i") {
     cat_header("Installation", level = 2, file = file)
