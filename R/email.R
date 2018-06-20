@@ -131,14 +131,14 @@ package_data <- function(packages, pkg = ".") {
     your_results <- crayon::strip_style(format_details_bullets(out))
 
     desc <- desc::desc(text = x$new$description)
-    maintainer <- as.list(unlist(utils::as.person(desc$get_maintainer())[[1]]))
+    maintainer <- utils::as.person(x$maintainer)[[1]]
 
     list(
       your_package = x$package,
       your_version = desc$get_version(),
       your_results = glue::collapse(your_results),
-      your_name = paste(maintainer$given, maintainer$family),
-      your_email = maintainer$email
+      your_name = format(maintainer, c("given", "family")),
+      your_email = format(maintainer, "email", braces = list(email = ""))
     )
   })
   lapply(data_package, function(x) utils::modifyList(data_base, x))
