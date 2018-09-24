@@ -261,5 +261,6 @@ db_results <- function(pkg, revdeps) {
 }
 
 db_maintainers <- function(pkg) {
-  dbGetQuery(db(pkg), "SELECT DISTINCT maintainer FROM revdeps")
+  res <- dbGetQuery(db(pkg), "SELECT DISTINCT maintainer, package FROM revdeps")
+  stats::setNames(res$maintainer, res$package)
 }
