@@ -5,13 +5,13 @@
 revdep_maintainers <- function(pkg = ".") {
   pkg <- pkg_check(pkg)
 
-  m <- unique(db_maintainers(pkg)[[1]])
+  m <- db_maintainers(pkg)
   structure(m, class = "maintainers")
 }
 
 #' @export
 print.maintainers <- function(x, ...) {
-  cat_line(paste0(x, collapse = ",\n"))
+  cat_line(paste0(names(x), " - ", x, collapse = ",\n"))
 }
 
 #' Notify revdep maintainers about problems
@@ -36,9 +36,11 @@ print.maintainers <- function(x, ...) {
 #'   failed to send in the previous round. If omitted uses all packages.
 #' @param data Optionally, supply a named list to provide your own parameters
 #'   to fill in the template
+#' @param draft If `TRUE`, create a gmail draft rather than sending the email
+#'   directly.
 #' @export
 
-revdep_email <- function(type = c("broken", "failed"), pkg = ".", packages = NULL) {
+revdep_email <- function(type = c("broken", "failed"), pkg = ".", packages = NULL, draft = FALSE) {
   type <- match.arg(type)
 
   packages <- db_results(pkg, packages)
@@ -48,12 +50,12 @@ revdep_email <- function(type = c("broken", "failed"), pkg = ".", packages = NUL
     broken = status == "-",
     failed = status %in% c("i", "t")
   )
-  revdep_email_by_type(pkg, packages[cond], type)
+  revdep_email_by_type(pkg, packages[cond], type, draft = draft)
 
   invisible()
 }
 
-revdep_email_by_type <- function(pkg, packages, type = "broken") {
+revdep_email_by_type <- function(pkg, packages, type = "broken", draft = FALSE) {
   if (length(packages) == 0) {
     message("All ok :D")
     return(invisible())
@@ -84,7 +86,7 @@ revdep_email_by_type <- function(pkg, packages, type = "broken") {
     to <- data$your_email
     subject <- glue_data(data, "{your_package} and upcoming CRAN release of {my_package}")
 
-    ok[[i]] <- email_send(to, body, subject, draft = FALSE)
+    ok[[i]] <- email_send(to, body, subject, draft = draft)
   }
 
   if (any(!ok)) {
@@ -131,7 +133,7 @@ package_data <- function(packages, pkg = ".") {
     your_results <- crayon::strip_style(format_details_bullets(out))
 
     desc <- desc::desc(text = x$new$description)
-    maintainer <- utils::as.person(x$maintainer)[[1]]
+    maintainer <- utils::as.person(desc$get_maintainer())[[1]]
 
     list(
       your_package = x$package,
