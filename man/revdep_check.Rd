@@ -5,9 +5,9 @@
 \alias{revdep_reset}
 \title{Run revdep checks}
 \usage{
-revdep_check(pkg = ".", dependencies = c("Depends", "Imports", "Suggests",
-  "LinkingTo"), quiet = TRUE, timeout = as.difftime(10, units = "mins"),
-  num_workers = 1, bioc = TRUE)
+revdep_check(pkg = ".", dependencies = c("Depends", "Imports",
+  "Suggests", "LinkingTo"), quiet = TRUE, timeout = as.difftime(10,
+  units = "mins"), num_workers = 1, bioc = TRUE)
 
 revdep_reset(pkg = ".")
 }
