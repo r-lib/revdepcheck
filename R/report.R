@@ -4,6 +4,10 @@
 #' You can use these functions to get intermediate reports of a [revdep_check()]
 #' running in another session.
 #'
+#' `revdep_report()` writes the `README.md` and `problems.md`. This is
+#' normally done automatically when the checks are complete, but you
+#' can also do it when checks are in progress to get a partial report.
+#'
 #' @inheritParams revdep_check
 #' @param file File to write output to. Default will write to console.
 #' @export
@@ -190,6 +194,37 @@ revdep_report_cran <- function(pkg = ".") {
 on_cran <- function(x) {
   desc <- desc::desc(text = x$new$description)
   identical(desc$get("Repository")[[1]], "CRAN")
+}
+
+#' @export
+#' @rdname revdep_report_summary
+
+revdep_report <- function(pkg = ".") {
+  pkg <- pkg_check(pkg)
+  root <- dir_find(pkg, "root")
+
+  # Open file here because we might write a partial note before
+  # calling `revdep_report_summary()`
+  readme_path <- file.path(root, "README.md")
+  readme_file <- file(readme_path, encoding = "UTF-8", open = "w")
+  on.exit(close(readme_file), add = TRUE)
+
+  opts <- options("crayon.enabled" = FALSE)
+  on.exit(options(opts), add = TRUE)
+
+
+  if (!identical(db_metadata_get(pkg, "todo"), "done")) {
+    message("Writing *partial* report")
+    cat("These are *partial* results!\n\n", file = readme_file)
+  }
+
+  message("Writing summary to 'revdep/README.md'")
+  revdep_report_summary(pkg, file = readme_file)
+
+  message("Writing problems to 'revdep/problems.md'")
+  revdep_report_problems(pkg, file = file.path(root, "problems.md"))
+
+  invisible()
 }
 
 # Helpers -----------------------------------------------------------------

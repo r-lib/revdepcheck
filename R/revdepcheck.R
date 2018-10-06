@@ -69,7 +69,7 @@ revdep_check <- function(pkg = ".",
       init =    revdep_init(pkg, dependencies = dependencies, bioc = bioc),
       install = revdep_install(pkg, quiet = quiet),
       run =     revdep_run(pkg, quiet = quiet, timeout = timeout, num_workers = num_workers),
-      report =  revdep_report(pkg),
+      report =  revdep_final_report(pkg),
       done =    break
     )
     did_something <- TRUE
@@ -205,21 +205,10 @@ revdep_run <- function(pkg = ".", quiet = TRUE,
   invisible()
 }
 
-revdep_report <- function(pkg = ".") {
-  pkg <- pkg_check(pkg)
-
-  status("REPORT")
-
-  root <- dir_find(pkg, "root")
-
-  message("Writing summary to 'revdep/README.md'")
-  revdep_report_summary(pkg, file = file.path(root, "README.md"))
-
-  message("Writing problems to 'revdep/problems.md'")
-  revdep_report_problems(pkg, file = file.path(root, "problems.md"))
-
+revdep_final_report <- function(pkg = ".") {
   db_metadata_set(pkg, "todo", "done")
-  invisible()
+  status("REPORT")
+  revdep_report(pkg)
 }
 
 report_exists <- function(pkg) {
