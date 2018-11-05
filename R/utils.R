@@ -11,11 +11,11 @@ base_packages <- function() {
 
 lapply_with_names <- function(X, FUN, ...) {
   n <- if (!is.null(names(X))) names(X) else if (is.character(X)) X
-  structure(lapply(X, FUN, ...), names = n)
+  structure(map(X, FUN, ...), names = n)
 }
 
 drop_nulls <- function(x) {
-  is_null <- vapply(x, is.null, logical(1))
+  is_null <- map_lgl(x, is.null)
   x[!is_null]
 }
 

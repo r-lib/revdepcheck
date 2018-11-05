@@ -58,7 +58,7 @@ parse_deps <- function(deps) {
   deps <- strsplit(deps, ",", fixed = TRUE)
 
   base <- base_packages()
-  deps <- lapply(deps, setdiff, y = c("R", base))
+  deps <- map(deps, setdiff, y = c("R", base))
 
   res[notempty] <- deps
   res

@@ -102,13 +102,13 @@ checking_now <- function(state) {
     return("")
   }
 
-  pkgs <- vapply(workers, "[[", "package", FUN.VALUE = character(1))
+  pkgs <- map_chr(workers, "[[", "package")
 
-  tasks <- vapply(workers, function(x) x$task$name, FUN.VALUE = character(1))
+  tasks <- map_chr(workers, function(x) x$task$name)
   task_lookup <- c("download" = "D", "deps_install" = "I", "check" = "C")
   tasks_abbr <- unname(task_lookup[tasks])
   pkg_tasks <- split(tasks_abbr, pkgs)
-  pkg_sum <- vapply(pkg_tasks, paste, collapse = "", FUN.VALUE = character(1))
+  pkg_sum <- map_chr(pkg_tasks, paste, collapse = "")
 
   width <- getOption("width") - 38 # conservative estimate
   str <- paste0(names(pkg_tasks), " [", pkg_sum, "]", collapse = ", ")
@@ -118,11 +118,11 @@ checking_now <- function(state) {
 poll <- function(state) {
   if (length(state$workers)) {
     timeout <- get_timeout(state)
-    procs <- lapply(state$workers, function(x) x$process)
+    procs <- map(state$workers, function(x) x$process)
 
     "!DEBUG poll with timeout of `timeout` ms"
     res <- processx::poll(procs, ms = timeout)
-    vapply(res, function(x) "ready" %in% x, logical(1))
+    map_lgl(res, function(x) "ready" %in% x)
 
   } else {
     "!DEBUG nothing to poll"
@@ -131,10 +131,9 @@ poll <- function(state) {
 }
 
 get_timeout <- function(state) {
-  ts <- vapply(
+  ts <- map_dbl(
     state$workers,
     get_process_waiting_time,
-    FUN.VALUE = numeric(1),
     timeout = state$options$timeout
   )
   max(min(ts, 200), 0)

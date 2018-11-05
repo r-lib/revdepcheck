@@ -44,7 +44,7 @@ revdep_email <- function(type = c("broken", "failed"), pkg = ".", packages = NUL
   type <- match.arg(type)
 
   packages <- db_results(pkg, packages)
-  status <- vapply(packages, rcmdcheck_status, character(1), USE.NAMES = FALSE)
+  status <- map_chr(packages, rcmdcheck_status)
 
   cond <- switch(type,
     broken = status == "-",
@@ -106,7 +106,7 @@ revdep_email_by_type <- function(pkg, packages, type = "broken", draft = FALSE) 
 revdep_email_draft <- function(type = "broken", pkg = ".", data = email_data(pkg)) {
   cat_line(rule("Draft email"))
 
-  data <- lapply(data, bold)
+  data <- map(data, bold)
   cat(email_build(type = type, data = data))
 
   cat_line()
@@ -123,7 +123,7 @@ revdep_email_draft <- function(type = "broken", pkg = ".", data = email_data(pkg
 
 package_data <- function(packages, pkg = ".") {
   data_base <- email_data(pkg)
-  data_package <- lapply(packages, function(x) {
+  data_package <- map(packages, function(x) {
     cmp <- x$cmp
     old <- unique(cmp$hash[cmp$which == "old"])
     new <- unique(cmp$hash[cmp$which == "new"])
@@ -143,7 +143,7 @@ package_data <- function(packages, pkg = ".") {
       your_email = format(maintainer, "email", braces = list(email = ""))
     )
   })
-  lapply(data_package, function(x) utils::modifyList(data_base, x))
+  map(data_package, function(x) utils::modifyList(data_base, x))
 }
 
 #' @importFrom gmailr mime send_message
