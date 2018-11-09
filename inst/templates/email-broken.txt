@@ -9,6 +9,8 @@ This is an automated email to let you know that:
 
 * We plan to submit {my_package} to CRAN on {release_date}.
 
+{release_details}
+
 I need your help to keep {your_package} and {my_package} working together smoothly. In the next {rel_release_date}, can you please:
 
 1. Read about the changes to {my_package} at
@@ -22,7 +24,10 @@ I need your help to keep {your_package} and {my_package} working together smooth
    that I have a bug. If you have made changes to your package, please
    submit an update to CRAN before {release_date}.
 
-If you have discovered a bug in {my_package}, please file an issue (ideally with a small reprex that illustrates the problem) at {my_issues_url}. If you're not sure whether or not you've found a bug, please an issue and we'll help you figure it out.
+If you have discovered a bug in {my_package}, please file an issue (ideally with a small reprex that illustrates the problem) at {my_issues_url}. If you're not sure whether or not you've found a bug, please an issue and we'll help you figure it out. Breaking changes that are not listed qualify as bugs.
+
+Please respond to this message if you have any questions.
+
 
 Thanks,
 
