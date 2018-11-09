@@ -28,7 +28,7 @@ revdep_add_broken <- function(pkg = ".") {
   pkg <- pkg_check(pkg)
 
   packages <- db_results(pkg, NULL)
-  broken <- vapply(packages, is_broken, logical(1))
+  broken <- map_lgl(packages, is_broken)
 
   to_add <- names(broken[broken])
   if (length(to_add) == 0) {

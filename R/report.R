@@ -65,7 +65,7 @@ revdep_report_problems <- function(pkg = ".", file = "") {
   comparisons <- db_results(pkg, NULL)
   n_issues <- map_int(comparisons, function(x) sum(x$cmp$change %in% c(0, 1)))
 
-  lapply(comparisons[n_issues > 0], failure_details, file = file)
+  map(comparisons[n_issues > 0], failure_details, file = file)
 
   invisible()
 }
@@ -105,7 +105,7 @@ cat_failure_section <- function(title, rows, file) {
 }
 
 format_details_bullets <- function(x, max_lines = 20) {
-  vapply(x, format_details_bullet, max_lines = max_lines, FUN.VALUE = character(1))
+  map_chr(x, format_details_bullet, max_lines = max_lines)
 }
 
 format_details_bullet <- function(x, max_lines = 20) {
@@ -140,7 +140,7 @@ revdep_report_cran <- function(pkg = ".") {
 
   comparisons <- db_results(pkg, NULL)
 
-  status <- map_chr(comparisons, function(x) x$status %||% "i")
+  status <- map_chr(comparisons, function(x) x$status %|0|% "i")
   package <- map_chr(comparisons, "[[", "package")
   on_cran <- map_lgl(comparisons, on_cran)
 
@@ -169,9 +169,9 @@ revdep_report_cran <- function(pkg = ".") {
     cat_line("(This reports the first line of each new failure)")
     cat_line()
 
-    issues <- lapply(comparisons[broke], "[[", "cmp")
-    new <- lapply(issues, function(x) x$output[x$change == 1])
-    first_line <- lapply(new, function(x) map_chr(strsplit(x, "\n"), "[[", 1))
+    issues <- map(comparisons[broke], "[[", "cmp")
+    new <- map(issues, function(x) x$output[x$change == 1])
+    first_line <- map(new, function(x) map_chr(strsplit(x, "\n"), "[[", 1))
     collapsed <- map_chr(first_line, function(x) paste0("  ", x, "\n", collapse = ""))
 
     cat(paste0("* ", package[broke], "\n", collapsed, "\n", collapse = ""))
@@ -210,7 +210,7 @@ report_libraries <- function(pkg) {
 
 report_status <- function(pkg = ".") {
   packages <- db_results(pkg, NULL)
-  broken <- vapply(packages, is_broken, logical(1))
+  broken <- map_lgl(packages, is_broken)
 
   list(
     todo = length(db_todo(pkg)),
@@ -256,16 +256,6 @@ report_revdeps <- function(pkg = ".") {
     stringsAsFactors = FALSE,
     check.names = FALSE
   )
-}
-
-map_chr <- function(x, fun, ...) {
-  vapply(x, fun, ..., FUN.VALUE = character(1), USE.NAMES = FALSE)
-}
-map_lgl <- function(x, fun, ...) {
-  vapply(x, fun, ..., FUN.VALUE = logical(1), USE.NAMES = FALSE)
-}
-map_int <- function(x, fun, ...) {
-  vapply(x, fun, ..., FUN.VALUE = integer(1), USE.NAMES = FALSE)
 }
 
 # Styling -----------------------------------------------------------------

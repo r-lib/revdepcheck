@@ -1,23 +1,21 @@
+#' @import rlang
 
-`%||%` <- function(l, r) if (length(l) == 0) r else l
-
-is_string <- function(x) {
-  is.character(x) && length(x) == 1 && !is.na(x)
+`%|0|%` <- function(x, y) {
+  if (!length(x)) y else x
 }
 
 #' @importFrom utils installed.packages
-
 base_packages <- function() {
   rownames(installed.packages(priority="base"))
 }
 
 lapply_with_names <- function(X, FUN, ...) {
   n <- if (!is.null(names(X))) names(X) else if (is.character(X)) X
-  structure(lapply(X, FUN, ...), names = n)
+  structure(map(X, FUN, ...), names = n)
 }
 
 drop_nulls <- function(x) {
-  is_null <- vapply(x, is.null, logical(1))
+  is_null <- map_lgl(x, is.null)
   x[!is_null]
 }
 
@@ -67,14 +65,14 @@ str_trunc <- function(x, n) {
 }
 
 
-#' @importFrom withr with_options with_libpaths with_envvar
+#' @importFrom withr with_libpaths with_envvar
 
 execute_r <- function(px_opts, new_session = FALSE) {
   if (new_session) {
     do.call(r, px_opts)
   } else {
-    with_options(
-      list(repos = px_opts$repos),
+    rlang::with_options(
+      repos = px_opts$repos,
       with_libpaths(px_opts$libpath,
         with_envvar(px_opts$env,
           do.call(px_opts$func, px_opts$args)

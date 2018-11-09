@@ -180,14 +180,14 @@ check <- function(pkgdir, pkgname, iam_old = TRUE) {
 }
 
 library_info <- function(file = "", libpath = .libPaths()) {
-  libraries <- lapply(libpath, installed.packages)
+  libraries <- map(libpath, installed.packages)
 
   package_list <- function(library) {
     nv <- paste0(format(library[, "Package"]), " (", library[, "Version"], ")")
     paste0(nv, "\n", collapse = "")
   }
 
-  library_sum <- vapply(libraries, package_list, character(1))
+  library_sum <- map_chr(libraries, package_list)
   cat(
     paste0("Library: ", libpath, "\n", library_sum, collapse = "\n"),
     file = file

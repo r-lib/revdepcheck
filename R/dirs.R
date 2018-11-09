@@ -85,9 +85,8 @@ dir_setup_package <- function(pkgdir, package) {
 }
 
 dir_create <- function(paths) {
-  vapply(
-    paths, FUN = dir.create, FUN.VALUE = logical(1),
-    recursive = TRUE, showWarnings = FALSE
+  map_lgl(paths, dir.create,
+    recursive = TRUE,
+    showWarnings = FALSE
   )
 }
-
