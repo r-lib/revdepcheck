@@ -34,6 +34,7 @@ Imports:
     RSQLite,
     sessioninfo,
     stats,
+    tibble (>= 1.4.99.9005),
     utils,
     whoami,
     withr,
@@ -42,6 +43,7 @@ Suggests:
     debugme,
     testthat
 Remotes: 
+    tidyverse/tibble,
     gaborcsardi/progress,
     r-lib/callr,
     r-lib/cli,

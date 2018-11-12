@@ -48,6 +48,7 @@
 #' @importFrom remotes install_local
 #' @importFrom withr with_libpaths with_envvar
 #' @importFrom crancache install_packages
+#' @importFrom tibble tibble as_tibble
 
 revdep_check <- function(pkg = ".",
                          dependencies = c("Depends", "Imports", "Suggests", "LinkingTo"),

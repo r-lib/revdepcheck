@@ -92,3 +92,21 @@ cut_into_lines <- function(x) {
   x <- strsplit(x, "\n", fixed = TRUE)[[1]]
   if (length(x)) x else ""
 }
+
+value <- function(expr) {
+  eval_tidy(enquo(expr), caller_env())
+}
+
+unduplicate <- function(x, ...) {
+  empty_dims <- n_dim(x) - 1L
+  empty_args <- rep_len(list(expr()), empty_dims)
+
+  subset <- x[...]
+  dups <- duplicated(subset)
+
+  value(x[which(!dups), !!!empty_args])
+}
+n_dim <- function(x) {
+  dim <- dim(x) %|0|% 1L
+  length(dim)
+}
