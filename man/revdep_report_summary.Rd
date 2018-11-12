@@ -11,7 +11,7 @@ revdep_report_summary(pkg = ".", file = "")
 
 revdep_report_problems(pkg = ".", file = "")
 
-revdep_report_cran(pkg = ".")
+revdep_report_cran(pkg = ".", groups = NULL)
 
 revdep_report(pkg = ".")
 }
@@ -19,6 +19,10 @@ revdep_report(pkg = ".")
 \item{pkg}{Path to package.}
 
 \item{file}{File to write output to. Default will write to console.}
+
+\item{groups}{A named character vector to specify group levels to
+summarise in. The name indexes a group and the value indexes a
+level.}
 }
 \description{
 You can use these functions to get intermediate reports of a \code{\link[=revdep_check]{revdep_check()}}
