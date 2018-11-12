@@ -66,7 +66,7 @@ revdep_report_problems <- function(pkg = ".", file = "") {
     on.exit(options(opts), add = TRUE)
   }
 
-  comparisons <- db_results(pkg, NULL)
+  comparisons <- db_results(pkg)$comparisons
   n_issues <- map_int(comparisons, function(x) sum(x$cmp$change %in% c(0, 1)))
 
   map(comparisons[n_issues > 0], failure_details, file = file)
@@ -142,12 +142,14 @@ revdep_report_cran <- function(pkg = ".") {
   opts <- options("crayon.enabled" = FALSE)
   on.exit(options(opts), add = TRUE)
 
-  comparisons <- db_results(pkg, NULL)
+  results <- db_results(pkg)
 
-  status <- map_chr(comparisons, function(x) x$status %|0|% "i")
-  package <- map_chr(comparisons, "[[", "package")
   on_cran <- map_lgl(comparisons, on_cran)
 
+  comparisons <- results$comparisons
+  package <- results$package
+
+  status <- map_chr(comparisons, function(x) x$status %|0|% "i")
   broke <- status == "-" & on_cran
   failed <- !(status %in% c("+", "-")) & on_cran
 
@@ -244,19 +246,17 @@ report_libraries <- function(pkg) {
 }
 
 report_status <- function(pkg = ".") {
-  packages <- db_results(pkg, NULL)
-  broken <- map_lgl(packages, is_broken)
+  comparisons <- db_results(pkg)$comparisons
+  broken <- map_lgl(comparisons, is_broken)
 
   list(
-    todo = length(db_todo(pkg)),
+    todo = nrow(db_todo(pkg)),
     ok = sum(!broken),
     broken = sum(broken)
   )
 }
 
 report_revdeps <- function(pkg = ".") {
-  comparisons <- db_results(pkg, NULL)
-
   make_summary <- function(x, type) {
     rows <- x$cmp[x$cmp$type == type, , drop = FALSE]
 
@@ -276,20 +276,20 @@ report_revdeps <- function(pkg = ".") {
     paste0("[", pkg, "](problems.md#", slug, ")")
   }
 
+  results <- db_results(pkg)
+  comparisons <- results$comparisons
+
   n_issues <- map_int(comparisons, function(x) sum(x$cmp$change %in% c(0, 1)))
+  package <- results$package
 
-  status <-  map_chr(comparisons, rcmdcheck_status)
-  pkgname <- map_chr(comparisons, "[[", "package")
-
-  data.frame(
-    status = status,
-    package = ifelse(n_issues > 0, problem_link(pkgname), pkgname),
+  tibble(
+    !!!results$groups,
+    status = map_chr(comparisons, rcmdcheck_status),
+    package = ifelse(n_issues > 0, problem_link(package), package),
     version = map_chr(comparisons, rcmdcheck_version),
     error = map_chr(comparisons, make_summary, "error"),
     warning = map_chr(comparisons, make_summary, "warning"),
-    note = map_chr(comparisons, make_summary, "note"),
-    stringsAsFactors = FALSE,
-    check.names = FALSE
+    note = map_chr(comparisons, make_summary, "note")
   )
 }
 

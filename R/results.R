@@ -11,9 +11,11 @@
 
 revdep_details <- function(pkg = ".", revdep) {
   assert_that(is_string(revdep))
+  results <- db_results(pkg, revdep)
+  comparison <- results$comparison[[1]]
 
   structure(
-    db_results(pkg, revdep)[[1]],
+    comparison,
     class = "revdepcheck_details"
   )
 }
@@ -29,8 +31,9 @@ print.revdepcheck_results <- function(x, ...) {
 #' @rdname revdep_details
 
 revdep_summary <- function(pkg = ".") {
+  comparisons <- db_results(pkg)$comparisons
   structure(
-    db_results(pkg, NULL),
+    comparisons,
     class = "revdepcheck_results"
   )
 }

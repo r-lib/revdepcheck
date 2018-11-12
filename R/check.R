@@ -160,7 +160,8 @@ check_done <- function(state, worker) {
   if (new_state == "done") {
     clear_line()
 
-    comparison <- db_results(state$options$pkgdir, worker$package)[[1]]
+    results <- db_results(state$options$pkgdir, worker$package)
+    comparison <- results$comparisons[[1]]
     print(summary(comparison))
 
     state$progress_bar$tick(tokens = list(packages = checking_now(state)))

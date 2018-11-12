@@ -171,30 +171,64 @@ revdep_run <- function(pkg = ".", quiet = TRUE,
                        num_workers = 1, bioc = TRUE) {
 
   pkg <- pkg_check(pkg)
-  pkgname <- pkg_name(pkg)
 
   if (!inherits(timeout, "difftime")) {
     timeout <- as.difftime(timeout, units = "secs")
   }
 
-  todo <- db_todo(pkg)
-  status("CHECK", paste0(length(todo), " packages"))
   start <- Sys.time()
 
-  state <- list(
-    options = list(
-      pkgdir = pkg,
-      pkgname = pkgname,
+  todo <- db_todo(pkg)
+  total <- nrow(todo)
+  elapsed <- 0L
+
+  groups <- unduplicate(todo$groups)
+  n_groups <- nrow(groups)
+
+  if (n_groups > 1L) {
+    for (i in seq_len(n_groups)) {
+      group <- unlist(groups[i, ])
+      group_label <- paste(group, collapse = ":")
+
+      matches <- pmap(todo$groups, function(...) identical(c(...), group))
+      idx <- which(unlist(matches))
+      group_todo <- todo[idx, ]
+
+      header1 <- sprintf("CHECK %s (%s/%s)", group_label, i, n_groups)
+      header2 <- paste0(nrow(group_todo), " packages")
+      status(header1, header2)
+
+      revdep_run_group(
+        pkg = pkg,
+        todo = group_todo$package,
+        total = total,
+        elapsed = elapsed,
+        quiet = quiet,
+        timeout = timeout,
+        num_workers = num_workers,
+        bioc = bioc
+      )
+
+      elapsed <- elapsed + nrow(group_todo)
+
+      if (i != n_groups) {
+        cat("\n")
+      }
+    }
+  } else {
+    status("CHECK", paste0(nrow(todo), " packages"))
+    revdep_run_group(
+      pkg = pkg,
+      todo = todo$package,
+      total = total,
+      elapsed = elapsed,
       quiet = quiet,
       timeout = timeout,
-      num_workers = num_workers),
-    packages = data.frame(
-      package = todo,
-      state = if (length(todo)) "todo" else character(),
-      stringsAsFactors = FALSE)
-  )
+      num_workers = num_workers,
+      bioc = bioc
+    )
+  }
 
-  run_event_loop(state)
   end <- Sys.time()
 
   status <- report_status(pkg)
@@ -204,6 +238,30 @@ revdep_run <- function(pkg = ".", quiet = TRUE,
 
   db_metadata_set(pkg, "todo", "report")
   invisible()
+}
+revdep_run_group <- function(pkg, todo, total, elapsed = 0, quiet = TRUE,
+                             timeout = as.difftime(10, units = "mins"),
+                             num_workers = 1, bioc = TRUE) {
+  pkgname <- pkg_name(pkg)
+
+  state <- list(
+    options = list(
+      pkgdir = pkg,
+      pkgname = pkgname,
+      quiet = quiet,
+      timeout = timeout,
+      num_workers = num_workers
+    ),
+    packages = data.frame(
+      package = todo,
+      state = if (length(todo)) "todo" else character(),
+      stringsAsFactors = FALSE
+    ),
+    total = total,
+    elapsed = elapsed
+  )
+
+  run_event_loop(state)
 }
 
 revdep_final_report <- function(pkg = ".") {

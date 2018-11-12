@@ -43,26 +43,27 @@ print.maintainers <- function(x, ...) {
 revdep_email <- function(type = c("broken", "failed"), pkg = ".", packages = NULL, draft = FALSE) {
   type <- match.arg(type)
 
-  packages <- db_results(pkg, packages)
-  status <- map_chr(packages, rcmdcheck_status)
+  results <- db_results(pkg, packages)
+  comparisons <- results$comparisons
+  status <- map_chr(comparisons, rcmdcheck_status)
 
   cond <- switch(type,
     broken = status == "-",
     failed = status %in% c("i", "t")
   )
-  revdep_email_by_type(pkg, packages[cond], type, draft = draft)
+  revdep_email_by_type(pkg, comparisons[cond], type, draft = draft)
 
   invisible()
 }
 
-revdep_email_by_type <- function(pkg, packages, type = "broken", draft = FALSE) {
-  if (length(packages) == 0) {
+revdep_email_by_type <- function(pkg, comparisons, type = "broken", draft = FALSE) {
+  if (length(comparisons) == 0) {
     message("All ok :D")
     return(invisible())
   }
 
   # Generate email templates
-  package_data <- package_data(pkg = pkg, packages = packages)
+  package_data <- package_data(pkg = pkg, comparisons = comparisons)
 
   # Show draft email (using first package) and check we're good
   revdep_email_draft(pkg = pkg, type = type, data = package_data[[1]])
@@ -121,9 +122,9 @@ revdep_email_draft <- function(type = "broken", pkg = ".", data = email_data(pkg
 
 # Internal --------------------------------------------------------------
 
-package_data <- function(packages, pkg = ".") {
+package_data <- function(comparisons, pkg = ".") {
   data_base <- email_data(pkg)
-  data_package <- map(packages, function(x) {
+  data_package <- map(comparisons, function(x) {
     cmp <- x$cmp
     old <- unique(cmp$hash[cmp$which == "old"])
     new <- unique(cmp$hash[cmp$which == "new"])
