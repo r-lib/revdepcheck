@@ -88,6 +88,13 @@ cut_into_lines <- function(x) {
   if (length(x)) x else ""
 }
 
+flatten_names <- function(x) {
+  x <- map2(x, names(x), function(v, n) {
+    set_names(v, rep_along(v, n))
+  })
+  unname(x)
+}
+
 value <- function(expr) {
   eval_tidy(enquo(expr), caller_env())
 }
@@ -104,4 +111,21 @@ unduplicate <- function(x, ...) {
 n_dim <- function(x) {
   dim <- dim(x) %|0|% 1L
   length(dim)
+}
+
+subset_groups <- function(data, group_nms, n) {
+  data <- as_tibble(data)
+
+  if (!length(group_nms)) {
+    return(data[n, ])
+  }
+
+  # paste0() + rev() produces original ordering
+  product <- value(paste0(!!!data[group_nms]))
+  subsets <- rev(map(split(data, product), head, n))
+  value(rbind(!!!subsets))
+}
+
+paste_line <- function(...) {
+  paste(chr(...), collapse = "\n")
 }

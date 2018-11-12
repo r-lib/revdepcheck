@@ -48,3 +48,12 @@ test_that("pkgs_validate() removes duplicated rows", {
   exp <- tibble(repo = c("a", "b"), package = c("foo", "bar"))
   expect_identical(out, exp)
 })
+
+test_that("revdep_pkgs() returns tibble", {
+  skip_if_offline()
+  scoped_options(revdepcheck__limit_revdeps = TRUE)
+
+  pkgs <- revdep_pkgs("tidyverse")
+  expect_named(pkgs, c("repo", "package"))
+})
+

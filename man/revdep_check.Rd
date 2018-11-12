@@ -5,17 +5,22 @@
 \alias{revdep_reset}
 \title{Run revdep checks}
 \usage{
-revdep_check(pkg = ".", dependencies = c("Depends", "Imports",
-  "Suggests", "LinkingTo"), quiet = TRUE, timeout = as.difftime(10,
-  units = "mins"), num_workers = 1, bioc = TRUE)
+revdep_check(pkg = ".", revdeps = NULL, quiet = TRUE,
+  timeout = as.difftime(10, units = "mins"), num_workers = 1,
+  bioc = NULL, dependencies = NULL)
 
 revdep_reset(pkg = ".")
 }
 \arguments{
 \item{pkg}{Path to package.}
 
-\item{dependencies}{Which types of revdeps should be checked. For CRAN
-release, we recommend using the default.}
+\item{revdeps}{A tibble as returned from \code{\link[=revdep_pkgs]{revdep_pkgs()}}. If
+\code{NULL} (the default), all the revdeps of \code{pkg} are checked,
+including those of Bioconductor.
+
+If a tibble, it must include a column \code{package} and can contain
+additional columns that will be used as groups in the final
+report.}
 
 \item{quiet}{Suppress output from internal processes?}
 
@@ -24,7 +29,7 @@ complete. Default is 10 minutes.}
 
 \item{num_workers}{Number of parallel workers to use}
 
-\item{bioc}{Also check revdeps that live in BioConductor?}
+\item{dependencies, bioc}{Deprecated. See \code{\link[=revdep_pkgs]{revdep_pkgs()}}.}
 }
 \description{
 \code{revdep_check()} runs \code{R CMD check} on all reverse dependencies of your
@@ -56,6 +61,24 @@ the report is on new failures. The reports are saved in \code{revdep/}.
 just re-run \code{revdep_check()} and it will start from where it left off.
 If you want to start again from scratch, run \code{revdep_reset()}.
 }
+\section{Structure of the revdeps tibble}{
+
+
+You normally use \code{\link[=revdep_pkgs]{revdep_pkgs()}} to create a tibble suitable as
+\code{revdeps} argument. You can also create it manually:
+\itemize{
+\item There must be a \code{package} column containing a character vector of
+packages to check.
+\item All other columns determine groups of packages. The groups are
+checked sequentially and are included in the summary report
+created by \code{\link[=revdep_report_summary]{revdep_report_summary()}}.
+\item If a group column named \code{repo} is present, it is used by
+\code{\link[=revdep_report_cran]{revdep_report_cran()}} to distinguish between CRAN and
+Bioconductor packages. It should be a character vector. The value
+\code{"CRAN"} determines whether a package comes from CRAN.
+}
+}
+
 \seealso{
 To see more details of problems during a run, call
 \code{\link[=revdep_summary]{revdep_summary()}} and \code{\link[=revdep_details]{revdep_details()}} in another process.

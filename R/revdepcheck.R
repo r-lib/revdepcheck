@@ -33,16 +33,38 @@
 #' If you want to start again from scratch, run `revdep_reset()`.
 #'
 #' @param pkg Path to package.
-#' @param dependencies Which types of revdeps should be checked. For CRAN
-#'   release, we recommend using the default.
+#' @param revdeps A tibble as returned from [revdep_pkgs()]. If
+#'   `NULL` (the default), all the revdeps of `pkg` are checked,
+#'   including those of Bioconductor.
+#'
+#'   If a tibble, it must include a column `package` and can contain
+#'   additional columns that will be used as groups in the final
+#'   report.
 #' @param quiet Suppress output from internal processes?
 #' @param timeout Maximum time to wait (in seconds) for `R CMD check` to
 #'   complete. Default is 10 minutes.
 #' @param num_workers Number of parallel workers to use
-#' @param bioc Also check revdeps that live in BioConductor?
+#' @param dependencies,bioc Deprecated. See [revdep_pkgs()].
 #'
 #' @seealso To see more details of problems during a run, call
 #'   [revdep_summary()] and [revdep_details()] in another process.
+#'
+#' @section Structure of the revdeps tibble:
+#'
+#' You normally use [revdep_pkgs()] to create a tibble suitable as
+#' `revdeps` argument. You can also create it manually:
+#'
+#' * There must be a `package` column containing a character vector of
+#'   packages to check.
+#'
+#' * All other columns determine groups of packages. The groups are
+#'   checked sequentially and are included in the summary report
+#'   created by [revdep_report_summary()].
+#'
+#' * If a group column named `repo` is present, it is used by
+#'   [revdep_report_cran()] to distinguish between CRAN and
+#'   Bioconductor packages. It should be a character vector. The value
+#'   `"CRAN"` determines whether a package comes from CRAN.
 #'
 #' @export
 #' @importFrom remotes install_local
@@ -51,11 +73,22 @@
 #' @importFrom tibble tibble as_tibble
 
 revdep_check <- function(pkg = ".",
-                         dependencies = c("Depends", "Imports", "Suggests", "LinkingTo"),
+                         revdeps = NULL,
                          quiet = TRUE,
                          timeout = as.difftime(10, units = "mins"),
                          num_workers = 1,
-                         bioc = TRUE) {
+                         bioc = NULL,
+                         dependencies = NULL) {
+
+  if (!is_null(bioc)) {
+    abort("The `bioc` argument is defunct. Please use `revdep_pkgs()` instead.")
+  }
+  if (!is_null(dependencies)) {
+    abort("The `dependencies` argument is defunct. Please use `revdep_pkgs()` instead.")
+  }
+  if (is_character(revdeps)) {
+    abort("`revdep_check()` no longer takes dependencies. Please use `revdep_pkgs()` instead.")
+  }
 
   pkg <- pkg_check(pkg)
   dir_setup(pkg)
@@ -63,11 +96,17 @@ revdep_check <- function(pkg = ".",
     db_setup(pkg)
   }
 
+  if (is_null(revdeps)) {
+    revdeps <- revdep_pkgs(pkg_name(pkg))
+  } else if (!is_pkgs_revdeps(revdeps)) {
+    abort("`revdeps` must be `NULL` or a tibble as returned by `revdep_pkgs()`")
+  }
+
   did_something <- FALSE
   repeat {
     stage <- db_metadata_get(pkg, "todo") %|0|% "init"
     switch(stage,
-      init =    revdep_init(pkg, dependencies = dependencies, bioc = bioc),
+      init =    revdep_init(pkg, revdeps),
       install = revdep_install(pkg, quiet = quiet),
       run =     revdep_run(pkg, quiet = quiet, timeout = timeout, num_workers = num_workers),
       report =  revdep_final_report(pkg),
@@ -96,18 +135,14 @@ revdep_setup <- function(pkg = ".") {
 }
 
 
-revdep_init <- function(pkg = ".",
-                         dependencies = c("Depends", "Imports",
-                                          "Suggests", "LinkingTo"),
-                         bioc = TRUE) {
+revdep_init <- function(pkg = ".", revdeps = chr()) {
 
   pkg <- pkg_check(pkg)
-  pkgname <- pkg_name(pkg)
   db_clean(pkg)              # Delete all records
 
   "!DEBUG getting reverse dependencies for `basename(pkg)`"
   status("INIT", "Computing revdeps")
-  revdeps <- cran_revdeps(pkgname, dependencies, bioc = bioc)
+
   db_todo_add(pkg, revdeps)
 
   db_metadata_set(pkg, "todo", "install")
