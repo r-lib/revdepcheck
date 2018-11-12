@@ -2,3 +2,4 @@
 .Rhistory
 .RData
 .httr-oauth
+tests/testthat/fixtures/rvdcTestPkg/revdep/data.sqlite

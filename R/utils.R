@@ -9,11 +9,6 @@ base_packages <- function() {
   rownames(installed.packages(priority="base"))
 }
 
-lapply_with_names <- function(X, FUN, ...) {
-  n <- if (!is.null(names(X))) names(X) else if (is.character(X)) X
-  structure(map(X, FUN, ...), names = n)
-}
-
 drop_nulls <- function(x) {
   is_null <- map_lgl(x, is.null)
   x[!is_null]

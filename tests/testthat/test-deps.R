@@ -20,3 +20,31 @@ test_that("parse_deps extreme cases", {
 
   expect_equal(parse_deps(character()), list())
 })
+
+test_that("pkgs_validate() checks types", {
+  expect_error(pkgs_validate(10), "must be")
+  expect_error(pkgs_validate(list()), "must be")
+  expect_error(pkgs_validate(data.frame(x = "foo")), "must be")
+})
+
+test_that("pkgs_validate() accepts character vectors", {
+  out <- pkgs_validate(c("foo", "bar"))
+  exp <- tibble(package = c("foo", "bar"))
+  expect_identical(out, exp)
+})
+
+test_that("pkgs_validate() coerces to tibble", {
+  expect_is(pkgs_validate(data.frame(package = "foo")), "tbl_df")
+})
+
+test_that("pkgs_validate() removes duplicated rows", {
+  df <- data.frame(
+    repo = c("a", "b", "b"),
+    package = c("foo", "bar", "foo"),
+    stringsAsFactors = FALSE
+  )
+
+  out <- pkgs_validate(df)
+  exp <- tibble(repo = c("a", "b"), package = c("foo", "bar"))
+  expect_identical(out, exp)
+})

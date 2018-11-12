@@ -6,7 +6,9 @@ db_version <- "2.0.0"
 #' @importFrom RSQLite dbIsValid dbConnect SQLite
 
 db <- function(package) {
-  if (exists(package, envir = dbenv) &&
+  if (is(package, "SQLiteConnection")) {
+    package
+  } else if (exists(package, envir = dbenv) &&
       dbIsValid(con <- dbenv[[package]])) {
     con
   } else if (package == ":memory:") {
@@ -37,6 +39,7 @@ db_setup <- function(package) {
   dbExecute(db, "DROP TABLE IF EXISTS revdeps")
   dbExecute(db, "DROP TABLE IF EXISTS metadata")
   dbExecute(db, "DROP TABLE IF EXISTS todo")
+  dbExecute(db, "DROP TABLE IF EXISTS groups")
 
   dbExecute(db, "CREATE TABLE metadata (name TEXT, value TEXT)")
 
@@ -63,6 +66,7 @@ db_setup <- function(package) {
   dbExecute(db, "CREATE INDEX idx_revdeps_package ON revdeps(package)")
 
   dbExecute(db, "CREATE TABLE todo (package TEXT)")
+  dbExecute(db, "CREATE TABLE groups (package TEXT)")
 
   invisible(db)
 }
@@ -70,8 +74,13 @@ db_setup <- function(package) {
 db_metadata_init <- function(package) {
   db_metadata_set(package, "dbversion", db_version)
 
-  if (package != ":memory:")
-    db_metadata_set(package, "package", pkg_name(package))
+  # Allow `:memory:` for unit tests
+  if (package == ":memory:") {
+    name <- package
+  } else {
+    name <- pkg_name(package)
+  }
+  db_metadata_set(package, "package", name)
 }
 
 #' @importFrom DBI dbExecute sqlInterpolate
@@ -149,19 +158,36 @@ db_list <- function(package) {
 db_todo <- function(pkgdir) {
   db <- db(pkgdir)
 
-  dbGetQuery(db, "SELECT DISTINCT package FROM todo")[[1]]
+  todo <- dbGetQuery(db, "SELECT DISTINCT package FROM todo")
+  groups <- db_groups(db)
+
+  # Join todo packages with known groups
+  join("package", .unmatched = "drop",
+    todo,
+    groups = groups
+  )
 }
 
 #' @importFrom DBI dbWriteTable
 
 db_todo_add <- function(pkgdir, packages) {
   db <- db(pkgdir)
+  data <- pkgs_validate(packages)
 
-  df <- data.frame(package = packages, stringsAsFactors = FALSE)
-  row.names(df) <- NULL
-  dbWriteTable(db, "todo", df, append = TRUE)
+  todo <- data["package"]
+  dbWriteTable(db, "todo", todo, append = TRUE)
+
+  # Merge new groups (if any) and known groups with a full outer join
+  groups <- db_groups(db)
+  groups <- unduplicate(full_join(data, groups, "package"))
+  dbWriteTable(db, "groups", groups, overwrite = TRUE)
 
   invisible(pkgdir)
+}
+
+db_groups <- function(pkgdir) {
+  groups <- dbGetQuery(db(pkgdir), "SELECT DISTINCT * FROM groups")
+  as_tibble(groups)
 }
 
 #' @importFrom DBI dbExecute sqlInterpolate
@@ -221,7 +247,7 @@ filter_result_pkgs <- function(res, revdeps) {
   res
 }
 
-db_get_results <- function(pkg, revdeps) {
+db_get_results <- function(pkg, revdeps = NULL) {
   db <- db(pkg)
 
   if (is.null(revdeps)) {
@@ -244,20 +270,41 @@ db_get_results <- function(pkg, revdeps) {
       "ORDER BY package COLLATE NOCASE"))
   }
 
-  list(old = old, new = new)
+  # Match old and new on `package`, nested in list-columns. The
+  # list-columns are suitable for mapping (e.g. a comparison
+  # function). Because we drop unmatched rows (partial results) the
+  # returned results are always in a consistent state, which is useful
+  # for creating preliminary reports while the checks are running.
+  results <- join("package", .unmatched = "drop",
+    old = nesting(old),
+    new = nesting(new)
+  )
+
+  # Match current results to known groups
+  results <- join("package", .unmatched = "drop",
+    groups = db_groups(db),
+    results
+  )
+
+  results
 }
 
-db_results <- function(pkg, revdeps) {
+db_results <- function(pkg, revdeps = NULL) {
   res <- db_get_results(pkg, revdeps)
+  db_results_compare(res)
+}
+db_results_compare <- function(data) {
+  # In case groups is empty (e.g. in tests, there should normally be a
+  # `repo` group)
+  subset <- data[c("package", "old", "new")]
 
-  packages <- union(res$old$package, res$new$package)
-
-  lapply_with_names(packages, function(package) {
-    oldcheck <- checkFromJSON(res$old$result[match(package, res$old$package)])
-    newcheck <- checkFromJSON(res$new$result[match(package, res$new$package)])
-
+  data$comparisons <- pmap(subset, function(package, old, new) {
+    oldcheck <- checkFromJSON(old$result)
+    newcheck <- checkFromJSON(new$result)
     try_compare_checks(package, oldcheck, newcheck)
   })
+
+  data
 }
 
 db_maintainers <- function(pkg) {
