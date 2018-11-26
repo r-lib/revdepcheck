@@ -42,14 +42,7 @@ Suggests:
     debugme,
     testthat
 Remotes: 
-    gaborcsardi/progress,
-    r-lib/callr,
-    r-lib/cli,
-    r-lib/crancache,
-    r-lib/desc,
-    r-lib/processx,
-    r-lib/rcmdcheck,
-    r-lib/remotes
+    r-lib/crancache
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
