@@ -215,6 +215,7 @@ email_data_defaults <- function(pkg = ".") {
     release_date = red("--release_date--"),
     rel_release_date = red("--rel_release_date---"),
     release_version = red("--release_version--"),
+    release_details = red("--release_details--"),
 
     your_package = green("your_package"),
     your_version = green("your_version"),
