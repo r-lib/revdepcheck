@@ -1,8 +1,8 @@
 
-#' Manage the package checking to do list.
+#' Manage the package checking to-do list.
 #'
-#' `revdep_todo()` tells you what packages still need to be check.
-#' `revdep_add()` adds a single package to the to do list.
+#' `revdep_todo()` tells you which packages still need to be checked.
+#' `revdep_add()` adds a single package to the to-do list.
 #' `revdep_add_broken()` re-adds all broken packages from the last check
 #' (this is useful if you think you've fixed the underlying problem in
 #' your package).
