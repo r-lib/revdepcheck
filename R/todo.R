@@ -3,6 +3,7 @@
 #'
 #' `revdep_todo()` tells you what packages still need to be check.
 #' `revdep_add()` adds a single package to the to do list.
+#' `revdep_rm()` removes packages from the todo list.
 #' `revdep_add_broken()` re-adds all broken packages from the last check
 #' (this is useful if you think you've fixed the underlying problem in
 #' your package).
@@ -52,3 +53,12 @@ revdep_todo <- function(pkg = ".") {
   db_todo(pkg)
 }
 
+#' @export
+#' @rdname revdep_add
+
+revdep_rm <- function(pkg = ".", packages) {
+  pkg <- pkg_check(pkg)
+  db_todo_rm(pkg, packages)
+
+  invisible()
+}

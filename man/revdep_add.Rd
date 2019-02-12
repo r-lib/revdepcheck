@@ -4,6 +4,7 @@
 \alias{revdep_add}
 \alias{revdep_add_broken}
 \alias{revdep_todo}
+\alias{revdep_rm}
 \title{Manage the package checking to do list.}
 \usage{
 revdep_add(pkg = ".", packages)
@@ -11,6 +12,8 @@ revdep_add(pkg = ".", packages)
 revdep_add_broken(pkg = ".")
 
 revdep_todo(pkg = ".")
+
+revdep_rm(pkg = ".", packages)
 }
 \arguments{
 \item{pkg}{Path to package.}
@@ -20,6 +23,7 @@ revdep_todo(pkg = ".")
 \description{
 \code{revdep_todo()} tells you what packages still need to be check.
 \code{revdep_add()} adds a single package to the to do list.
+\code{revdep_rm()} removes packages from the todo list.
 \code{revdep_add_broken()} re-adds all broken packages from the last check
 (this is useful if you think you've fixed the underlying problem in
 your package).
