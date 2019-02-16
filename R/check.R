@@ -7,9 +7,15 @@ check_proc <- function(pkgdir, pkgname, version = c("old", "new")) {
   dir <- dir_find(pkgdir, "check", pkgname)
   tarball <- dir(dir, pattern = "\\.tar\\.gz$", full.names = TRUE)
   if (length(tarball) > 1) {
-    stop("Internal error, multiple source packages?")
+    stop(sprintf(
+      "Internal error for package %s. Multiple *.tar.gz files found.",
+      pkgname
+    ), call. = FALSE)
   } else if (length(tarball) == 0) {
-    stop("Internal error, no source package, download failed?")
+    stop(sprintf(
+      "Internal error for package %s. No *.tar.gz file found.",
+      pkgname
+    ), call. = FALSE)
   }
 
   out <- file.path(dir, version)
