@@ -164,6 +164,8 @@ db_todo_add <- function(pkgdir, packages) {
   invisible(pkgdir)
 }
 
+#' @importFrom DBI dbReadTable
+
 db_todo_rm <- function(pkgdir, packages) {
   db <- db(pkgdir)
 
