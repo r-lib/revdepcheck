@@ -164,6 +164,17 @@ db_todo_add <- function(pkgdir, packages) {
   invisible(pkgdir)
 }
 
+db_todo_rm <- function(pkgdir, packages) {
+  db <- db(pkgdir)
+
+  df <- dbReadTable(db, "todo")
+  df <- data.frame(package = setdiff(df$package, packages), stringsAsFactors = FALSE)
+  row.names(df) <- NULL
+  dbWriteTable(db, "todo", df, overwrite = TRUE)
+
+  invisible(pkgdir)
+}
+
 #' @importFrom DBI dbExecute sqlInterpolate
 
 db_insert <- function(pkgdir, package, version = NULL, maintainer = NULL,
