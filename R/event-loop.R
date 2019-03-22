@@ -87,7 +87,7 @@ check_for_timeouts <- function(state) {
         w$process$is_alive()) {
       "!DEBUG Killing worker for package `w$package`"
       w$killed <- TRUE
-      w$process$kill()
+      w$process$kill(close_connections = FALSE)
     }
   }
 }
