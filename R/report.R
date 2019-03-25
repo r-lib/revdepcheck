@@ -4,17 +4,22 @@
 #' You can use these functions to get intermediate reports of a [revdep_check()]
 #' running in another session.
 #'
-#' `revdep_report()` writes the `README.md` and `problems.md`. This is
-#' normally done automatically when the checks are complete, but you
-#' can also do it when checks are in progress to get a partial report.
+#' `revdep_report_summary()` writes the contents of `README.md`, by
+#' default to the console. This is handy to quickly inspect the (current)
+#' list of problematic packages.
 #'
 #' @inheritParams revdep_check
 #' @param file File to write output to. Default will write to console.
+#' @param all Whether to report all problems, including the ones that
+#'   were already present when checks with the previous version of the
+#'   package. This potentially generated a lot of output, most of which
+#'   is irrelevant, so by default they are omitted, and only problems that
+#'   were newly seen with the new version of the package, are reported.
 #' @export
 #' @importFrom crayon black red yellow green
 #' @importFrom sessioninfo platform_info
 
-revdep_report_summary <- function(pkg = ".", file = "") {
+revdep_report_summary <- function(pkg = ".", file = "", all = FALSE) {
   pkg <- pkg_check(pkg)
   if (is_string(file) && !identical(file, "")) {
     file <- file(file, encoding = "UTF-8", open = "w")
@@ -40,7 +45,7 @@ revdep_report_summary <- function(pkg = ".", file = "") {
 
   revdep_report_section("Couldn't check", revdeps[failed, ], file = file)
   revdep_report_section("Broken", revdeps[broken, ], file = file)
-  revdep_report_section("All", revdeps, file = file)
+  if (all) revdep_report_section("All", revdeps, file = file)
 
   invisible()
 }
@@ -54,10 +59,13 @@ revdep_report_section <- function(title, rows, file) {
   cat_kable(rows, file = file)
 }
 
+#' `revdep_report_problems()` writes the contents of the `problems.md`
+#' file to the screen (corresponding to the current state of the checks).
+#'
 #' @export
 #' @rdname revdep_report_summary
 
-revdep_report_problems <- function(pkg = ".", file = "") {
+revdep_report_problems <- function(pkg = ".", file = "", all = FALSE) {
   if (is_string(file) && !identical(file, "")) {
     file <- file(file, encoding = "UTF-8", open = "w")
     on.exit(close(file), add = TRUE)
@@ -66,10 +74,24 @@ revdep_report_problems <- function(pkg = ".", file = "") {
     on.exit(options(opts), add = TRUE)
   }
 
+  ## We show the packages that
+  ## 1. are newly broken
+  ## 2. still broken, if all == TRUE
+  ## 3. we could not check
   comparisons <- db_results(pkg, NULL)
-  n_issues <- map_int(comparisons, function(x) sum(x$cmp$change %in% c(0, 1)))
+  show <- map_lgl(
+    comparisons,
+    function(x) {
+      any(x$cmp$change == 1) ||
+        (all && any(x$cmp$change == 0)) ||
+        ! x$status %in% c("+", "-")
+    })
 
-  map(comparisons[n_issues > 0], failure_details, file = file)
+  if (sum(show)) {
+    map(comparisons[show], failure_details, file = file)
+  } else {
+    cat("*Wow, no problems at all. :)*", file = file)
+  }
 
   invisible()
 }
@@ -79,22 +101,37 @@ failure_details <- function(x, file = "") {
   cat_line("Version: ", x$versions[[1]], file = file)
   cat_line(file = file)
 
-  rows <- x$cmp
-  cat_failure_section("Newly broken", rows[rows$change == +1, ], file = file)
-  cat_failure_section("Newly fixed",  rows[rows$change == -1, ], file = file)
-  cat_failure_section("In both",      rows[rows$change ==  0, ], file = file)
-
-  if (x$status == "i") {
-    cat_header("Installation", level = 2, file = file)
+  if (x$status == "E") {
+    cat_header("Error before installation", level = 2, file = file)
     cat_header("Devel", level = 3, file = file)
     cat_line("```", file = file)
-    cat_line(x$new$install_out, file = file)
+    cat_line(x$new$stdout, sep = "\n", file = file)
+    cat_line(x$new$stderr, sep = "\n", file = file)
     cat_line("```", file = file)
     cat_header("CRAN", level = 3, file = file)
     cat_line("```", file = file)
-    cat_line(x$old[[1]]$install_out, file = file)
+    cat_line(x$old$stdout, sep = "\n", file = file)
+    cat_line(x$old$stderr, sep = "\n", file = file)
     cat_line("```", file = file)
-  }
+
+    } else {
+      rows <- x$cmp
+      cat_failure_section("Newly broken", rows[rows$change == +1, ], file = file)
+      cat_failure_section("Newly fixed",  rows[rows$change == -1, ], file = file)
+      cat_failure_section("In both",      rows[rows$change ==  0, ], file = file)
+
+      if (x$status == "i") {
+        cat_header("Installation", level = 2, file = file)
+        cat_header("Devel", level = 3, file = file)
+        cat_line("```", file = file)
+        cat_line(x$new$install_out, file = file)
+        cat_line("```", file = file)
+        cat_header("CRAN", level = 3, file = file)
+        cat_line("```", file = file)
+        cat_line(x$old[[1]]$install_out, file = file)
+        cat_line("```", file = file)
+      }
+    }
 
   invisible()
 }
@@ -134,6 +171,9 @@ format_details_bullet <- function(x, max_lines = 20) {
   )
 }
 
+#' `revdep_report_cran()` prints a short summary of the reverse dependency
+#' checks, that is suitable for a CRAN submission.
+#'
 #' @export
 #' @rdname revdep_report_summary
 #' @importFrom utils available.packages
@@ -196,10 +236,14 @@ on_cran <- function(x) {
   identical(desc$get("Repository")[[1]], "CRAN")
 }
 
+#' `revdep_report()` writes the `README.md` and `problems.md`. This is
+#' normally done automatically when the checks are complete, but you
+#' can also do it when checks are in progress to get a partial report.
+#'
 #' @export
 #' @rdname revdep_report_summary
 
-revdep_report <- function(pkg = ".") {
+revdep_report <- function(pkg = ".", all = FALSE) {
   pkg <- pkg_check(pkg)
   root <- dir_find(pkg, "root")
 
@@ -219,7 +263,7 @@ revdep_report <- function(pkg = ".") {
   }
 
   message("Writing summary to 'revdep/README.md'")
-  revdep_report_summary(pkg, file = readme_file)
+  revdep_report_summary(pkg, file = readme_file, all = all)
 
   message("Writing problems to 'revdep/problems.md'")
   revdep_report_problems(pkg, file = file.path(root, "problems.md"))
@@ -298,8 +342,8 @@ report_revdeps <- function(pkg = ".") {
 #' @importFrom knitr kable
 #' @importFrom crayon bold
 
-cat_line <- function(..., file = "") {
-  cat(..., "\n", sep = "", file = file)
+cat_line <- function(..., file = "", sep = "") {
+  cat(..., "\n", sep = sep, file = file)
 }
 
 cat_rule <- function(..., file = "") {
