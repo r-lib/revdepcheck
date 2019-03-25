@@ -10,6 +10,10 @@
 #'
 #' @inheritParams revdep_check
 #' @param packages Character vector of package names to add
+#' @param install_failures Whether to re-add packages that failed to
+#'   install.
+#' @param timeout_failures Whether to re-add packages that timed out.
+#'
 #' @export
 
 revdep_add <- function(pkg = ".", packages) {
@@ -25,11 +29,12 @@ revdep_add <- function(pkg = ".", packages) {
 #' @export
 #' @rdname revdep_add
 
-revdep_add_broken <- function(pkg = ".") {
+revdep_add_broken <- function(pkg = ".", install_failures = TRUE,
+                              timeout_failures = TRUE) {
   pkg <- pkg_check(pkg)
 
   packages <- db_results(pkg, NULL)
-  broken <- map_lgl(packages, is_broken)
+  broken <- map_lgl(packages, is_broken, install_failures, timeout_failures)
 
   to_add <- names(broken[broken])
   if (length(to_add) == 0) {

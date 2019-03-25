@@ -9,7 +9,8 @@
 \usage{
 revdep_add(pkg = ".", packages)
 
-revdep_add_broken(pkg = ".")
+revdep_add_broken(pkg = ".", install_failures = TRUE,
+  timeout_failures = TRUE)
 
 revdep_todo(pkg = ".")
 
@@ -19,6 +20,11 @@ revdep_rm(pkg = ".", packages)
 \item{pkg}{Path to package.}
 
 \item{packages}{Character vector of package names to add}
+
+\item{install_failures}{Whether to re-add packages that failed to
+install.}
+
+\item{timeout_failures}{Whether to re-add packages that timed out.}
 }
 \description{
 \code{revdep_todo()} tells you what packages still need to be check.
