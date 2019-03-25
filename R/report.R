@@ -320,6 +320,10 @@ report_revdeps <- function(pkg = ".") {
     paste0("[", pkg, "](problems.md#", slug, ")")
   }
 
+  md_link <- function(pkg, lnk) {
+    paste0("[", pkg, "](", lnk, ")")
+  }
+
   n_issues <- map_int(comparisons, function(x) sum(x$cmp$change %in% c(0, 1)))
 
   status <-  map_chr(comparisons, rcmdcheck_status)
@@ -332,6 +336,8 @@ report_revdeps <- function(pkg = ".") {
     error = map_chr(comparisons, make_summary, "error"),
     warning = map_chr(comparisons, make_summary, "warning"),
     note = map_chr(comparisons, make_summary, "note"),
+    source = md_link(
+      paste0("cran/", pkgname), paste0("https://github.com/cran/", pkgname)),
     stringsAsFactors = FALSE,
     check.names = FALSE
   )
