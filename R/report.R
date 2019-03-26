@@ -232,8 +232,7 @@ revdep_report_cran <- function(pkg = ".") {
 }
 
 on_cran <- function(x) {
-  desc <- desc::desc(text = x$new$description)
-  identical(desc$get("Repository")[[1]], "CRAN")
+  isTRUE(x$new$cran)
 }
 
 #' `revdep_report()` writes the `README.md` and `problems.md`. This is
