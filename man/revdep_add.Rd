@@ -9,8 +9,8 @@
 \usage{
 revdep_add(pkg = ".", packages)
 
-revdep_add_broken(pkg = ".", install_failures = TRUE,
-  timeout_failures = TRUE)
+revdep_add_broken(pkg = ".", install_failures = FALSE,
+  timeout_failures = FALSE)
 
 revdep_todo(pkg = ".")
 

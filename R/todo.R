@@ -29,8 +29,8 @@ revdep_add <- function(pkg = ".", packages) {
 #' @export
 #' @rdname revdep_add
 
-revdep_add_broken <- function(pkg = ".", install_failures = TRUE,
-                              timeout_failures = TRUE) {
+revdep_add_broken <- function(pkg = ".", install_failures = FALSE,
+                              timeout_failures = FALSE) {
   pkg <- pkg_check(pkg)
 
   packages <- db_results(pkg, NULL)
