@@ -47,8 +47,8 @@ revdep_email <- function(type = c("broken", "failed"), pkg = ".", packages = NUL
   status <- map_chr(packages, rcmdcheck_status)
 
   cond <- switch(type,
-    broken = status == "-",
-    failed = status %in% c("i", "t")
+    broken = status %in% c("-", "t-", "i-"),
+    failed = status %in% c("i+", "t+")
   )
   revdep_email_by_type(pkg, packages[cond], type, draft = draft)
 

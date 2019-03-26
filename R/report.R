@@ -40,8 +40,8 @@ revdep_report_summary <- function(pkg = ".", file = "", all = FALSE) {
 
   status <- revdeps$status
   revdeps$status <- NULL
-  broken <- status == "-"
-  failed <- !(status %in% c("+", "-"))
+  broken <- status %in% c("-", "i-", "t-")
+  failed <- ! broken & ! status == "+"
 
   revdep_report_section("Couldn't check", revdeps[failed, ], file = file)
   revdep_report_section("Broken", revdeps[broken, ], file = file)
@@ -77,14 +77,14 @@ revdep_report_problems <- function(pkg = ".", file = "", all = FALSE) {
   ## We show the packages that
   ## 1. are newly broken
   ## 2. still broken, if all == TRUE
-  ## 3. we could not check
+  ## 3. newly timed out or install newly failed
   comparisons <- db_results(pkg, NULL)
   show <- map_lgl(
     comparisons,
     function(x) {
       any(x$cmp$change == 1) ||
         (all && any(x$cmp$change == 0)) ||
-        ! x$status %in% c("+", "-")
+        x$status %in% c("t-", "i-")
     })
 
   if (sum(show)) {
