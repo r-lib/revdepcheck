@@ -66,6 +66,19 @@ revdep_report_section <- function(title, rows, file) {
 #' @rdname revdep_report_summary
 
 revdep_report_problems <- function(pkg = ".", file = "", all = FALSE) {
+  ## We show the packages that
+  ## 1. are newly broken
+  ## 2. still broken, if all == TRUE
+  ## 3. newly timed out or install newly failed
+  problem <- function(x) {
+    any(x$cmp$change == 1) ||
+      (all && any(x$cmp$change == 0)) ||
+      x$status %in% c("t-", "i-")
+  }
+  revdep_report_if(pkg = pkg, file = file, predicate = problem)
+}
+
+revdep_report_if <- function(pkg = ".", file = "", predicate) {
   if (is_string(file) && !identical(file, "")) {
     file <- file(file, encoding = "UTF-8", open = "w")
     on.exit(close(file), add = TRUE)
@@ -74,18 +87,8 @@ revdep_report_problems <- function(pkg = ".", file = "", all = FALSE) {
     on.exit(options(opts), add = TRUE)
   }
 
-  ## We show the packages that
-  ## 1. are newly broken
-  ## 2. still broken, if all == TRUE
-  ## 3. newly timed out or install newly failed
   comparisons <- db_results(pkg, NULL)
-  show <- map_lgl(
-    comparisons,
-    function(x) {
-      any(x$cmp$change == 1) ||
-        (all && any(x$cmp$change == 0)) ||
-        x$status %in% c("t-", "i-")
-    })
+  show <- map_lgl(comparisons, predicate)
 
   if (sum(show)) {
     map(comparisons[show], failure_details, file = file)
