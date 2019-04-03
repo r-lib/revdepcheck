@@ -265,7 +265,7 @@ revdep_report <- function(pkg = ".", all = FALSE) {
   revdep_report_summary(pkg, file = readme_file, all = all)
 
   message("Writing problems to 'revdep/problems.md'")
-  revdep_report_problems(pkg, file = file.path(root, "problems.md"))
+  revdep_report_problems(pkg, file = file.path(root, "problems.md"), all = all)
 
   invisible()
 }
