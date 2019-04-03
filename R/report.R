@@ -11,10 +11,10 @@
 #' @inheritParams revdep_check
 #' @param file File to write output to. Default will write to console.
 #' @param all Whether to report all problems, including the ones that
-#'   were already present when checks with the previous version of the
-#'   package. This potentially generated a lot of output, most of which
-#'   is irrelevant, so by default they are omitted, and only problems that
-#'   were newly seen with the new version of the package, are reported.
+#'   were already present in the old version of the package. This potentially
+#'   generated a lot of output, most of which was irrelevant, so they are
+#'   omitted by default, and only problems seen with the new version of
+#'   the package are reported.
 #' @export
 #' @importFrom crayon black red yellow green
 #' @importFrom sessioninfo platform_info
@@ -265,7 +265,7 @@ revdep_report <- function(pkg = ".", all = FALSE) {
   revdep_report_summary(pkg, file = readme_file, all = all)
 
   message("Writing problems to 'revdep/problems.md'")
-  revdep_report_problems(pkg, file = file.path(root, "problems.md"))
+  revdep_report_problems(pkg, file = file.path(root, "problems.md"), all = all)
 
   invisible()
 }
