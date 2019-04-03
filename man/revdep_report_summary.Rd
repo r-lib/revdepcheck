@@ -26,10 +26,10 @@ revdep_report(pkg = ".", all = FALSE, results = NULL)
 \item{file}{File to write output to. Default will write to console.}
 
 \item{all}{Whether to report all problems, including the ones that
-were already present when checks with the previous version of the
-package. This potentially generated a lot of output, most of which
-is irrelevant, so by default they are omitted, and only problems that
-were newly seen with the new version of the package, are reported.}
+were already present in the old version of the package. This potentially
+generated a lot of output, most of which was irrelevant, so they are
+omitted by default, and only problems seen with the new version of
+the package are reported.}
 
 \item{results}{Cached results from \code{db_results()}. Expert use only.}
 }
