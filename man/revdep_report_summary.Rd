@@ -3,17 +3,22 @@
 \name{revdep_report_summary}
 \alias{revdep_report_summary}
 \alias{revdep_report_problems}
+\alias{revdep_report_failures}
 \alias{revdep_report_cran}
 \alias{revdep_report}
 \title{Markdown report of reverse dependency check results}
 \usage{
-revdep_report_summary(pkg = ".", file = "", all = FALSE)
+revdep_report_summary(pkg = ".", file = "", all = FALSE,
+  results = NULL)
 
-revdep_report_problems(pkg = ".", file = "", all = FALSE)
+revdep_report_problems(pkg = ".", file = "", all = FALSE,
+  results = NULL)
+
+revdep_report_failures(pkg = ".", file = "", results = NULL)
 
 revdep_report_cran(pkg = ".")
 
-revdep_report(pkg = ".", all = FALSE)
+revdep_report(pkg = ".", all = FALSE, results = NULL)
 }
 \arguments{
 \item{pkg}{Path to package.}
@@ -25,6 +30,8 @@ were already present when checks with the previous version of the
 package. This potentially generated a lot of output, most of which
 is irrelevant, so by default they are omitted, and only problems that
 were newly seen with the new version of the package, are reported.}
+
+\item{results}{Cached results from \code{db_results()}. Expert use only.}
 }
 \description{
 You can use these functions to get intermediate reports of a \code{\link[=revdep_check]{revdep_check()}}
