@@ -98,7 +98,7 @@ revdep_report_problems <- function(pkg = ".", file = "", all = FALSE) {
 
 failure_details <- function(x, file = "") {
   cat_header(x$package, file = file)
-  cat_line("Version: ", x$versions[[1]], file = file)
+  cat_package_info(x, file = file)
   cat_line(file = file)
 
   if (x$status == "E") {
@@ -134,6 +134,46 @@ failure_details <- function(x, file = "") {
     }
 
   invisible()
+}
+
+cat_package_info <- function(cmp, file) {
+  chk <- cmp$new
+  desc <-
+    tryCatch(desc::desc(text = chk$description), error = function(x) NULL)
+
+  addifx <- function(field) {
+    if (is.null(desc)) return(NULL)
+    if (is.na(desc$has_fields(field))) return(NULL)
+    paste0("* ", field, ": ", normalize_space(desc$get_field(field)))
+  }
+  out <- c(
+    paste0("* Version: ", chk$version),
+    paste0("* Source code: ", pkg_source_link(chk)),
+    addifx("URL"),
+    addifx("BugReports"),
+    addifx("Date/Publication")
+  )
+  out <- wrap_tag("details", out)
+  cat(out, file = file)
+}
+
+pkg_source_link <- function(chk) {
+  if (chk$cran) {
+    paste0("https://github.com/cran/", chk$package)
+  } else if (chk$bioc) {
+    "???"
+  } else {
+    "???"
+  }
+}
+
+wrap_tag <- function(tag, txt) {
+  txt <- paste0(txt, collapse = "\n")
+  paste0("<", tag, ">\n\n", txt, "\n\n</", tag, ">\n")
+}
+
+normalize_space <- function(x) {
+  gsub("\\s+", " ", x)
 }
 
 cat_failure_section <- function(title, rows, file) {
