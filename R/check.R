@@ -93,7 +93,8 @@ revdep_env_vars <- function(force_suggests = FALSE) {
     },
     "_R_CHECK_FORCE_SUGGESTS_" = as.character(force_suggests),
     "RGL_USE_NULL" = "TRUE",
-    DISPLAY = ""
+    DISPLAY = "",
+    R_COMPILE_AND_INSTALL_PACKAGES = "never"
   )
 }
 
