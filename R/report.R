@@ -382,8 +382,6 @@ report_revdeps <- function(pkg = ".") {
     error = map_chr(comparisons, make_summary, "error"),
     warning = map_chr(comparisons, make_summary, "warning"),
     note = map_chr(comparisons, make_summary, "note"),
-    source = md_link(
-      paste0("cran/", pkgname), paste0("https://github.com/cran/", pkgname)),
     stringsAsFactors = FALSE,
     check.names = FALSE
   )
