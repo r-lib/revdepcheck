@@ -151,10 +151,17 @@ cat_package_info <- function(cmp, file) {
     paste0("* Source code: ", pkg_source_link(chk)),
     addifx("URL"),
     addifx("BugReports"),
-    addifx("Date/Publication")
+    addifx("Date/Publication"),
+    paste0("* Number of recursive dependencies: ", num_deps(chk$package)),
+    paste0("\nRun `revdep_details(,\"", chk$package, "\")` for more info")
   )
   out <- wrap_tag("details", out)
   cat(out, file = file)
+}
+
+num_deps <- function(pkg) {
+  repos <- get_repos(bioc = TRUE)
+  length(cran_deps(pkg, repos))
 }
 
 pkg_source_link <- function(chk) {
