@@ -18,7 +18,24 @@ db <- function(package) {
     }
 
     dbenv[[package]] <- dbConnect(SQLite(), dir_find(package, "db"))
+    db_check_version(package)
     dbenv[[package]]
+  }
+}
+
+db_check_version <- function(package) {
+  db <- db(package)
+  ## If not metadata table, we just assume that the DB is empty
+  if (!dbExistsTable(db, "metadata")) return()
+  dbver <- dbGetQuery(
+    db, "SELECT value FROM metadata WHERE name = 'dbversion'")
+  rdver <- dbGetQuery(
+    db, "SELECT value FROM metadata WHERE name = 'revdepcheckversion'")
+  if (dbver[1,1] != db_version) {
+    verstr <- if (nrow(rdver)) rdver[1,1] else "< 1.0.0.9001"
+    stop("This revdep DB was created by revdepcheck ", verstr, ". ",
+         "You can use `revdep_reset()` to remove the DB, or you can ",
+         "install a different version of revdepcheck.")
   }
 }
 
@@ -69,6 +86,8 @@ db_setup <- function(package) {
 
 db_metadata_init <- function(package) {
   db_metadata_set(package, "dbversion", db_version)
+  db_metadata_set(package, "revdepcheckversion",
+                  getNamespaceVersion("revdepcheck")[[1]])
 
   if (package != ":memory:")
     db_metadata_set(package, "package", pkg_name(package))
