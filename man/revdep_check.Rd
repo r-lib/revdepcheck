@@ -7,7 +7,8 @@
 \usage{
 revdep_check(pkg = ".", dependencies = c("Depends", "Imports",
   "Suggests", "LinkingTo"), quiet = TRUE, timeout = as.difftime(10,
-  units = "mins"), num_workers = 1, bioc = TRUE)
+  units = "mins"), num_workers = 1, bioc = TRUE,
+  env = revdep_env_vars())
 
 revdep_reset(pkg = ".")
 }
@@ -25,6 +26,9 @@ complete. Default is 10 minutes.}
 \item{num_workers}{Number of parallel workers to use}
 
 \item{bioc}{Also check revdeps that live in BioConductor?}
+
+\item{env}{Environment variables to set for the install and check
+processes. See \code{\link[=revdep_env_vars]{revdep_env_vars()}}.}
 }
 \description{
 \code{revdep_check()} runs \code{R CMD check} on all reverse dependencies of your
