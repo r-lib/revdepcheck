@@ -120,7 +120,7 @@ failure_details <- function(x, file = "") {
       cat_failure_section("Newly fixed",  rows[rows$change == -1, ], file = file)
       cat_failure_section("In both",      rows[rows$change ==  0, ], file = file)
 
-      if (x$status == "i") {
+      if (x$status %in% c("i-", "i+")) {
         cat_header("Installation", level = 2, file = file)
         cat_header("Devel", level = 3, file = file)
         cat_line("```", file = file)
@@ -184,7 +184,7 @@ revdep_report_cran <- function(pkg = ".") {
 
   comparisons <- db_results(pkg, NULL)
 
-  status <- map_chr(comparisons, function(x) x$status %|0|% "i")
+  status <- map_chr(comparisons, function(x) x$status %|0|% "i-")
   package <- map_chr(comparisons, "[[", "package")
   on_cran <- map_lgl(comparisons, on_cran)
 
