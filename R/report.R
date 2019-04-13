@@ -332,7 +332,7 @@ revdep_report <- function(pkg = ".", all = FALSE, results = NULL) {
   revdep_report_summary(pkg, file = readme_file, all = all, results = results)
 
   message("Writing problems to 'revdep/problems.md'")
-  revdep_report_problems(pkg, file = file.path(root, "problems.md"), all = all, results = result)
+  revdep_report_problems(pkg, file = file.path(root, "problems.md"), all = all, results = results)
 
   message("Writing failures to 'revdep/failures.md'")
   revdep_report_failures(pkg, file = file.path(root, "failures.md"), results = results)
