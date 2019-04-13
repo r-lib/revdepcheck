@@ -29,7 +29,7 @@ check_proc <- function(pkgdir, pkgname, version = c("old", "new"),
     rcmdcheck_process$new(
       path = tarball,
       libpath = lib,
-      args = c("-o", out)
+      args = c("--no-manual", "--no-build-vignettes", "-o", out)
     )
   )
 }
