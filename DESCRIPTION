@@ -33,7 +33,6 @@ Imports:
     rlang (>= 0.3.0),
     RSQLite,
     sessioninfo,
-    stats,
     utils,
     whoami,
     withr,
