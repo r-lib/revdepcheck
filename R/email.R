@@ -47,8 +47,8 @@ revdep_email <- function(type = c("broken", "failed"), pkg = ".", packages = NUL
   status <- map_chr(packages, rcmdcheck_status)
 
   cond <- switch(type,
-    broken = status == "-",
-    failed = status %in% c("i", "t")
+    broken = status %in% c("-", "t-", "i-"),
+    failed = status %in% c("i+", "t+")
   )
   revdep_email_by_type(pkg, packages[cond], type, draft = draft)
 
@@ -215,6 +215,7 @@ email_data_defaults <- function(pkg = ".") {
     release_date = red("--release_date--"),
     rel_release_date = red("--rel_release_date---"),
     release_version = red("--release_version--"),
+    release_details = red("--release_details--"),
 
     your_package = green("your_package"),
     your_version = green("your_version"),

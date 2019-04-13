@@ -33,8 +33,12 @@ rcmdcheck_version.rcmdcheck_error <- function(x) "?"
 #' @export
 rcmdcheck_version.rcmdcheck_comparison <- function(x) x$versions[[1]]
 
-is_broken <- function(x) {
-  rcmdcheck_status(x) != "+"
+is_broken <- function(x, install_failures = FALSE,
+                      timeout_failures = FALSE) {
+  stat <- rcmdcheck_status(x)
+  stat == "-" ||
+    (install_failures && stat %in% c("i-", "E", "?")) ||
+    (timeout_failures && stat == "t-")
 }
 
 #' @importFrom clisymbols symbol

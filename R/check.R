@@ -1,15 +1,17 @@
 
 #' @importFrom rcmdcheck rcmdcheck_process
 
-check_proc <- function(pkgdir, pkgname, version = c("old", "new")) {
+check_proc <- function(pkgdir, pkgname, version = c("old", "new"),
+                       env = character()) {
   version <- match.arg(version)
 
   dir <- dir_find(pkgdir, "check", pkgname)
-  tarball <- dir(dir, pattern = "\\.tar\\.gz$", full.names = TRUE)
-  if (length(tarball) > 1) {
-    stop("Internal error, multiple source packages?")
-  } else if (length(tarball) == 0) {
-    stop("Internal error, no source package, download failed?")
+  tarball <- latest_file(dir(dir, pattern = "\\.tar\\.gz$", full.names = TRUE))
+  if (length(tarball) == 0) {
+    stop(sprintf(
+      "Internal error for package %s. No *.tar.gz file found.",
+      pkgname
+    ), call. = FALSE)
   }
 
   out <- file.path(dir, version)
@@ -23,7 +25,7 @@ check_proc <- function(pkgdir, pkgname, version = c("old", "new")) {
   library_info(file.path(out, "libraries.txt"), lib)
 
   with_envvar(
-    check_env_vars(),
+    c("R_ENVIRON_USER" = tempdir(), "R_LIBS" = "", env),
     rcmdcheck_process$new(
       path = tarball,
       libpath = lib,
@@ -38,7 +40,7 @@ check_task <- function(state, task) {
   version <- task$args[[2]]
 
   "!DEBUG Checking `pkgname`"
-  px <- check_proc(pkgdir, pkgname, version = version)
+  px <- check_proc(pkgdir, pkgname, version = version, env = state$options$env)
 
   ## Update state
   worker <- list(process = px, package = pkgname,
@@ -66,20 +68,28 @@ check_task <- function(state, task) {
   state
 }
 
-check_env_vars <- function(check_version = FALSE, force_suggests = FALSE) {
+#' Environment variables to set for install and check processes while
+#' running the reverse dependency check
+#'
+#' @param force_suggests Whether to force the installation of the
+#'   suggested packages.
+#' @return Named character vector.
+#'
+#' @export
+
+revdep_env_vars <- function(force_suggests = FALSE) {
   c(
-    "R_ENVIRON_USER" = tempdir(),
-    "R_LIBS" = "",
     # Switch off expensive check for package version
     # https://github.com/hadley/devtools/issues/1271
     if (getRversion() >= "3.4.0" && as.numeric(R.version[["svn rev"]]) >= 70944) {
-      c("_R_CHECK_CRAN_INCOMING_REMOTE_" = as.character(check_version))
+      c("_R_CHECK_CRAN_INCOMING_REMOTE_" = "FALSE")
     } else {
-      c("_R_CHECK_CRAN_INCOMING_" = as.character(check_version))
+      c("_R_CHECK_CRAN_INCOMING_" = "FALSE")
     },
     "_R_CHECK_FORCE_SUGGESTS_" = as.character(force_suggests),
     "RGL_USE_NULL" = "TRUE",
-    DISPLAY = ""
+    DISPLAY = "",
+    R_COMPILE_AND_INSTALL_PACKAGES = "never"
   )
 }
 

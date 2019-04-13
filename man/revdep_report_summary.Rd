@@ -7,25 +7,31 @@
 \alias{revdep_report}
 \title{Markdown report of reverse dependency check results}
 \usage{
-revdep_report_summary(pkg = ".", file = "")
+revdep_report_summary(pkg = ".", file = "", all = FALSE)
 
-revdep_report_problems(pkg = ".", file = "")
+revdep_report_problems(pkg = ".", file = "", all = FALSE)
 
 revdep_report_cran(pkg = ".")
 
-revdep_report(pkg = ".")
+revdep_report(pkg = ".", all = FALSE)
 }
 \arguments{
 \item{pkg}{Path to package.}
 
 \item{file}{File to write output to. Default will write to console.}
+
+\item{all}{Whether to report all problems, including the ones that
+were already present in the old version of the package. This potentially
+generated a lot of output, most of which was irrelevant, so they are
+omitted by default, and only problems seen with the new version of
+the package are reported.}
 }
 \description{
 You can use these functions to get intermediate reports of a \code{\link[=revdep_check]{revdep_check()}}
 running in another session.
 }
 \details{
-\code{revdep_report()} writes the \code{README.md} and \code{problems.md}. This is
-normally done automatically when the checks are complete, but you
-can also do it when checks are in progress to get a partial report.
+\code{revdep_report_summary()} writes the contents of \code{README.md}, by
+default to the console. This is handy to quickly inspect the (current)
+list of problematic packages.
 }

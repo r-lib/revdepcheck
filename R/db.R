@@ -1,7 +1,7 @@
 
 dbenv <- new.env()
 
-db_version <- "2.0.0"
+db_version <- "3.0.0"
 
 #' @importFrom RSQLite dbIsValid dbConnect SQLite
 
@@ -18,7 +18,24 @@ db <- function(package) {
     }
 
     dbenv[[package]] <- dbConnect(SQLite(), dir_find(package, "db"))
+    db_check_version(package)
     dbenv[[package]]
+  }
+}
+
+db_check_version <- function(package) {
+  db <- db(package)
+  ## If not metadata table, we just assume that the DB is empty
+  if (!dbExistsTable(db, "metadata")) return()
+  dbver <- dbGetQuery(
+    db, "SELECT value FROM metadata WHERE name = 'dbversion'")
+  rdver <- dbGetQuery(
+    db, "SELECT value FROM metadata WHERE name = 'revdepcheckversion'")
+  if (dbver[1,1] != db_version) {
+    verstr <- if (nrow(rdver)) rdver[1,1] else "< 1.0.0.9001"
+    stop("This revdep DB was created by revdepcheck ", verstr, ". ",
+         "You can use `revdep_reset()` to remove the DB, or you can ",
+         "install a different version of revdepcheck.")
   }
 }
 
@@ -62,13 +79,15 @@ db_setup <- function(package) {
   )
   dbExecute(db, "CREATE INDEX idx_revdeps_package ON revdeps(package)")
 
-  dbExecute(db, "CREATE TABLE todo (package TEXT)")
+  dbExecute(db, "CREATE TABLE todo (package TEXT PRIMARY KEY, status TEXT)")
 
   invisible(db)
 }
 
 db_metadata_init <- function(package) {
   db_metadata_set(package, "dbversion", db_version)
+  db_metadata_set(package, "revdepcheckversion",
+                  getNamespaceVersion("revdepcheck")[[1]])
 
   if (package != ":memory:")
     db_metadata_set(package, "package", pkg_name(package))
@@ -79,19 +98,21 @@ db_metadata_init <- function(package) {
 db_metadata_set <- function(package, name, value) {
   db <- db(package)
 
-  sql <- sqlInterpolate(
-    db, "DELETE FROM metadata WHERE name = ?name",
-    name = name
-  )
-  dbExecute(db, sql)
+  dbWithTransaction(db, {
+    sql <- sqlInterpolate(
+      db, "DELETE FROM metadata WHERE name = ?name",
+      name = name
+    )
+    dbExecute(db, sql)
 
-  sql <- sqlInterpolate(
-    db,
-    "INSERT INTO metadata VALUES (?name, ?value)",
-    name = name,
-    value = value
-  )
-  dbExecute(db, sql)
+    sql <- sqlInterpolate(
+      db,
+      "INSERT INTO metadata VALUES (?name, ?value)",
+      name = name,
+      value = value
+    )
+    dbExecute(db, sql)
+  })
 }
 
 #' @importFrom DBI dbGetQuery sqlInterpolate
@@ -149,17 +170,86 @@ db_list <- function(package) {
 db_todo <- function(pkgdir) {
   db <- db(pkgdir)
 
-  dbGetQuery(db, "SELECT DISTINCT package FROM todo")[[1]]
+  dbGetQuery(db, "SELECT package FROM todo WHERE status = 'todo'")[[1]]
 }
 
-#' @importFrom DBI dbWriteTable
+db_todo_status_internal <- function(db) {
+  dbReadTable(db, "todo")
+}
 
-db_todo_add <- function(pkgdir, packages) {
+db_todo_status <- function(pkgdir) {
+  db <- db(pkgdir)
+  db_todo_status_internal(db)
+}
+
+#' @importFrom DBI dbWithTransaction dbReadTable dbWriteTable
+
+db_todo_add_internal <- function(db, packages, silent = TRUE) {
+  if (!silent) {
+    message(
+      "Adding packages to TODO list: \n",
+      paste("*", packages, "\n", collapse = ""),
+      "\n",
+      "Run revdepcheck::revdep_check() to check")
+  }
+  todo <- dbReadTable(db, "todo")
+  todo$status[todo$package %in% packages] <- "todo"
+  new <- setdiff(packages, todo$package)
+  if (length(new)) {
+    newdf <- data.frame(package = new, status = "todo",
+                        stringsAsFactors = FALSE)
+    todo <- rbind(todo, newdf)
+  }
+  dbWriteTable(db, "todo", todo, overwrite = TRUE)
+}
+
+db_todo_add <- function(pkgdir, packages, silent = TRUE) {
+  db <- db(pkgdir)
+  dbWithTransaction(db, db_todo_add_internal(db, packages, silent))
+  invisible(pkgdir)
+}
+
+db_todo_add_new <- function(pkgdir, revdeps, silent) {
+  db <- db(pkgdir)
+  dbWithTransaction(db, {
+    intodo <- db_todo_status_internal(db)$package
+    donever <- dbGetQuery(
+      db, "SELECT r.package, r.version FROM todo t, revdeps r
+           WHERE r.package = t.package AND t.status = 'done' AND
+                 r.which = 'new'")
+
+    ## Need to add packages that are not in the todo table at all
+    to_add <- setdiff(revdeps$package, intodo)
+
+    ## Need to re-add packages that are there and that are done already,
+    ## but they have new releases
+    cmn <- intersect(donever$package, revdeps$package)
+    oldver <- donever$version[match(cmn, donever$package)]
+    newver <- revdeps$version[match(cmn, revdeps$package)]
+    to_add <- c(to_add, cmn[oldver != newver])
+
+    if (length(to_add)) db_todo_add_internal(db, to_add, silent)
+  })
+
+  to_add
+}
+
+#' @importFrom DBI dbReadTable
+
+db_todo_rm <- function(pkgdir, packages) {
   db <- db(pkgdir)
 
-  df <- data.frame(package = packages, stringsAsFactors = FALSE)
-  row.names(df) <- NULL
-  dbWriteTable(db, "todo", df, append = TRUE)
+  dbWithTransaction(
+    db, {
+      todo <- dbReadTable(db, "todo")
+      todo$status[todo$package %in% packages] <- "ignore"
+      miss <- setdiff(packages, todo$package)
+      if (length(miss)) {
+        warning("Unknown package(s): ", paste(miss, collapse = ", "))
+      }
+      dbWriteTable(db, "todo", todo, overwrite = TRUE)
+    }
+  )
 
   invisible(pkgdir)
 }
@@ -182,11 +272,23 @@ db_insert <- function(pkgdir, package, version = NULL, maintainer = NULL,
       which = which
     )
   )
-  dbExecute(db,
-    sqlInterpolate(db,
-      "DELETE FROM todo WHERE package = ?package",
-      package = package
-    )
+  ## If both checks are done then we set the status to 'done'
+  ## If only one of them is done, then we don't do this, so
+  ## both checks are re-run if the checks are interrupted half-way
+  dbWithTransaction(
+    db, {
+      q <- "SELECT which FROM revdeps WHERE package = ?package AND which <> ?which"
+      done <- dbGetQuery(db, sqlInterpolate(db, q,
+        package = package, which = which))
+      if (nrow(done)) {
+        dbExecute(db,
+          sqlInterpolate(db,
+            "UPDATE todo SET status='done' WHERE package = ?package",
+            package = package
+          )
+        )
+      }
+    }
   )
 
   q <- "INSERT INTO revdeps
