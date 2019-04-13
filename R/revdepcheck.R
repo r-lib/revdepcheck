@@ -115,6 +115,9 @@ revdep_init <- function(pkg = ".",
   db_todo_add(pkg, revdeps)
 
   db_metadata_set(pkg, "todo", "install")
+  db_metadata_set(pkg, "bioc", as.character(bioc))
+  db_metadata_set(pkg, "dependencies", paste(dependencies, collapse = ";"))
+
   invisible()
 }
 

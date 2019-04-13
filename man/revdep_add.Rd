@@ -3,6 +3,7 @@
 \name{revdep_add}
 \alias{revdep_add}
 \alias{revdep_add_broken}
+\alias{revdep_add_new}
 \alias{revdep_todo}
 \alias{revdep_rm}
 \title{Manage the package checking to do list.}
@@ -11,6 +12,8 @@ revdep_add(pkg = ".", packages)
 
 revdep_add_broken(pkg = ".", install_failures = FALSE,
   timeout_failures = FALSE)
+
+revdep_add_new(pkg = ".")
 
 revdep_todo(pkg = ".")
 
