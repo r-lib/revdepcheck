@@ -52,7 +52,8 @@
 #' @importFrom crancache install_packages
 
 revdep_check <- function(pkg = ".",
-                         dependencies = c("Depends", "Imports", "Suggests", "LinkingTo"),
+                         dependencies = c("Depends", "Imports",
+                                          "Suggests", "LinkingTo"),
                          quiet = TRUE,
                          timeout = as.difftime(10, units = "mins"),
                          num_workers = 1,

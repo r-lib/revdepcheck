@@ -55,7 +55,7 @@ revdep_add_broken <- function(pkg = ".", install_failures = FALSE,
 #' @rdname revdep_add
 
 revdep_todo <- function(pkg = ".") {
-  db_todo(pkg)
+  db_todo_status(pkg)
 }
 
 #' @export

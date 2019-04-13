@@ -1,7 +1,7 @@
 
 dbenv <- new.env()
 
-db_version <- "2.0.0"
+db_version <- "3.0.0"
 
 #' @importFrom RSQLite dbIsValid dbConnect SQLite
 
@@ -79,7 +79,7 @@ db_setup <- function(package) {
   )
   dbExecute(db, "CREATE INDEX idx_revdeps_package ON revdeps(package)")
 
-  dbExecute(db, "CREATE TABLE todo (package TEXT)")
+  dbExecute(db, "CREATE TABLE todo (package TEXT PRIMARY KEY, status TEXT)")
 
   invisible(db)
 }
@@ -168,17 +168,32 @@ db_list <- function(package) {
 db_todo <- function(pkgdir) {
   db <- db(pkgdir)
 
-  dbGetQuery(db, "SELECT DISTINCT package FROM todo")[[1]]
+  dbGetQuery(db, "SELECT package FROM todo WHERE status = 'todo'")[[1]]
 }
 
-#' @importFrom DBI dbWriteTable
+db_todo_status <- function(pkgdir) {
+  db <- db(pkgdir)
+  dbReadTable(db, "todo")
+}
+
+#' @importFrom DBI dbWithTransaction dbReadTable dbWriteTable
 
 db_todo_add <- function(pkgdir, packages) {
   db <- db(pkgdir)
 
-  df <- data.frame(package = packages, stringsAsFactors = FALSE)
-  row.names(df) <- NULL
-  dbWriteTable(db, "todo", df, append = TRUE)
+  dbWithTransaction(
+    db, {
+      todo <- dbReadTable(db, "todo")
+      todo$status[todo$package %in% packages] <- "todo"
+      new <- setdiff(packages, todo$package)
+      if (length(new)) {
+        newdf <- data.frame(package = new, status = "todo",
+                            stringsAsFactors = FALSE)
+        todo <- rbind(todo, newdf)
+      }
+      dbWriteTable(db, "todo", todo, overwrite = TRUE)
+    }
+  )
 
   invisible(pkgdir)
 }
@@ -188,10 +203,17 @@ db_todo_add <- function(pkgdir, packages) {
 db_todo_rm <- function(pkgdir, packages) {
   db <- db(pkgdir)
 
-  df <- dbReadTable(db, "todo")
-  df <- data.frame(package = setdiff(df$package, packages), stringsAsFactors = FALSE)
-  row.names(df) <- NULL
-  dbWriteTable(db, "todo", df, overwrite = TRUE)
+  dbWithTransaction(
+    db, {
+      todo <- dbReadTable(db, "todo")
+      todo$status[todo$package %in% packages] <- "ignore"
+      miss <- setdiff(packages, todo$package)
+      if (length(miss)) {
+        warning("Unknown package(s): ", paste(miss, collapse = ", "))
+      }
+      dbWriteTable(db, "todo", todo, overwrite = TRUE)
+    }
+  )
 
   invisible(pkgdir)
 }
@@ -216,7 +238,7 @@ db_insert <- function(pkgdir, package, version = NULL, maintainer = NULL,
   )
   dbExecute(db,
     sqlInterpolate(db,
-      "DELETE FROM todo WHERE package = ?package",
+      "UPDATE todo SET status='done' WHERE package = ?package",
       package = package
     )
   )
