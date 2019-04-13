@@ -117,7 +117,7 @@ revdep_report_if <- function(pkg = ".", file = "", predicate, results = NULL) {
 
 failure_details <- function(x, file = "") {
   cat_header(x$package, file = file)
-  cat_line("Version: ", x$versions[[1]], file = file)
+  cat_package_info(x, file = file)
   cat_line(file = file)
 
   if (x$status == "E") {
@@ -139,7 +139,7 @@ failure_details <- function(x, file = "") {
       cat_failure_section("Newly fixed",  rows[rows$change == -1, ], file = file)
       cat_failure_section("In both",      rows[rows$change ==  0, ], file = file)
 
-      if (x$status == "i") {
+      if (x$status %in% c("i-", "i+")) {
         cat_header("Installation", level = 2, file = file)
         cat_header("Devel", level = 3, file = file)
         cat_line("```", file = file)
@@ -153,6 +153,53 @@ failure_details <- function(x, file = "") {
     }
 
   invisible()
+}
+
+cat_package_info <- function(cmp, file) {
+  chk <- cmp$new
+  desc <-
+    tryCatch(desc::desc(text = chk$description), error = function(x) NULL)
+
+  addifx <- function(field) {
+    if (is.null(desc)) return(NULL)
+    if (is.na(desc$has_fields(field))) return(NULL)
+    paste0("* ", field, ": ", normalize_space(desc$get_field(field)))
+  }
+  out <- c(
+    paste0("* Version: ", chk$version),
+    paste0("* Source code: ", pkg_source_link(chk)),
+    addifx("URL"),
+    addifx("BugReports"),
+    addifx("Date/Publication"),
+    paste0("* Number of recursive dependencies: ", num_deps(chk$package)),
+    paste0("\nRun `revdep_details(,\"", chk$package, "\")` for more info")
+  )
+  out <- wrap_tag("details", out)
+  cat(out, file = file)
+}
+
+num_deps <- function(pkg) {
+  repos <- get_repos(bioc = TRUE)
+  length(cran_deps(pkg, repos))
+}
+
+pkg_source_link <- function(chk) {
+  if (chk$cran) {
+    paste0("https://github.com/cran/", chk$package)
+  } else if (chk$bioc) {
+    "???"
+  } else {
+    "???"
+  }
+}
+
+wrap_tag <- function(tag, txt) {
+  txt <- paste0(txt, collapse = "\n")
+  paste0("<", tag, ">\n\n", txt, "\n\n</", tag, ">\n")
+}
+
+normalize_space <- function(x) {
+  gsub("\\s+", " ", x)
 }
 
 cat_failure_section <- function(title, rows, file) {
@@ -203,7 +250,7 @@ revdep_report_cran <- function(pkg = ".") {
 
   comparisons <- db_results(pkg, NULL)
 
-  status <- map_chr(comparisons, function(x) x$status %|0|% "i")
+  status <- map_chr(comparisons, function(x) x$status %|0|% "i-")
   package <- map_chr(comparisons, "[[", "package")
   on_cran <- map_lgl(comparisons, on_cran)
 
@@ -364,8 +411,6 @@ report_revdeps <- function(pkg = ".", all = FALSE, results = NULL) {
     error = map_chr(results, make_summary, "error"),
     warning = map_chr(results, make_summary, "warning"),
     note = map_chr(results, make_summary, "note"),
-    source = md_link(
-      paste0("cran/", pkgname), paste0("https://github.com/cran/", pkgname)),
     stringsAsFactors = FALSE,
     check.names = FALSE
   )

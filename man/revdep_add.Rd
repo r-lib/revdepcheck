@@ -3,14 +3,17 @@
 \name{revdep_add}
 \alias{revdep_add}
 \alias{revdep_add_broken}
+\alias{revdep_add_new}
 \alias{revdep_todo}
 \alias{revdep_rm}
-\title{Manage the package checking to do list.}
+\title{Manage the package checking to-do list.}
 \usage{
 revdep_add(pkg = ".", packages)
 
 revdep_add_broken(pkg = ".", install_failures = FALSE,
   timeout_failures = FALSE)
+
+revdep_add_new(pkg = ".")
 
 revdep_todo(pkg = ".")
 
@@ -27,8 +30,8 @@ install.}
 \item{timeout_failures}{Whether to re-add packages that timed out.}
 }
 \description{
-\code{revdep_todo()} tells you what packages still need to be check.
-\code{revdep_add()} adds a single package to the to do list.
+\code{revdep_todo()} tells you which packages still need to be checked.
+\code{revdep_add()} adds a single package to the to-do list.
 \code{revdep_rm()} removes packages from the todo list.
 \code{revdep_add_broken()} re-adds all broken packages from the last check
 (this is useful if you think you've fixed the underlying problem in

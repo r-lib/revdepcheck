@@ -40,6 +40,8 @@
 #'   complete. Default is 10 minutes.
 #' @param num_workers Number of parallel workers to use
 #' @param bioc Also check revdeps that live in BioConductor?
+#' @param env Environment variables to set for the install and check
+#'   processes. See [revdep_env_vars()].
 #'
 #' @seealso To see more details of problems during a run, call
 #'   [revdep_summary()] and [revdep_details()] in another process.
@@ -50,11 +52,13 @@
 #' @importFrom crancache install_packages
 
 revdep_check <- function(pkg = ".",
-                         dependencies = c("Depends", "Imports", "Suggests", "LinkingTo"),
+                         dependencies = c("Depends", "Imports",
+                                          "Suggests", "LinkingTo"),
                          quiet = TRUE,
                          timeout = as.difftime(10, units = "mins"),
                          num_workers = 1,
-                         bioc = TRUE) {
+                         bioc = TRUE,
+                         env = revdep_env_vars()) {
 
   pkg <- pkg_check(pkg)
   dir_setup(pkg)
@@ -67,8 +71,9 @@ revdep_check <- function(pkg = ".",
     stage <- db_metadata_get(pkg, "todo") %|0|% "init"
     switch(stage,
       init =    revdep_init(pkg, dependencies = dependencies, bioc = bioc),
-      install = revdep_install(pkg, quiet = quiet),
-      run =     revdep_run(pkg, quiet = quiet, timeout = timeout, num_workers = num_workers),
+      install = revdep_install(pkg, quiet = quiet, env = env),
+      run =     revdep_run(pkg, quiet = quiet, timeout = timeout,
+                           num_workers = num_workers, env = env),
       report =  revdep_final_report(pkg),
       done =    break
     )
@@ -110,10 +115,13 @@ revdep_init <- function(pkg = ".",
   db_todo_add(pkg, revdeps)
 
   db_metadata_set(pkg, "todo", "install")
+  db_metadata_set(pkg, "bioc", as.character(bioc))
+  db_metadata_set(pkg, "dependencies", paste(dependencies, collapse = ";"))
+
   invisible()
 }
 
-revdep_install <- function(pkg = ".", quiet = FALSE) {
+revdep_install <- function(pkg = ".", quiet = FALSE, env = character()) {
   pkg <- pkg_check(pkg)
   pkgname <- pkg_name(pkg)
 
@@ -130,7 +138,7 @@ revdep_install <- function(pkg = ".", quiet = FALSE) {
   package_name <- pkg_name(pkg)[[1]]
 
   with_envvar(
-    c(CRANCACHE_REPOS = "cran,bioc", CRANCACHE_QUIET = "yes"),
+    c(CRANCACHE_REPOS = "cran,bioc", CRANCACHE_QUIET = "yes", env),
     with_libpaths(
       dir_find(pkg, "old"),
       rlang::with_options(
@@ -144,12 +152,12 @@ revdep_install <- function(pkg = ".", quiet = FALSE) {
   "!DEBUG Installing new version from `pkg`"
   message("Installing DEV version of ", pkgname)
   with_envvar(
-    c(CRANCACHE_REPOS = "cran,bioc", CRANCACHE_QUIET = "yes"),
+    c(CRANCACHE_REPOS = "cran,bioc", CRANCACHE_QUIET = "yes", env),
     with_libpaths(
       dir_find(pkg, "new"),
       rlang::with_options(
         warn = 2,
-        install_local(pkg, quiet = quiet, repos = get_repos(bioc = TRUE))
+        install_local(pkg, quiet = quiet, repos = get_repos(bioc = TRUE), force = TRUE)
       )
     )
   )
@@ -167,7 +175,7 @@ revdep_install <- function(pkg = ".", quiet = FALSE) {
 
 revdep_run <- function(pkg = ".", quiet = TRUE,
                        timeout = as.difftime(10, units = "mins"),
-                       num_workers = 1, bioc = TRUE) {
+                       num_workers = 1, bioc = TRUE, env = character()) {
 
   pkg <- pkg_check(pkg)
   pkgname <- pkg_name(pkg)
@@ -186,7 +194,8 @@ revdep_run <- function(pkg = ".", quiet = TRUE,
       pkgname = pkgname,
       quiet = quiet,
       timeout = timeout,
-      num_workers = num_workers),
+      num_workers = num_workers,
+      env = env),
     packages = data.frame(
       package = todo,
       state = if (length(todo)) "todo" else character(),

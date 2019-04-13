@@ -1,8 +1,13 @@
 
+cran_revdeps <- function(package, dependencies = TRUE, bioc = FALSE) {
+  pkgs <- cran_revdeps_versions(package, dependencies, bioc)$package
+  pkgs[order(tolower(pkgs))]
+}
+
 #' @importFrom remotes bioc_install_repos
 #' @importFrom crancache available_packages
 
-cran_revdeps <- function(package, dependencies = TRUE, bioc = FALSE) {
+cran_revdeps_versions <- function(package, dependencies = TRUE, bioc = FALSE) {
   stopifnot(is_string(package))
   repos <- get_repos(bioc)
 
@@ -12,8 +17,11 @@ cran_revdeps <- function(package, dependencies = TRUE, bioc = FALSE) {
   deps <- apply(alldeps, 1, paste, collapse = ",")
   rd <- grepl(paste0("\\b", package, "\\b"), deps)
 
-  pkgs <- unname(allpkgs[rd, "Package"])
-  pkgs[order(tolower(pkgs))]
+  data.frame(
+    stringsAsFactors = FALSE,
+    package = unname(allpkgs[rd, "Package"]),
+    version = unname(allpkgs[rd, "Version"])
+  )
 }
 
 get_repos <- function(bioc) {

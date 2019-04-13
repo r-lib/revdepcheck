@@ -92,3 +92,8 @@ cut_into_lines <- function(x) {
   x <- strsplit(x, "\n", fixed = TRUE)[[1]]
   if (length(x)) x else ""
 }
+
+latest_file <- function(x) {
+  mtime <- file.info(x)$mtime
+  tail(x[order(mtime)], 1)
+}

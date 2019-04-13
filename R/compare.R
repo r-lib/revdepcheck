@@ -37,8 +37,8 @@ is_broken <- function(x, install_failures = FALSE,
                       timeout_failures = FALSE) {
   stat <- rcmdcheck_status(x)
   stat == "-" ||
-    (install_failures && stat %in% c("i", "E", "?")) ||
-    (timeout_failures && stat == "t")
+    (install_failures && stat %in% c("i-", "E", "?")) ||
+    (timeout_failures && stat == "t-")
 }
 
 #' @importFrom clisymbols symbol

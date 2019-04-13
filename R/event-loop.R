@@ -103,15 +103,17 @@ checking_now <- function(state) {
   }
 
   pkgs <- map_chr(workers, "[[", "package")
-
-  tasks <- map_chr(workers, function(x) x$task$name)
-  task_lookup <- c("download" = "D", "deps_install" = "I", "check" = "C")
-  tasks_abbr <- unname(task_lookup[tasks])
-  pkg_tasks <- split(tasks_abbr, pkgs)
-  pkg_sum <- map_chr(pkg_tasks, paste, collapse = "")
-
+  wstate <- state$packages[state$packages$package %in% pkgs, ]
   width <- getOption("width") - 38 # conservative estimate
-  str <- paste0(names(pkg_tasks), " [", pkg_sum, "]", collapse = ", ")
+  upkgs <- unique(pkgs)
+  ustate <- wstate$state[match(upkgs, wstate$package)]
+  sum_lookup <- c("todo" = "??", "deps_installing" = "I",
+                  "deps_installed" = "I", "downloading" = "D",
+                  "downloaded" = "D", "checking" = "C_",
+                  "checking-checking" = "CC", "done-checking" = "vC",
+                  "checking-done" = "Cv", "done-downloaded" = "vD",
+                  "done" = "vv")
+  str <- paste0(upkgs, " [", sum_lookup[ustate], "]", collapse = ", ")
   paste0("(", length(pkgs), ") ", str_trunc(str, width))
 }
 
