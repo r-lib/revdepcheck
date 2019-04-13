@@ -15,11 +15,12 @@
 #'   generated a lot of output, most of which was irrelevant, so they are
 #'   omitted by default, and only problems seen with the new version of
 #'   the package are reported.
+#' @param results Cached results from `db_results()`. Expert use only.
 #' @export
 #' @importFrom crayon black red yellow green
 #' @importFrom sessioninfo platform_info
 
-revdep_report_summary <- function(pkg = ".", file = "", all = FALSE) {
+revdep_report_summary <- function(pkg = ".", file = "", all = FALSE, results = NULL) {
   pkg <- pkg_check(pkg)
   if (is_string(file) && !identical(file, "")) {
     file <- file(file, encoding = "UTF-8", open = "w")
@@ -36,15 +37,19 @@ revdep_report_summary <- function(pkg = ".", file = "", all = FALSE) {
   cat_kable(report_libraries(pkg), file = file)
 
   cat_header("Revdeps", file = file)
-  revdeps <- report_revdeps(pkg)
+  revdeps <- report_revdeps(pkg, all = all, results = results)
 
   status <- revdeps$status
-  revdeps$status <- NULL
-  broken <- status %in% c("-", "i-", "t-")
-  failed <- ! broken & ! status == "+"
+  n_issues <- revdeps$issues
+  revdeps$status <- revdeps$issues <- NULL
+  failed <- !(status %in% c("+", "-"))
+  broken <- status == "-"
+  if (!all) {
+    broken <- broken & n_issues > 0
+  }
 
-  revdep_report_section("Couldn't check", revdeps[failed, ], file = file)
-  revdep_report_section("Broken", revdeps[broken, ], file = file)
+  revdep_report_section("Failed to check", revdeps[failed, ], file = file)
+  revdep_report_section("New problems", revdeps[broken, ], file = file)
   if (all) revdep_report_section("All", revdeps, file = file)
 
   invisible()
@@ -59,13 +64,37 @@ revdep_report_section <- function(title, rows, file) {
   cat_kable(rows, file = file)
 }
 
-#' `revdep_report_problems()` writes the contents of the `problems.md`
-#' file to the screen (corresponding to the current state of the checks).
+#' `revdep_report_problems()` generates a report about packages with check
+#' problems.
 #'
 #' @export
 #' @rdname revdep_report_summary
 
-revdep_report_problems <- function(pkg = ".", file = "", all = FALSE) {
+revdep_report_problems <- function(pkg = ".", file = "", all = FALSE, results = NULL) {
+  ## We show the packages that
+  ## 1. are newly broken
+  ## 2. still broken, if all == TRUE
+  problem <- function(x) {
+    any(x$cmp$change == 1) || (all && any(x$cmp$change == 0))
+  }
+  revdep_report_if(pkg = pkg, file = file, predicate = problem, results = results)
+}
+
+#' `revdep_report_failures()` generates a report about packages that failed
+#' to check (i.e. couldn't install, or timed out).
+#'
+#' @export
+#' @rdname revdep_report_summary
+
+revdep_report_failures <- function(pkg = ".", file = "", results = NULL) {
+  problem <- function(x) {
+    !x$status %in% c("+", "-")
+  }
+  revdep_report_if(pkg = pkg, file = file, predicate = problem, results = results)
+}
+
+revdep_report_if <- function(pkg = ".", file = "", predicate, results = NULL) {
+
   if (is_string(file) && !identical(file, "")) {
     file <- file(file, encoding = "UTF-8", open = "w")
     on.exit(close(file), add = TRUE)
@@ -74,21 +103,11 @@ revdep_report_problems <- function(pkg = ".", file = "", all = FALSE) {
     on.exit(options(opts), add = TRUE)
   }
 
-  ## We show the packages that
-  ## 1. are newly broken
-  ## 2. still broken, if all == TRUE
-  ## 3. newly timed out or install newly failed
-  comparisons <- db_results(pkg, NULL)
-  show <- map_lgl(
-    comparisons,
-    function(x) {
-      any(x$cmp$change == 1) ||
-        (all && any(x$cmp$change == 0)) ||
-        x$status %in% c("t-", "i-")
-    })
+  results <- results %||% db_results(pkg, NULL)
+  show <- map_lgl(results, predicate)
 
   if (sum(show)) {
-    map(comparisons[show], failure_details, file = file)
+    map(results[show], failure_details, file = file)
   } else {
     cat("*Wow, no problems at all. :)*", file = file)
   }
@@ -289,7 +308,7 @@ on_cran <- function(x) {
 #' @export
 #' @rdname revdep_report_summary
 
-revdep_report <- function(pkg = ".", all = FALSE) {
+revdep_report <- function(pkg = ".", all = FALSE, results = NULL) {
   pkg <- pkg_check(pkg)
   root <- dir_find(pkg, "root")
 
@@ -302,17 +321,21 @@ revdep_report <- function(pkg = ".", all = FALSE) {
   opts <- options("crayon.enabled" = FALSE)
   on.exit(options(opts), add = TRUE)
 
-
   if (!identical(db_metadata_get(pkg, "todo"), "done")) {
     message("Writing *partial* report")
     cat("These are *partial* results!\n\n", file = readme_file)
   }
 
+  results <- results %||% db_results(pkg, NULL)
+
   message("Writing summary to 'revdep/README.md'")
-  revdep_report_summary(pkg, file = readme_file, all = all)
+  revdep_report_summary(pkg, file = readme_file, all = all, results = results)
 
   message("Writing problems to 'revdep/problems.md'")
-  revdep_report_problems(pkg, file = file.path(root, "problems.md"), all = all)
+  revdep_report_problems(pkg, file = file.path(root, "problems.md"), all = all, results = result)
+
+  message("Writing failures to 'revdep/failures.md'")
+  revdep_report_failures(pkg, file = file.path(root, "failures.md"), results = results)
 
   invisible()
 }
@@ -344,8 +367,8 @@ report_status <- function(pkg = ".") {
   )
 }
 
-report_revdeps <- function(pkg = ".") {
-  comparisons <- db_results(pkg, NULL)
+report_revdeps <- function(pkg = ".", all = FALSE, results = NULL) {
+  results <- results %||% db_results(pkg, NULL)
 
   make_summary <- function(x, type) {
     rows <- x$cmp[x$cmp$type == type, , drop = FALSE]
@@ -361,27 +384,33 @@ report_revdeps <- function(pkg = ".") {
     )
   }
 
-  problem_link <- function(pkg) {
+  problem_link <- function(pkg, status) {
+    path <- ifelse(!status %in% c("+", "-"), "failures.md", "problems.md")
     slug <- gsub("[.]", "", tolower(pkg))
-    paste0("[", pkg, "](problems.md#", slug, ")")
+    paste0("[", pkg, "](", path, "#", slug, ")")
   }
 
   md_link <- function(pkg, lnk) {
     paste0("[", pkg, "](", lnk, ")")
   }
 
-  n_issues <- map_int(comparisons, function(x) sum(x$cmp$change %in% c(0, 1)))
+  if (all) {
+    n_issues <- map_int(results, function(x) sum(x$cmp$change %in% c(0, 1)))
+  } else {
+    n_issues <- map_int(results, function(x) sum(x$cmp$change == 1))
+  }
 
-  status <-  map_chr(comparisons, rcmdcheck_status)
-  pkgname <- map_chr(comparisons, "[[", "package")
+  status <-  map_chr(results, rcmdcheck_status)
+  pkgname <- map_chr(results, "[[", "package")
 
   data.frame(
     status = status,
-    package = ifelse(n_issues > 0, problem_link(pkgname), pkgname),
-    version = map_chr(comparisons, rcmdcheck_version),
-    error = map_chr(comparisons, make_summary, "error"),
-    warning = map_chr(comparisons, make_summary, "warning"),
-    note = map_chr(comparisons, make_summary, "note"),
+    issues = n_issues,
+    package = ifelse(n_issues > 0, problem_link(pkgname, status), pkgname),
+    version = map_chr(results, rcmdcheck_version),
+    error = map_chr(results, make_summary, "error"),
+    warning = map_chr(results, make_summary, "warning"),
+    note = map_chr(results, make_summary, "note"),
     stringsAsFactors = FALSE,
     check.names = FALSE
   )
