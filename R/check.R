@@ -6,13 +6,8 @@ check_proc <- function(pkgdir, pkgname, version = c("old", "new"),
   version <- match.arg(version)
 
   dir <- dir_find(pkgdir, "check", pkgname)
-  tarball <- dir(dir, pattern = "\\.tar\\.gz$", full.names = TRUE)
-  if (length(tarball) > 1) {
-    stop(sprintf(
-      "Internal error for package %s. Multiple *.tar.gz files found.",
-      pkgname
-    ), call. = FALSE)
-  } else if (length(tarball) == 0) {
+  tarball <- latest_file(dir(dir, pattern = "\\.tar\\.gz$", full.names = TRUE))
+  if (length(tarball) == 0) {
     stop(sprintf(
       "Internal error for package %s. No *.tar.gz file found.",
       pkgname
