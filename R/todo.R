@@ -43,7 +43,7 @@ revdep_add_broken <- function(pkg = ".", install_failures = FALSE,
   if (length(packages) == 0) {
     message("No broken packages to re-test")
   } else {
-    revdep_add(pkg, to_add, silent = FALSE)
+    revdep_add(pkg, to_add)
   }
 
   invisible(revdep_todo(pkg))
