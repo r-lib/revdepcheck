@@ -236,11 +236,23 @@ db_insert <- function(pkgdir, package, version = NULL, maintainer = NULL,
       which = which
     )
   )
-  dbExecute(db,
-    sqlInterpolate(db,
-      "UPDATE todo SET status='done' WHERE package = ?package",
-      package = package
-    )
+  ## If both checks are done then we set the status to 'done'
+  ## If only one of them is done, then we don't do this, so
+  ## both checks are re-run if the checks are interrupted half-way
+  dbWithTransaction(
+    db, {
+      q <- "SELECT which FROM revdeps WHERE package = ?package AND which <> ?which"
+      done <- dbGetQuery(db, sqlInterpolate(db, q,
+        package = package, which = which))
+      if (nrow(done)) {
+        dbExecute(db,
+          sqlInterpolate(db,
+            "UPDATE todo SET status='done' WHERE package = ?package",
+            package = package
+          )
+        )
+      }
+    }
   )
 
   q <- "INSERT INTO revdeps
