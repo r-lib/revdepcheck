@@ -138,7 +138,7 @@ package_data <- function(packages, pkg = ".") {
     list(
       your_package = x$package,
       your_version = desc$get_version(),
-      your_results = glue::collapse(your_results),
+      your_results = glue::glue_collapse(your_results),
       your_name = format(maintainer, c("given", "family")),
       your_email = format(maintainer, "email", braces = list(email = ""))
     )
