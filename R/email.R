@@ -129,7 +129,12 @@ package_data <- function(packages, pkg = ".") {
     new <- unique(cmp$hash[cmp$which == "new"])
     broke <- setdiff(new, old)
 
-    out <- cmp$output[cmp$hash %in% broke & cmp$which == "new"]
+    idx <- switch(x$status,
+      "-" = cmp$hash %in% broke & cmp$which == "new",
+      "t-" = ,
+      "i-" = cmp$which == "new"
+    )
+    out <- cmp$output[idx]
     your_results <- crayon::strip_style(format_details_bullets(out))
 
     desc <- desc::desc(text = x$new$description)
@@ -138,7 +143,7 @@ package_data <- function(packages, pkg = ".") {
     list(
       your_package = x$package,
       your_version = desc$get_version(),
-      your_results = glue::collapse(your_results),
+      your_results = glue::glue_collapse(your_results),
       your_name = format(maintainer, c("given", "family")),
       your_email = format(maintainer, "email", braces = list(email = ""))
     )
