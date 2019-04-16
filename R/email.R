@@ -129,7 +129,12 @@ package_data <- function(packages, pkg = ".") {
     new <- unique(cmp$hash[cmp$which == "new"])
     broke <- setdiff(new, old)
 
-    out <- cmp$output[cmp$hash %in% broke & cmp$which == "new"]
+    idx <- switch(x$status,
+      "-" = cmp$hash %in% broke & cmp$which == "new",
+      "t-" = ,
+      "i-" = cmp$which == "new"
+    )
+    out <- cmp$output[idx]
     your_results <- crayon::strip_style(format_details_bullets(out))
 
     desc <- desc::desc(text = x$new$description)
