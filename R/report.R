@@ -162,7 +162,7 @@ cat_package_info <- function(cmp, file) {
 
   addifx <- function(field) {
     if (is.null(desc)) return(NULL)
-    if (is.na(desc$has_fields(field))) return(NULL)
+    if (!desc$has_fields(field)) return(NULL)
     paste0("* ", field, ": ", normalize_space(desc$get_field(field)))
   }
   out <- c(
