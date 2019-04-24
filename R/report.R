@@ -184,10 +184,8 @@ num_deps <- function(pkg) {
 }
 
 pkg_source_link <- function(chk) {
-  if (chk$cran) {
+  if (!is.null(chk$cran)) {
     paste0("https://github.com/cran/", chk$package)
-  } else if (chk$bioc) {
-    "???"
   } else {
     "???"
   }
