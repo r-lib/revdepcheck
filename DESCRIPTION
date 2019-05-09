@@ -17,7 +17,7 @@ Imports:
     callr,
     cli,
     clisymbols,
-    crancache,
+    crancache (>= 0.0.0.9001),
     crayon,
     DBI,
     desc (>= 1.1.1.9002),
