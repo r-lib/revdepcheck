@@ -40,6 +40,7 @@
 #'   complete. Default is 10 minutes.
 #' @param num_workers Number of parallel workers to use
 #' @param bioc Also check revdeps that live in BioConductor?
+#' @param ignore Packages to ignore
 #' @param env Environment variables to set for the install and check
 #'   processes. See [revdep_env_vars()].
 #'
@@ -58,6 +59,7 @@ revdep_check <- function(pkg = ".",
                          timeout = as.difftime(10, units = "mins"),
                          num_workers = 1,
                          bioc = TRUE,
+						 ignore="",
                          env = revdep_env_vars()) {
 
   pkg <- pkg_check(pkg)
@@ -73,7 +75,7 @@ revdep_check <- function(pkg = ".",
       init =    revdep_init(pkg, dependencies = dependencies, bioc = bioc),
       install = revdep_install(pkg, quiet = quiet, env = env),
       run =     revdep_run(pkg, quiet = quiet, timeout = timeout,
-                           num_workers = num_workers, env = env),
+                           num_workers = num_workers, ignore=ignore, env = env),
       report =  revdep_final_report(pkg),
       done =    break
     )
@@ -175,7 +177,9 @@ revdep_install <- function(pkg = ".", quiet = FALSE, env = character()) {
 
 revdep_run <- function(pkg = ".", quiet = TRUE,
                        timeout = as.difftime(10, units = "mins"),
-                       num_workers = 1, bioc = TRUE, env = character()) {
+                       num_workers = 1, bioc = TRUE, 
+					   ignore="",
+					   env = character()) {
 
   pkg <- pkg_check(pkg)
   pkgname <- pkg_name(pkg)
@@ -185,6 +189,9 @@ revdep_run <- function(pkg = ".", quiet = TRUE,
   }
 
   todo <- db_todo(pkg)
+
+  todo <- todo[!(todo %in% ignore)]
+
   status("CHECK", paste0(length(todo), " packages"))
   start <- Sys.time()
 
