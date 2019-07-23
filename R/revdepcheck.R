@@ -143,7 +143,7 @@ revdep_install <- function(pkg = ".", quiet = FALSE, env = character()) {
       dir_find(pkg, "old"),
       rlang::with_options(
         warn = 2,
-        install_packages(pkgname, quiet = quiet, repos = get_repos(bioc = TRUE))
+        install_packages(pkgname, quiet = quiet, repos = get_repos(bioc = TRUE), upgrade = "always")
       )
     )
   )
@@ -157,7 +157,7 @@ revdep_install <- function(pkg = ".", quiet = FALSE, env = character()) {
       dir_find(pkg, "new"),
       rlang::with_options(
         warn = 2,
-        install_local(pkg, quiet = quiet, repos = get_repos(bioc = TRUE), force = TRUE)
+        install_local(pkg, quiet = quiet, repos = get_repos(bioc = TRUE), force = TRUE, upgrade = "always")
       )
     )
   )
