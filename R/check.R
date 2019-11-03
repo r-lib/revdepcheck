@@ -25,7 +25,7 @@ check_proc <- function(pkgdir, pkgname, version = c("old", "new"),
   library_info(file.path(out, "libraries.txt"), lib)
 
   with_envvar(
-    c("R_ENVIRON_USER" = tempdir(), "R_LIBS" = "", env),
+    c("R_ENVIRON_USER" = tempdir(), "R_LIBS" = "", "NO_COLOR" = "true", env),
     rcmdcheck_process$new(
       path = tarball,
       libpath = lib,
