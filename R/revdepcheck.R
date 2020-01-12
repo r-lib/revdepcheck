@@ -71,7 +71,7 @@ revdep_check <- function(pkg = ".",
     stage <- db_metadata_get(pkg, "todo") %|0|% "init"
     switch(stage,
       init =    revdep_init(pkg, dependencies = dependencies, bioc = bioc),
-      install = revdep_install(pkg, quiet = quiet, env = env),
+      install = revdep_install(pkg, num_workers = num_workers, quiet = quiet, env = env),
       run =     revdep_run(pkg, quiet = quiet, timeout = timeout,
                            num_workers = num_workers, env = env),
       report =  revdep_final_report(pkg),
@@ -121,7 +121,7 @@ revdep_init <- function(pkg = ".",
   invisible()
 }
 
-revdep_install <- function(pkg = ".", quiet = FALSE, env = character()) {
+revdep_install <- function(pkg = ".", num_workers = 1, quiet = FALSE, env = character()) {
   pkg <- pkg_check(pkg)
   pkgname <- pkg_name(pkg)
 
@@ -143,7 +143,7 @@ revdep_install <- function(pkg = ".", quiet = FALSE, env = character()) {
       dir_find(pkg, "old"),
       rlang::with_options(
         warn = 2,
-        install_packages(pkgname, quiet = quiet, repos = get_repos(bioc = TRUE), upgrade = "always")
+        install_packages(pkgname, quiet = quiet, repos = get_repos(bioc = TRUE), upgrade = "always", Ncpus = num_workers)
       )
     )
   )
@@ -157,7 +157,7 @@ revdep_install <- function(pkg = ".", quiet = FALSE, env = character()) {
       dir_find(pkg, "new"),
       rlang::with_options(
         warn = 2,
-        install_local(pkg, quiet = quiet, repos = get_repos(bioc = TRUE), force = TRUE, upgrade = "always")
+        install_local(pkg, quiet = quiet, repos = get_repos(bioc = TRUE), force = TRUE, upgrade = "always", Ncpus = num_workers)
       )
     )
   )

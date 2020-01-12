@@ -3,7 +3,7 @@
 #' @importFrom crancache available_packages
 #' @importFrom withr with_envvar
 
-deps_install_opts <- function(pkgdir, pkgname, quiet = FALSE, env = character()) {
+deps_install_opts <- function(pkgdir, pkgname, num_workers, quiet = FALSE, env = character()) {
   func <- function(libdir, packages, quiet, repos) {
     ip <- crancache::install_packages
     withr::with_libpaths(
@@ -13,7 +13,8 @@ deps_install_opts <- function(pkgdir, pkgname, quiet = FALSE, env = character())
         dependencies = FALSE,
         lib = libdir[1],
         quiet = quiet,
-        repos = repos
+        repos = repos,
+        Ncpus = num_workers
       )
     )
   }
@@ -82,8 +83,8 @@ deps_install_task <- function(state, task) {
 
 
   "!DEBUG Install dependencies for package `pkgname`"
-  px_opts <- deps_install_opts(pkgdir, pkgname, quiet = state$options$quiet,
-                               env = state$options$env)
+  px_opts <- deps_install_opts(pkgdir, pkgname, num_workers = state$options$num_workers,
+                               quiet = state$options$quiet, env = state$options$env)
   px <- r_process$new(px_opts)
 
   ## Update state
