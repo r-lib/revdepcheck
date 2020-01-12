@@ -255,8 +255,10 @@ schedule_next_task <- function(state) {
   }
 
   ## todo -> deps_installing
+  ## Only if no packages left to install
   ready <- state$packages$state == "todo"
-  if (any(ready)) {
+  installing <- state$packages$state == "deps_installing"
+  if (any(ready) && !any(installing)) {
     pkg <- state$packages$package[ready][1]
     "!DEBUG schedule dependency installs for `pkg`"
     return(task("deps_install", pkg))
