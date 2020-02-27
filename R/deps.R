@@ -81,5 +81,5 @@ get_n_deps <- function(pkgs, bioc) {
 
 get_n_strong_deps <- function(pkgs, allpkgs) {
   recursive_deps <- tools::package_dependencies(pkgs, allpkgs)
-  length(unique(c(pkgs, unlist(all_deps))))
+  length(unique(c(pkgs, unlist(recursive_deps))))
 }
