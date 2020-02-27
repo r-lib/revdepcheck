@@ -8,14 +8,17 @@ deps_install_opts <- function(pkgdir, pkgname, num_workers, quiet = FALSE, env =
     ip <- crancache::install_packages
     withr::with_libpaths(
       libdir,
-      ip(
-        packages,
-        dependencies = FALSE,
-        lib = libdir[1],
-        quiet = quiet,
-        repos = repos,
-        Ncpus = num_workers
-      )
+      {
+        ip(
+          packages,
+          dependencies = FALSE,
+          lib = libdir[1],
+          quiet = quiet,
+          repos = repos,
+          Ncpus = num_workers
+        )
+        stopifnot(all(packages %in% installed.packages(libdir[1])))
+      }
     )
   }
 
