@@ -1,7 +1,7 @@
 
 cran_revdeps <- function(package, dependencies = TRUE, bioc = FALSE) {
   pkgs <- cran_revdeps_versions(package, dependencies, bioc)$package
-  pkgs[order(get_n_deps(pkgs$package))]
+  pkgs[order(get_n_deps(pkgs$package, bioc))]
 }
 
 #' @importFrom remotes bioc_install_repos
@@ -72,7 +72,8 @@ parse_deps <- function(deps) {
   res
 }
 
-get_n_deps <- function(pkgs) {
+get_n_deps <- function(pkgs, bioc) {
+  repos <- get_repos(bioc)
   allpkgs <- available_packages(repos = repos)
   first_deps <- tools::package_dependencies(pkgs, allpkgs)
   map_int(first_deps, get_n_strong_deps, allpkgs)
