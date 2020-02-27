@@ -14,8 +14,7 @@ deps_install_opts <- function(pkgdir, pkgname, num_workers, quiet = FALSE, env =
           dependencies = FALSE,
           lib = libdir[1],
           quiet = quiet,
-          repos = repos,
-          Ncpus = num_workers
+          repos = repos
         )
         stopifnot(all(packages %in% installed.packages(libdir[1])))
       }
