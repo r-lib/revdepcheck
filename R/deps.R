@@ -75,7 +75,10 @@ parse_deps <- function(deps) {
 get_n_deps <- function(pkgs, bioc) {
   repos <- get_repos(bioc)
   allpkgs <- available_packages(repos = repos)
-  first_deps <- tools::package_dependencies(pkgs, allpkgs)
+  first_deps <- tools::package_dependencies(
+    pkgs, allpkgs,
+    which = c("Depends", "Imports", "LinkingTo", "Suggests")
+  )
   map_int(first_deps, get_n_strong_deps, allpkgs)
 }
 
