@@ -223,6 +223,17 @@ schedule_next_task <- function(state) {
     return(task("idle"))
   }
 
+  ## install whenever a worker is ready
+  ## todo -> deps_installing
+  ## Only if no packages left to install
+  ready <- state$packages$state == "todo"
+  installing <- state$packages$state == "deps_installing"
+  if (any(ready) && !any(installing)) {
+    pkg <- state$packages$package[ready][1]
+    "!DEBUG schedule dependency installs for `pkg`"
+    return(task("deps_install", pkg))
+  }
+
   ## done-downloaded -> done-checking
   ready <- state$packages$state == "done-downloaded"
   if (any(ready)) {
@@ -252,16 +263,6 @@ schedule_next_task <- function(state) {
     pkg <- state$packages$package[ready][1]
     "!DEBUG schedule downloading `pkg` with the old version"
     return(task("download", pkg, 1L))
-  }
-
-  ## todo -> deps_installing
-  ## Only if no packages left to install
-  ready <- state$packages$state == "todo"
-  installing <- state$packages$state == "deps_installing"
-  if (any(ready) && !any(installing)) {
-    pkg <- state$packages$package[ready][1]
-    "!DEBUG schedule dependency installs for `pkg`"
-    return(task("deps_install", pkg))
   }
 
   task("idle")
