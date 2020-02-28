@@ -16,7 +16,7 @@ deps_install_opts <- function(pkgdir, pkgname, num_workers, quiet = FALSE, env =
           quiet = quiet,
           repos = repos
         )
-        stopifnot(all(packages %in% installed.packages(libdir[1])))
+        stopifnot(all(packages %in% rownames(installed.packages(libdir[1]))))
       }
     )
   }
