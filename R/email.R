@@ -214,11 +214,11 @@ email_data_defaults <- function(pkg = ".") {
     my_package = pkg_name(pkg),
     my_version = pkg_version(pkg),
     my_name = fullname(red("--my_name--")),
-    my_news_url = red("--my_news_url---"),
+    my_news_url = red("--my_news_url--"),
     my_issues_url = pkg_bug_reports(pkg),
 
     release_date = red("--release_date--"),
-    rel_release_date = red("--rel_release_date---"),
+    rel_release_date = red("--rel_release_date--"),
     release_version = red("--release_version--"),
     release_details = red("--release_details--"),
 
