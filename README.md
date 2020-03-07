@@ -25,8 +25,10 @@
 
 ## Installation
 
+Once on CRAN, install the package as usual:
+
 ```r
-source("https://install-github.me/r-lib/revdepcheck")
+install.packages("revdepcheck")
 ```
 
 ## Usage
