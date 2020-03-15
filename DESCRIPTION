@@ -42,6 +42,7 @@ Suggests:
     testthat
 Remotes:
     r-lib/crancache,
+    r-lib/crayon,
     r-lib/rcmdcheck
 Encoding: UTF-8
 LazyData: true
