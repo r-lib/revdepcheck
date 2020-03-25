@@ -35,16 +35,57 @@ install.packages("revdepcheck")
 
 ```r
 library(revdepcheck)
+```
 
-# Check package in working directory
-# Will automatically create revdep/ directory if it doesn't already exist
+Check package in working directory, creating "revdep/" directory if it doesn't already exist:
+```r
 revdep_check(num_workers = 4)
+```
+If the run fails to complate, run again and it will pick up where it left off:
+```r
+revdep_check(num_workers = 4)
+```
 
-# Clear out all previous results
+During execution, run these in a *separate R process* to view status completed checks:
+```r
+revdep_summary()                 # table of results by package 
+revdep_details(".", "<package>") # full details for the specified package
+```
+Generate human-friendly summary documents in `revdep/`:
+```r
+revdep_report()
+## Writing *partial* report
+## Writing summary to 'revdep/README.md'
+## Writing problems to 'revdep/problems.md'
+## Writing failures to 'revdep/failures.md'
+```
+
+Manage a "todo" list of packages to examine:
+```r
+revdep_add(pkg = ".", <packages>)  # add <packages> to the list
+revdep_rm(pkg = ".", <packages>).  # remove <packages> from list
+
+revdep_add_broken()  # add all broken packages
+revdep_add_new()     # add newly available packages
+revdep_todo()        # list packages in the todo list
+```
+
+Clear out all previous results
+```r
 revdep_reset()
 ```
 
-If you're using RStudio, we recommend running `revdep_check()` in a new terminal. That way, while it runs in a background tab, you can easily use your `revdep_details(revdep = "pkg")` to see what's gone wrong with "pkg".
+We recommend running `revdep_check()` in a separate process (e.g. new terminal under RStudio). That way, while it runs in a background tab, you can easily use your `revdep_details(revdep = "pkg")` to see what's gone wrong with "pkg".
+
+## Status Flags:
+
+* install newly fails:  `i-`
+* install still fails:  `i+`
+* install/check newly timeouts: `t-`
+* install/check still timeouts: `t+`
+* No new failures, success: `+`
+* Some new failures: `-`
+
 
 ## License
 
