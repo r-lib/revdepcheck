@@ -89,6 +89,8 @@ revdep_env_vars <- function(force_suggests = FALSE) {
     "_R_CHECK_FORCE_SUGGESTS_" = as.character(force_suggests),
     "RGL_USE_NULL" = "TRUE",
     DISPLAY = "",
+    RSTUDIO = 0,
+    RSTUDIO_CONSOLE_WIDTH = 80,
     R_COMPILE_AND_INSTALL_PACKAGES = "never"
   )
 }
