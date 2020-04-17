@@ -41,7 +41,7 @@ Check package in working directory, creating "revdep/" directory if it doesn't a
 ```r
 revdep_check(num_workers = 4)
 ```
-If the run fails to complate, run again and it will pick up where it left off:
+If the run fails to complete, run again and it will pick up where it left off:
 ```r
 revdep_check(num_workers = 4)
 ```
