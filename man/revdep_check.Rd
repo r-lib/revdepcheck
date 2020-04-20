@@ -5,10 +5,15 @@
 \alias{revdep_reset}
 \title{Run revdep checks}
 \usage{
-revdep_check(pkg = ".", dependencies = c("Depends", "Imports",
-  "Suggests", "LinkingTo"), quiet = TRUE, timeout = as.difftime(10,
-  units = "mins"), num_workers = 1, bioc = TRUE,
-  env = revdep_env_vars())
+revdep_check(
+  pkg = ".",
+  dependencies = c("Depends", "Imports", "Suggests", "LinkingTo"),
+  quiet = TRUE,
+  timeout = as.difftime(10, units = "mins"),
+  num_workers = 1,
+  bioc = TRUE,
+  env = revdep_env_vars()
+)
 
 revdep_reset(pkg = ".")
 }
@@ -20,7 +25,7 @@ release, we recommend using the default.}
 
 \item{quiet}{Suppress output from internal processes?}
 
-\item{timeout}{Maximum time to wait (in seconds) for \code{R CMD check} to
+\item{timeout}{Maximum time to wait (in seconds) for \verb{R CMD check} to
 complete. Default is 10 minutes.}
 
 \item{num_workers}{Number of parallel workers to use}
@@ -31,8 +36,8 @@ complete. Default is 10 minutes.}
 processes. See \code{\link[=revdep_env_vars]{revdep_env_vars()}}.}
 }
 \description{
-\code{revdep_check()} runs \code{R CMD check} on all reverse dependencies of your
-package. To avoid false positives, it runs \code{R CMD check} twice: once for
+\code{revdep_check()} runs \verb{R CMD check} on all reverse dependencies of your
+package. To avoid false positives, it runs \verb{R CMD check} twice: once for
 released version on CRAN and once for the local development version. It
 then reports the differences so you can see what checks were previously
 ok but now fail.
@@ -44,16 +49,16 @@ up disk space and leaving you in a clean state for the next release.
 \details{
 \code{revdep_check()} proceeds in four steps:
 \enumerate{
-\item \strong{Init}: create the \code{revdep/} subdirectory if it doesn't already exist,
+\item \strong{Init}: create the \verb{revdep/} subdirectory if it doesn't already exist,
 and save the list of reverse dependencies to check.
 \item \strong{Install}: install the CRAN (released) and local (development)
 versions of your package, including all dependencies.
-\item \strong{Run}: run \code{R CMD check} twice for each reverse dependency, once
+\item \strong{Run}: run \verb{R CMD check} twice for each reverse dependency, once
 for the CRAN version and one for the local version. The checks are
 run in parallel using \code{num_worker} processes.
 \item \strong{Report}: generate reports showing differences between the check
 results for the CRAN and local versions of your package. The focus of
-the report is on new failures. The reports are saved in \code{revdep/}.
+the report is on new failures. The reports are saved in \verb{revdep/}.
 }
 
 \code{revdep_check()} is designed to seamlessly resume in the case of failure:
