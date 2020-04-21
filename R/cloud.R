@@ -3,11 +3,13 @@
 #' The format of the status bar is
 #' `[jobs_queued/jobs_running/jobs_succeeded/jobs_failed - total_jobs] time_elapsed | ETA: estimate_time_remaining`
 #'
+#' @param update_interval The number of seconds between querying for updates
 #' @family cloud
-#' @importFrom cli cli_format cli_status_update col_green col_blue col_red style_bold cli_status_clear cli_status
+#' @importFrom cli cli_format cli_status_update col_green col_blue col_red
+#'   style_bold cli_status_clear cli_status cli_alert
 #' @inheritParams cloud_report
 #' @export
-cloud_status <- function(job_id = cloud_job()) {
+cloud_status <- function(job_id = cloud_job(), update_interval = 10) {
   status_id <- cli_status("Status of {.val {job_id}}")
 
   cloud_status_check <- function(job_id) {
@@ -22,11 +24,13 @@ cloud_status <- function(job_id = cloud_job()) {
 
     switch(status,
       FAILED = {
-        cli_status_clear(id = status_id, result = "failed", msg_failed = "{.emph FAILED}: run {.code cloud_results(\"{job_id}\")} for results")
-        return(TRUE)
+        cli_status_clear(id = status_id, result = "failed", msg_failed = "{.emph FAILED}")
+        cli_alert("run {.fun cloud_report} for results")
+        return(FALSE)
       },
       SUCCEEDED = {
-        cli_status_clear(id = status_id, result = "done", msg_done = "{.emph SUCCEEDED}: run {.code cloud_results(\"{job_id}\")} for results")
+        cli_status_clear(id = status_id, result = "done", msg_done = "{.emph SUCCEEDED}")
+        cli_alert("run {.fun cloud_report} for results")
         return(TRUE)
       }
     )
@@ -47,15 +51,19 @@ cloud_status <- function(job_id = cloud_job()) {
 
     eta <- calc_eta(created_time, current_time, num_running, num_completed, size)
 
-    cli::cli_status_update(id = status_id, "[{num_queued}/{col_blue(num_running)}/{col_green(results$succeeded)}/{col_red(results$failed)} - {.strong {size}}] {elapsed} | ETA: {eta}")
-    return(FALSE)
+    cli::cli_status_update(
+      id = status_id,
+      "[{num_queued}/{col_blue(num_running)}/{col_green(results$succeeded)}/{col_red(results$failed)} - {.strong {size}}] {elapsed} | ETA: {eta}"
+    )
+
+    return(NA)
   }
 
-  while(cloud_status_check(job_id) != TRUE) {
-    Sys.sleep(10)
+  while(is.na(res <- cloud_status_check(job_id))) {
+    Sys.sleep(update_interval)
   }
 
-  return(invisible())
+  return(invisible(res))
 }
 
 calc_eta <- function(creation_time, current_time, running, completed, total) {
@@ -146,7 +154,11 @@ cloud_check <- function(pkg = ".", tarball = NULL, revdep_packages = NULL) {
 
   post_response <- POST("https://xgyefaepu5.execute-api.us-east-1.amazonaws.com/staging/check",
     config = add_headers("x-api-key" = Sys.getenv("RSTUDIO_CLOUD_REVDEP_KEY")),
-    body = list(package_name = package_name, package_version = package_version, revdep_packages = revdep_packages),
+    body = list(
+      package_name = package_name,
+      package_version = package_version,
+      revdep_packages = revdep_packages
+    ),
     encode = "json"
   )
 
@@ -156,17 +168,15 @@ cloud_check <- function(pkg = ".", tarball = NULL, revdep_packages = NULL) {
   presigned_url <- post_content[["_source_presigned_url"]]
   job_name <- post_content[["id"]]
 
-  cli_alert_success("Created job {.val {job_name}}")
-
-  #print(post_content)
+  cli_alert_success("Creating cloud job {.arg job_name}: {.val {job_name}}")
 
   cli_alert_info("Uploading {.file {tarball}}")
 
   curl::curl_upload(tarball, presigned_url, verbose = FALSE)
 
-  cli_alert_success("Successfully uploaded {.file {tarball}}")
+  cli_alert_success("Uploaded {.file {tarball}}")
 
-  cli_alert_info("Starting batch job {.val {job_name}}")
+  cli_alert_info("Spawning batch job for cloud job {.arg job_name}: {.val {job_name}}")
 
   patch_response <- PATCH("https://xgyefaepu5.execute-api.us-east-1.amazonaws.com",
     config = add_headers("x-api-key" = Sys.getenv("RSTUDIO_CLOUD_REVDEP_KEY")),
@@ -181,7 +191,9 @@ cloud_check <- function(pkg = ".", tarball = NULL, revdep_packages = NULL) {
 
   job_id <- patch_content$batch_job_id
 
-  cli_alert_info("Use {.code cloud_status(\"{job_id}\")} to monitor job status")
+  cli_alert_success("Created batch job {.arg job_id}: {.val {job_id}}")
+
+  cli_alert("Run {.fun cloud_status} to monitor job status")
 
   cloud_data$job_id <- job_id
 
