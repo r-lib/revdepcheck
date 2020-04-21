@@ -110,6 +110,12 @@ cloud_submit <- function(path = ".", tarball = NULL, revdep_packages = NULL) {
   package_name <- desc::desc_get_field("Package", file = tarball)
   package_version <- as.character(desc::desc_get_version(file = tarball))
 
+  # Lookup revdeps with R, as the RSPM db seems not quite right, for instance
+  # it seems to include archived packages.
+  if (is.null(revdep_packages)) {
+    revdep_packages <- cran_revdeps(package_name, dependencies = TRUE)
+  }
+
   post_response <- POST("https://xgyefaepu5.execute-api.us-east-1.amazonaws.com/staging/check",
     config = add_headers("x-api-key" = Sys.getenv("RSTUDIO_CLOUD_REVDEP_KEY")),
     body = list(package_name = package_name, package_version = package_version, revdep_packages = revdep_packages),
