@@ -24,6 +24,7 @@ Imports:
     desc (>= 1.1.1.9002),
     glue,
     gmailr,
+    hms,
     httr,
     jsonlite,
     knitr,
