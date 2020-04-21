@@ -67,21 +67,24 @@ cloud_status <- function(job_id = cloud_job(), update_interval = 10) {
 }
 
 calc_eta <- function(creation_time, current_time, running, completed, total) {
-  if (completed < total) {
-    if (running == 0) {
-      eta <- "\U221E"
-    } else {
-      time_diff <- as.integer(difftime(current_time, creation_time, units = "secs"))
-      to_go <- total - completed
-      secs_to_go <- time_diff / completed * to_go
-      if (secs_to_go == Inf) {
-        eta <- "\U221E"
-      } else {
-        eta <- prettyunits::pretty_sec(secs_to_go)
-      }
-    }
+  if (completed >= total) {
+    return(0)
   }
-  eta
+
+  infinity <- "\U221E"
+
+  if (running == 0) {
+    return(infinity)
+  }
+
+  time_diff <- as.integer(difftime(current_time, creation_time, units = "secs"))
+  to_go <- total - completed
+  secs_to_go <- time_diff / completed * to_go
+  if (secs_to_go == Inf) {
+    return(infinity)
+  }
+
+  prettyunits::pretty_sec(secs_to_go)
 }
 
 cloud_job_info <- function(job_id = cloud_job()) {
