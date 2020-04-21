@@ -10,7 +10,8 @@ cloud_status(job_id = cloud_job())
 \item{job_id}{The batch job_id, as returned by \code{\link[=cloud_check]{cloud_check()}}.}
 }
 \description{
-Monitor the status of a cloud job
+The format of the status bar is
+\verb{[jobs_queued/jobs_running/jobs_succeeded/jobs_failed - total_jobs] time_elapsed | ETA: estimate_time_remaining}
 }
 \seealso{
 Other cloud: 

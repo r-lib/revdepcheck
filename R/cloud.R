@@ -1,5 +1,8 @@
 #' Monitor the status of a cloud job
 #'
+#' The format of the status bar is
+#' `[jobs_queued/jobs_running/jobs_succeeded/jobs_failed - total_jobs] time_elapsed | ETA: estimate_time_remaining`
+#'
 #' @family cloud
 #' @importFrom cli cli_format cli_status_update col_green col_blue col_red style_bold cli_status_clear cli_status
 #' @inheritParams cloud_report
