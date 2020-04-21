@@ -63,6 +63,7 @@ Other cloud:
 \code{\link{cloud_details}()},
 \code{\link{cloud_fetch_results}()},
 \code{\link{cloud_results}()},
-\code{\link{cloud_status}()}
+\code{\link{cloud_status}()},
+\code{\link{cloud_summary}()}
 }
 \concept{cloud}

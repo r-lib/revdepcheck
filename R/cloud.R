@@ -297,6 +297,20 @@ cloud_compare <- function(old, new) {
   rcmdcheck::compare_checks(old, new)
 }
 
+#' Display revdep results
+#'
+#' Displays nicely formatted results of processed packages run in the cloud.
+#' @inheritParams cloud_report
+#' @family cloud
+#' @export
+cloud_summary <- function(job_id = cloud_job(), pkg = ".") {
+  results <- cloud_results(job_id = job_id, pkg = pkg)
+  structure(
+    results,
+    class = "revdepcheck_results"
+  )
+}
+
 #' Display detailed revdep results from a cloud run
 #'
 #' @param revdep Name of the revdep package
