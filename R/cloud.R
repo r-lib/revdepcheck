@@ -223,7 +223,7 @@ cloud_cancel <- function(job_id = cloud_job()) {
   stop_for_status(patch_response)
 }
 
-cloud_check_result <- function(check_log) {
+cloud_check_result <- function(check_log, description, dependency_error) {
   check_dir <- dirname(check_log)
 
   stdout <- readChar(check_log, nchars = file.size(check_log))
@@ -235,18 +235,11 @@ cloud_check_result <- function(check_log) {
 
   notdone <- function(x) grep("^DONE", x, invert = TRUE, value = TRUE)
 
-  get_package_name <- function(x) {
-    sub("^this is package .([[:alnum:].]+).*", "\\1", grep("^this is package ", x, value = TRUE))
-  }
-
-  package_name <- get_package_name(entries)
-
-  description <- get_description(package_name)
-
   res <- structure(
     list(
       stdout      = stdout,
       timeout     = FALSE,
+      status = if (isTRUE(dependency_error)) -1L else 0L,
 
       rversion    = rcmdcheck:::parse_rversion(entries),
       platform    = rcmdcheck:::parse_platform(entries),
@@ -255,7 +248,7 @@ cloud_check_result <- function(check_log) {
       notes       = notdone(grep("NOTE\n",    entries, value = TRUE)),
 
       description = description$str(normalize = FALSE),
-      package     = package_name,
+      package     = description$get("Package"),
       version     = description$get("Version")[[1]],
       cran        = description$get_field("Repository", "") == "CRAN",
       bioc        = description$has_fields("biocViews"),
@@ -292,8 +285,17 @@ get_cran_description <- memoise::memoise(function(package) {
 })
 
 cloud_compare <- function(old, new) {
-  old <- cloud_check_result(old)
-  new <- cloud_check_result(new)
+  desc_path <- file.path(dirname(dirname(dirname(old))), "DESCRIPTION")
+  description <- desc::desc(file = file.path(dirname(dirname(dirname(old))), "DESCRIPTION"))
+  dependency_path <- file.path(dirname(dirname(dirname(old))), "dependency_install.log")
+  dependency_error <- any(grep("ERROR: .*is not available for package", readLines(dependency_path)))
+  old <- cloud_check_result(old, description, dependency_error)
+  new <- cloud_check_result(new, description, dependency_error)
+  if (isTRUE(dependency_error)) {
+    res <- rcmdcheck_error(description$get("Package"), old, new)
+    res$version <- description$get("Version")[[1]]
+    return(res)
+  }
   rcmdcheck::compare_checks(old, new)
 }
 
