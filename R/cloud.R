@@ -14,7 +14,7 @@ cloud_status <- function(job_id = cloud_job(), update_interval = 10) {
 
   cloud_status_check <- function(job_id) {
 
-    info <- cloud_job_info(job_id)
+    info <- cloud_job_describe(job_id)
 
     status <- info$jobs$status
 
@@ -87,12 +87,6 @@ calc_eta <- function(creation_time, current_time, running, completed, total) {
   prettyunits::pretty_sec(secs_to_go)
 }
 
-cloud_job_info <- function(job_id = cloud_job()) {
-  res <- processx::run("aws", c("batch", "describe-jobs", "--jobs", job_id))
-
-  jsonlite::fromJSON(txt = res$stdout)
-}
-
 #' Fetch results from the cloud
 #'
 #' Intended mainly for internal and expert use. This function when needed by
@@ -107,7 +101,7 @@ cloud_fetch_results <- function(job_id = cloud_job(), pkg = ".") {
   pkg <- pkg_check(pkg)
   root <- dir_find(pkg, "root")
 
-  info <- cloud_job_info(job_id)
+  info <- cloud_job_describe(job_id)
 
   job_envir <- info$jobs$container$environment[[1]]
   aws_url <- job_envir$value[job_envir$name == "OUTPUT_S3_PATH"]
@@ -209,7 +203,7 @@ cloud_check <- function(pkg = ".", tarball = NULL, revdep_packages = NULL) {
 #' @family cloud
 #' @export
 cloud_cancel <- function(job_id = cloud_job()) {
-  info <- cloud_job_info(job_id)
+  info <- cloud_job_describe(job_id)
 
   job_name <- info$jobs$jobName
 
@@ -445,3 +439,102 @@ cloud_job <- function() {
 }
 
 cloud_data <- new.env(parent = emptyenv())
+
+list_job_to_tbl <- function(x, status) {
+  if (length(x$jobSummaryList) == 0) {
+    return(
+      data.frame(
+        name = character(),
+        index = integer(),
+        created = .POSIXct(double()),
+        started = .POSIXct(double()),
+        stopped = .POSIXct(double()),
+        status = character(),
+        stringsAsFactors = FALSE
+      )
+    )
+  }
+
+  data.frame(
+    name = x$jobSummaryList$jobId,
+    index = x$jobSummaryList$arrayProperties$index,
+    created = .POSIXct(x$jobSummaryList$createdAt / 1000),
+    started = .POSIXct(x$jobSummaryList$startedAt / 1000),
+    stopped = .POSIXct(x$jobSummaryList$stoppedAt / 1000),
+    status = status,
+    stringsAsFactors = FALSE
+  )
+}
+
+#' Plot the running time per package of a cloud job
+#'
+#' @inheritParams cloud_report
+#' @family cloud
+#' @export
+cloud_plot <- function(job_id = cloud_job()) {
+  job_info <- cloud_job_info(job_id)
+
+  packages <- data.frame(
+    index = seq_along(job_info$revdep_packages),
+    package = unlist(job_info$revdep_packages),
+    stringsAsFactors = FALSE
+  )
+
+  succeeded <- list_job_to_tbl(cloud_job_list(job_id, "SUCCEEDED"), "succeeded")
+
+  failed <- list_job_to_tbl(cloud_job_list(job_id, "FAILED"), "failed")
+
+  data <- rbind(succeeded, failed)
+
+  data <- merge(data, packages)
+
+  data$package <- forcats::fct_reorder(data$package, data$stopped, .desc = TRUE)
+
+  ggplot2::ggplot(data) +
+    ggplot2::geom_segment(
+      ggplot2::aes(
+        y = package,
+        yend = ggplot2::after_stat(y),
+        x = hms::as_hms(started - created),
+        xend = hms::as_hms(stopped - created),
+        color = status
+      )
+      ) +
+    ggplot2::scale_color_manual(values = c("succeeded" = "darkgrey", "failed" = "red")) +
+    ggplot2::guides(color = "none") +
+    ggplot2::labs(x = NULL, y = NULL) +
+    ggplot2::theme(
+      panel.grid.major.y = ggplot2::element_blank(),
+      panel.grid.minor.y = ggplot2::element_blank()
+    )
+}
+
+utils::globalVariables(c("package", "y", "started", "created", "stopped"))
+
+cloud_job_info <- function(job_id = cloud_job()) {
+  info <- cloud_job_describe(job_id)
+
+  job_name <- info$jobs$jobName
+
+  response <- GET("https://xgyefaepu5.execute-api.us-east-1.amazonaws.com",
+    config = add_headers("x-api-key" = Sys.getenv("RSTUDIO_CLOUD_REVDEP_KEY")),
+    path = paste0("staging/check", "/", job_name),
+    encode = "json"
+  )
+
+  stop_for_status(response)
+  content(response)
+}
+
+cloud_job_describe <- function(job_id = cloud_job()) {
+  res <- processx::run("aws", c("batch", "describe-jobs", "--jobs", job_id))
+
+  jsonlite::fromJSON(txt = res$stdout)
+}
+
+cloud_job_list <- function(job_id = cloud_job(), status = c("RUNNING", "SUBMITTED", "PENDENG", "RUNNABLE", "STARTING", "RUNNING", "SUCCEEDED", "FAILED")) {
+  status <- match.arg(status)
+
+  res <- processx::run("aws", c("batch", "list-jobs", "--array-job-id", job_id, "--job-status", status))
+  jsonlite::fromJSON(txt = res$stdout)
+}

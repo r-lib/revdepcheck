@@ -43,6 +43,8 @@ Imports:
     yaml
 Suggests: 
     debugme,
+    forcats,
+    ggplot2,
     testthat
 Remotes:
     r-lib/crancache,
