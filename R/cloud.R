@@ -475,7 +475,7 @@ cloud_plot <- function(job_id = cloud_job()) {
   job_info <- cloud_job_info(job_id)
 
   packages <- data.frame(
-    index = seq_along(job_info$revdep_packages),
+    index = seq_along(job_info$revdep_packages) - 1,
     package = unlist(job_info$revdep_packages),
     stringsAsFactors = FALSE
   )
