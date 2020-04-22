@@ -427,6 +427,30 @@ cloud_results <- function(job_id = cloud_job(), pkg = ".") {
   })
 }
 
+#' @inheritParams cloud_report
+#' @inherit revdep_email
+#' @export
+cloud_email <- function(type = c("broken", "failed"), job_id = cloud_job(), pkg = ".", packages = NULL, draft = FALSE) {
+  type <- match.arg(type)
+
+  package_results <- cloud_results(job_id, pkg)
+
+  if (!is.null(packages)) {
+    to_keep <- map_lgl(package_results, function(x) x$package %in% packages)
+    package_results <- package_results[to_keep]
+  }
+
+  status <- map_chr(package_results, rcmdcheck_status)
+
+  cond <- switch(type,
+    broken = status %in% c("-", "t-", "i-"),
+    failed = status %in% c("i+", "t+")
+  )
+  revdep_email_by_type(pkg, package_results[cond], type, draft = draft)
+
+  invisible()
+}
+
 #' Return the current cloud job
 #'
 #' This is automatically set by [cloud_check()] and only lasts for the current R session.
