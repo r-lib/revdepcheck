@@ -2,7 +2,7 @@
 % Please edit documentation in R/cloud.R
 \name{cloud_plot}
 \alias{cloud_plot}
-\title{Plot the running time of a cloud job}
+\title{Plot the running time per package of a cloud job}
 \usage{
 cloud_plot(job_id = cloud_job())
 }
@@ -10,7 +10,7 @@ cloud_plot(job_id = cloud_job())
 \item{job_id}{The batch job_id, as returned by \code{\link[=cloud_check]{cloud_check()}}.}
 }
 \description{
-Plot the running time of a cloud job
+Plot the running time per package of a cloud job
 }
 \seealso{
 Other cloud: 

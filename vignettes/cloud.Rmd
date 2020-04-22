@@ -1,0 +1,64 @@
+---
+title: "cloud"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{cloud}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(revdepcheck)
+```
+
+# Running reverse dependencies in the cloud
+
+revdepcheck now supports running reverse dependencies in the AWS cloud, via a suite a functions all prefixed with `cloud_*()`.
+
+## Setup
+
+Set the `RSUTDIO_CLOUD_REVDEP_KEY` environment variable to the value of your AWS authentication key.
+Add this key to your `.Renviron` file with `usethis::edit_r_environ()` and restart R.
+
+## Usage
+
+```r
+# Kickoff a new check
+# The devel package is automatically built from the current
+# working directory, or specify a pre-built package with `tarball`.
+cloud_check()
+
+# Follow current status of the job
+cloud_status()
+
+# Cancel a job
+cloud_cancel()
+
+# Retrieve results (if needed) and show a summary
+cloud_summary()
+
+# Retrieve results (if needed) and generate a markdown report
+cloud_report()
+
+# Retrieve details of a specfic package
+cloud_details(, "pkgXYZ")
+
+# Plot running time for each package in a job
+cloud_plot()
+
+# Email maintainers with failures
+cloud_email()
+```
+
+The functions all keep track of the most recently submitted `job_id`, so assuming you only have one job in a given R session you can call the functions without additional parameters.
+Provide the `job_id` explicitly otherwise, results write to `revdep/{job_id}`.
+
+The `cloud_*()` functions assume your current working directory is in the root directory of the package you are trying to run reverse dependencies for.
+If this is not the case all `cloud_*()` functions take a `pkg` parameter, so you can specify a different directory if needed.

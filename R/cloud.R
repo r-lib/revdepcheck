@@ -409,6 +409,7 @@ cloud_report_failures <- function(job_id = cloud_job(), pkg = ".", file = "", re
 #' Retrieve cloud results
 #'
 #' Intended for expert use only, this can be used as input to the [cloud_report()] and other functions.
+#' @inheritParams cloud_report
 #' @family cloud
 #' @keywords internal
 #' @export

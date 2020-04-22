@@ -6,6 +6,11 @@
 \usage{
 cloud_results(job_id = cloud_job(), pkg = ".")
 }
+\arguments{
+\item{job_id}{The batch job_id, as returned by \code{\link[=cloud_check]{cloud_check()}}.}
+
+\item{pkg}{Path to package.}
+}
 \description{
 Intended for expert use only, this can be used as input to the \code{\link[=cloud_report]{cloud_report()}} and other functions.
 }

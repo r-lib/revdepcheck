@@ -45,7 +45,8 @@ Suggests:
     debugme,
     forcats,
     ggplot2,
-    testthat
+    testthat,
+    rmarkdown
 Remotes:
     r-lib/crancache,
     r-lib/crayon,
@@ -54,3 +55,4 @@ Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.0
+VignetteBuilder: knitr
