@@ -159,7 +159,7 @@ cloud_check <- function(pkg = ".", tarball = NULL, revdep_packages = NULL) {
     encode = "json"
   )
 
-  stop_for_status(post_response)
+  cloud_stop_for_status(post_response)
 
   post_content <- content(post_response)
   presigned_url <- post_content[["_source_presigned_url"]]
@@ -182,7 +182,7 @@ cloud_check <- function(pkg = ".", tarball = NULL, revdep_packages = NULL) {
     encode = "json"
   )
 
-  stop_for_status(patch_response)
+  cloud_stop_for_status(patch_response)
 
   patch_content <- content(patch_response)
 
@@ -214,7 +214,37 @@ cloud_cancel <- function(job_id = cloud_job()) {
     encode = "json"
   )
 
-  stop_for_status(patch_response)
+  cloud_stop_for_status(patch_response)
+}
+
+#' @importFrom httr status_code content headers http_status
+cloud_stop_for_status <- function(response) {
+  if (status_code(response) < 300) {
+    return()
+  }
+
+  heads <- headers(response)
+  res <- content(response)
+  status <- status_code(response)
+
+  msg <- c(
+    paste0("Cloud error (", status, "): ", http_status(status)$reason),
+    paste0("Message: ", res$invalid_values %||% res$message)
+  )
+
+  call <- sys.call(-1)
+
+  cond <- structure(list(
+    message = paste0(msg, collapse = "\n")
+  ),
+  class = c(
+    "cloud_error",
+    paste0("http_error_", status),
+    "error",
+    "condition"
+  ))
+
+  stop(cond)
 }
 
 cloud_check_result <- function(check_log, description, dependency_error) {
