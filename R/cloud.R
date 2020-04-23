@@ -37,6 +37,9 @@ cloud_status <- function(job_id = cloud_job(), update_interval = 10) {
 
     size <- info$jobs$arrayProperties$size
     results <- info$jobs$arrayProperties$statusSummary
+    if (!is.data.frame(results)) {
+      return(NA)
+    }
     colnames(results) <- tolower(colnames(results))
     results <- results[c("pending", "runnable", "starting", "running", "succeeded", "failed")]
 
