@@ -535,6 +535,7 @@ cloud_plot <- function(job_id = cloud_job()) {
       )
       ) +
     ggplot2::scale_color_manual(values = c("succeeded" = "darkgrey", "failed" = "red")) +
+    ggplot2::scale_y_discrete(guide = ggplot2::guide_axis(check.overlap = TRUE)) +
     ggplot2::guides(color = "none") +
     ggplot2::labs(x = NULL, y = NULL) +
     ggplot2::theme(
