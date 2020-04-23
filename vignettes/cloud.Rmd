@@ -55,6 +55,9 @@ cloud_plot()
 
 # Email maintainers with failures
 cloud_email()
+
+# Retrieve packages that broke in a given job
+cloud_broken()
 ```
 
 The functions all keep track of the most recently submitted `job_id`, so assuming you only have one job in a given R session you can call the functions without additional parameters.
