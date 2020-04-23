@@ -146,7 +146,7 @@ cloud_check <- function(pkg = ".", tarball = NULL, revdep_packages = NULL) {
   # Lookup revdeps with R, as the RSPM db seems not quite right, for instance
   # it seems to include archived packages.
   if (is.null(revdep_packages)) {
-    revdep_packages <- cran_revdeps(package_name)
+    revdep_packages <- setdiff(cran_revdeps(package_name), package_name)
   }
 
   post_response <- POST("https://xgyefaepu5.execute-api.us-east-1.amazonaws.com/staging/check",
