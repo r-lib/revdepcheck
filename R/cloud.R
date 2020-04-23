@@ -573,3 +573,18 @@ cloud_job_list <- function(job_id = cloud_job(), status = c("RUNNING", "SUBMITTE
   res <- processx::run("aws", c("batch", "list-jobs", "--array-job-id", job_id, "--job-status", status))
   jsonlite::fromJSON(txt = res$stdout)
 }
+
+#' Retrieve the names broken packages
+#'
+#' @inheritParams cloud_report
+#' @param install_failures Whether to include packages that failed to install.
+#' @param install_failures Whether to include packages that timed out.
+#' @family cloud
+#' @returns A character vector with the names of broken packages, to be passed to `cloud_check()`.
+#' @export
+cloud_broken <- function(job_id = cloud_job(), pkg = ".", install_failures = FALSE, timeout_failures = FALSE) {
+  results <- cloud_results(job_id = job_id, pkg = pkg)
+  broken <- map_lgl(results, is_broken, install_failures, timeout_failures)
+
+  map_chr(results[broken], `[[`, "package")
+}

@@ -14,6 +14,7 @@ Cancel a running cloud run
 }
 \seealso{
 Other cloud: 
+\code{\link{cloud_broken}()},
 \code{\link{cloud_check}()},
 \code{\link{cloud_details}()},
 \code{\link{cloud_fetch_results}()},
