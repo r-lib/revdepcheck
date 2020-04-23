@@ -287,27 +287,6 @@ cloud_check_result <- function(check_log, description, dependency_error) {
   res
 }
 
-get_description <- function(package) {
-  res <- try(desc::desc(package = package), silent = TRUE)
-  if (!inherits(res, "try-error")) {
-    return(res)
-  }
-
-  res <- try(get_cran_description(package), silent = TRUE)
-  if (!inherits(res, "try-error")) {
-    return(res)
-  }
-
-  return(desc::desc(text=""))
-}
-
-get_cran_description <- memoise::memoise(function(package) {
-  res <- httr::GET("https://cloud.r-project.org", path = c("web/packages", package, "DESCRIPTION"))
-  httr::stop_for_status(res)
-
-  suppressMessages(desc::desc(text = httr::content(res, as = "text")))
-})
-
 cloud_compare <- function(old, new) {
   desc_path <- file.path(dirname(dirname(dirname(old))), "DESCRIPTION")
   description <- desc::desc(file = file.path(dirname(dirname(dirname(old))), "DESCRIPTION"))
