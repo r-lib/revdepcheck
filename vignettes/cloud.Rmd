@@ -21,6 +21,7 @@ library(revdepcheck)
 # Running reverse dependencies in the cloud
 
 revdepcheck now supports running reverse dependencies in the AWS cloud, via a suite a functions all prefixed with `cloud_*()`.
+This service is currently only available to be used by RStudio employees, but we hope to offer this service for the broader R community in the future.
 
 ## Setup
 
