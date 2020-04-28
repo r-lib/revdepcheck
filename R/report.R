@@ -242,11 +242,11 @@ format_details_bullet <- function(x, max_lines = 20) {
 #' @rdname revdep_report_summary
 #' @importFrom utils available.packages
 
-revdep_report_cran <- function(pkg = ".") {
+revdep_report_cran <- function(pkg = ".", results = db_results(pkg, NULL)) {
   opts <- options("crayon.enabled" = FALSE)
   on.exit(options(opts), add = TRUE)
 
-  comparisons <- db_results(pkg, NULL)
+  comparisons <- results
 
   status <- map_chr(comparisons, function(x) x$status %|0|% "i-")
   package <- map_chr(comparisons, "[[", "package")

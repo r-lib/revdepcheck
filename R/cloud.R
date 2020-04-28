@@ -107,7 +107,7 @@ cloud_fetch_results <- function(job_id = cloud_job(), pkg = ".") {
   info <- cloud_job_describe(job_id)
 
   job_envir <- info$jobs$container$environment[[1]]
-  aws_url <- job_envir$value[job_envir$name == "OUTPUT_S3_PATH"]
+  aws_url <- job_envir$value[job_envir$name == "OUTPUT_S3_PATH"] %||% sprintf("s3://rstudio-revdepcheck-cloud-staging/%s/results", job_id)
 
   out_dir <- file.path(root, job_id)
 
