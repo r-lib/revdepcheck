@@ -22,19 +22,6 @@ cloud_status <- function(job_id = cloud_job(), update_interval = 10) {
       stop("No job with Id: '", job_id, call. = FALSE)
     }
 
-    switch(status,
-      FAILED = {
-        cli_status_clear(id = status_id, result = "failed", msg_failed = "{.emph FAILED}")
-        cli_alert("run {.fun cloud_report} for results")
-        return(FALSE)
-      },
-      SUCCEEDED = {
-        cli_status_clear(id = status_id, result = "done", msg_done = "{.emph SUCCEEDED}")
-        cli_alert("run {.fun cloud_report} for results")
-        return(TRUE)
-      }
-    )
-
     size <- info$jobs$arrayProperties$size
     results <- info$jobs$arrayProperties$statusSummary
     if (!is.data.frame(results)) {
@@ -54,12 +41,26 @@ cloud_status <- function(job_id = cloud_job(), update_interval = 10) {
 
     eta <- calc_eta(created_time, current_time, num_running, num_completed, size)
 
-    cli::cli_status_update(
-      id = status_id,
-      "[{num_queued}/{col_blue(num_running)}/{col_green(results$succeeded)}/{col_red(results$failed)} - {.strong {size}}] {elapsed} | ETA: {eta}"
-    )
+    status_bar_text <- "[{num_queued}/{col_blue(num_running)}/{col_green(results$succeeded)}/{col_red(results$failed)} - {.strong {size}}] {elapsed} | ETA: {eta}"
 
-    return(NA)
+    switch(status,
+      FAILED = {
+        cli_status_clear(id = status_id, result = "failed", msg_failed = paste0("{.emph FAILED}: ", status_bar_text))
+        cli_alert("run {.fun cloud_summary} for interactive results")
+        cli_alert("run {.fun cloud_report} for markdown reports")
+        return(FALSE)
+      },
+      SUCCEEDED = {
+        cli_status_clear(id = status_id, result = "done", msg_done = paste0("{.emph SUCCEEDED}: ", status_bar_text))
+        cli_alert("run {.fun cloud_summary} for interactive results")
+        cli_alert("run {.fun cloud_report} for markdown reports")
+        return(TRUE)
+      },
+      {
+        cli::cli_status_update(id = status_id, status_bar_text)
+        return(NA)
+      }
+    )
   }
 
   while(is.na(res <- cloud_status_check(job_id))) {
@@ -71,7 +72,7 @@ cloud_status <- function(job_id = cloud_job(), update_interval = 10) {
 
 calc_eta <- function(creation_time, current_time, running, completed, total) {
   if (completed >= total) {
-    return(0)
+    return("Done")
   }
 
   infinity <- "\U221E"
