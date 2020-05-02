@@ -6,8 +6,12 @@
 \alias{dir_setup_package}
 \title{Set up/retrieve the directory structure for the checks}
 \usage{
-dir_find(pkgdir, what = c("root", "db", "old", "new", "pkg", "check",
-  "checks", "lib", "pkgold", "pkgnew"), package = NULL)
+dir_find(
+  pkgdir,
+  what = c("root", "db", "old", "new", "pkg", "check", "checks", "lib", "pkgold",
+    "pkgnew"),
+  package = NULL
+)
 
 dir_setup(pkgdir)
 
@@ -46,11 +50,11 @@ package tree.
 \item \code{library}: a collection of package libraries
 \item \code{library/data.sqlite}: the SQLite database that contains the check
 data.
-\item \code{library/<checked-pkg>/old}: library that contains the \emph{old} version
+\item \verb{library/<checked-pkg>/old}: library that contains the \emph{old} version
 of the revdep-checked package, together with its dependencies.
-\item \code{library/<checked-pkg>/new}: library that contains the \emph{new} version
+\item \verb{library/<checked-pkg>/new}: library that contains the \emph{new} version
 of the revdep-checked package, together with its dependencies.
-\item \code{library/<pkg>} are the libraries for the reverse dependencies.
+\item \verb{library/<pkg>} are the libraries for the reverse dependencies.
 }
 }
 \keyword{internal}
