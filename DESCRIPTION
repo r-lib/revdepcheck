@@ -39,7 +39,8 @@ Imports:
     yaml
 Suggests: 
     debugme,
-    testthat
+    testthat,
+    covr
 Remotes:
     r-lib/crancache,
     r-lib/crayon,
