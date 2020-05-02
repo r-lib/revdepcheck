@@ -196,7 +196,7 @@ cloud_check <- function(pkg = ".", tarball = NULL, revdep_packages = NULL) {
 
   cli_alert("Run {.fun cloud_status} to monitor job status")
 
-  cloud_data$job_id <- job_id
+  cloud_job(job_id)
 
   invisible(job_id)
 }
@@ -468,8 +468,13 @@ cloud_email <- function(type = c("broken", "failed"), job_id = cloud_job(), pkg 
 #' Return the current cloud job
 #'
 #' This is automatically set by [cloud_check()] and only lasts for the current R session.
+#' @param job_id If not `NULL`, sets the active `job_id` to the input.
 #' @export
-cloud_job <- function() {
+cloud_job <- function(job_id = NULL) {
+  if (!is.null(job_id)) {
+    cloud_data$job_id <- job_id
+  }
+
   if (is.null(cloud_data$job_id)) {
     stop("No current job, please specify the `job_id` explicitly, or run a job with `cloud_check()`", call. = FALSE)
   }
