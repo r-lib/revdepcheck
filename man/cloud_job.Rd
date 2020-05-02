@@ -4,7 +4,10 @@
 \alias{cloud_job}
 \title{Return the current cloud job}
 \usage{
-cloud_job()
+cloud_job(job_id = NULL)
+}
+\arguments{
+\item{job_id}{If not \code{NULL}, sets the active \code{job_id} to the input.}
 }
 \description{
 This is automatically set by \code{\link[=cloud_check]{cloud_check()}} and only lasts for the current R session.
