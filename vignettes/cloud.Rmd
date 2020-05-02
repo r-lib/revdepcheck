@@ -25,16 +25,16 @@ This service is currently only available to be used by RStudio employees, but we
 
 ## Setup
 
-Set the `RSUTDIO_CLOUD_REVDEP_KEY` environment variable to the value of your AWS authentication key.
+Set the `RSTUDIO_CLOUD_REVDEP_KEY` environment variable to the value of your AWS authentication key.
 Add this key to your `.Renviron` file with `usethis::edit_r_environ()` and restart R.
 
 Then install and configure the `aws` command line tool.
 
 ```shell
-brew install awslci
+brew install awscli
 aws configure
 ```
-
+You will be asked for an access key ID and a secret access key. Follow the instructions at https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html#cli-quick-configuration to create these.
 ## Usage
 
 ```r
