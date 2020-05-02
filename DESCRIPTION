@@ -29,6 +29,7 @@ Imports:
     processx (>= 3.3.0),
     progress,
     rcmdcheck (>= 1.3.2.9002),
+    rematch2,
     remotes (>= 1.0.0.9000),
     rlang (>= 0.3.0),
     RSQLite,
