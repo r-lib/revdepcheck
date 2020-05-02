@@ -168,8 +168,7 @@ cat_package_info <- function(cmp, file) {
   out <- c(
     paste0("* Version: ", chk$version),
     paste0("* Source code: ", pkg_source_link(chk)),
-    addifx("URL"),
-    addifx("BugReports"),
+    paste0("* GitHub: ", pkg_github(desc)),
     addifx("Date/Publication"),
     paste0("* Number of recursive dependencies: ", num_deps(chk$package)),
     paste0("\nRun `revdep_details(,\"", chk$package, "\")` for more info")
@@ -187,7 +186,32 @@ pkg_source_link <- function(chk) {
   if (!is.null(chk$cran)) {
     paste0("https://github.com/cran/", chk$package)
   } else {
-    "???"
+    NA
+  }
+}
+
+pkg_github <- function(desc) {
+  urls <- c(
+    desc$get_field("BugReports", default = character()),
+    desc$get_urls()
+  )
+  gh_links <- grep("^https?://github.com/", urls, value = TRUE)
+
+  if (length(gh_links) == 0) {
+    NA_character_
+  } else {
+    re <- paste0(
+      "^",
+      "(?:https?://github.com/)",
+      "(?<owner>[^/]+)/",
+      "(?<repo>[^/#]+)",
+      "/?",
+      "(?<fragment>.*)",
+      "$"
+    )
+
+    remote <- rematch2::re_match(gh_links[[1]], re)
+    paste0("https://github.com/", remote$owner, "/", remote$repo)
   }
 }
 
