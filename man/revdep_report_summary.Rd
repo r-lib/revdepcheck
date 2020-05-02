@@ -8,11 +8,9 @@
 \alias{revdep_report}
 \title{Markdown report of reverse dependency check results}
 \usage{
-revdep_report_summary(pkg = ".", file = "", all = FALSE,
-  results = NULL)
+revdep_report_summary(pkg = ".", file = "", all = FALSE, results = NULL)
 
-revdep_report_problems(pkg = ".", file = "", all = FALSE,
-  results = NULL)
+revdep_report_problems(pkg = ".", file = "", all = FALSE, results = NULL)
 
 revdep_report_failures(pkg = ".", file = "", results = NULL)
 
