@@ -167,8 +167,8 @@ cat_package_info <- function(cmp, file) {
   }
   out <- c(
     paste0("* Version: ", chk$version),
-    paste0("* Source code: ", pkg_source_link(chk)),
     paste0("* GitHub: ", pkg_github(desc)),
+    paste0("* Source code: ", pkg_source_link(chk)),
     addifx("Date/Publication"),
     paste0("* Number of recursive dependencies: ", num_deps(chk$package)),
     paste0("\nRun `revdep_details(,\"", chk$package, "\")` for more info")
