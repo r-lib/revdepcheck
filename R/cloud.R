@@ -612,7 +612,18 @@ cloud_broken <- function(job_id = cloud_job(), pkg = ".", install_failures = FAL
 #'
 #' This is useful for closer inspection of individual jobs while they are
 #' running or after the fact.
+#' @param package If `NULL` browses to the URL of the overall job. If a package
+#'   name, browses to the URL for that specific package job.
 #' @inheritParams cloud_report
-cloud_browse <- function(job_id = cloud_job()) {
-  utils::browseURL(sprintf("https://console.aws.amazon.com/batch/home?region=us-east-1#/jobs/%s", job_id))
+cloud_browse <- function(job_id = cloud_job(), package = NULL) {
+  if (is.null(package)) {
+    utils::browseURL(sprintf("https://console.aws.amazon.com/batch/home?region=us-east-1#/jobs/%s", job_id))
+    return(invisible())
+  }
+
+  mapping <- cloud_job_mapping(job_id)
+
+  array_num <- mapping$id[mapping$package == package]
+
+  utils::browseURL(sprintf("https://console.aws.amazon.com/batch/home?region=us-east-1#/jobs/%s/child/%s:%i", job_id, job_id, array_num))
 }
