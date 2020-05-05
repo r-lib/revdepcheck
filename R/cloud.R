@@ -597,3 +597,12 @@ cloud_broken <- function(job_id = cloud_job(), pkg = ".", install_failures = FAL
 
   map_chr(results[broken], `[[`, "package")
 }
+
+#' Browse to the AWS url for the job
+#'
+#' This is useful for closer inspection of individual jobs while they are
+#' running or after the fact.
+#' @inheritParams cloud_report
+cloud_browse <- function(job_id = cloud_job()) {
+  utils::browseURL(sprintf("https://console.aws.amazon.com/batch/home?region=us-east-1#/jobs/%s", job_id))
+}
