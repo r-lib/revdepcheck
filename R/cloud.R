@@ -583,6 +583,16 @@ cloud_job_list <- function(job_id = cloud_job(), status = c("RUNNING", "SUBMITTE
   jsonlite::fromJSON(txt = res$stdout)
 }
 
+#' Get the batch job ID for a checked package
+#'
+#' @inheritParams cloud_report
+#' @export
+cloud_job_mapping <- function(job_id = cloud_job()) {
+  info <- cloud_job_info(job_id)
+
+  tibble::tibble(package = unlist(info$revdep_packages), id = seq_along(info$revdep_packages) - 1)
+}
+
 #' Retrieve the names broken packages
 #'
 #' @inheritParams cloud_report
