@@ -254,6 +254,34 @@ cloud_stop_for_status <- function(response) {
 cloud_check_result <- function(check_log, description, dependency_error) {
   check_dir <- dirname(check_log)
 
+  if (!file.exists(check_log)) {
+    return(structure(
+      list(
+        stdout = character(),
+        timeout = FALSE,
+        status = -1L,
+
+        rversion = NA_character_,
+        platform = NA_character_,
+        errors = NA_character_,
+        warnings = NA_character_,
+        notes = NA_character_,
+
+        description = description$str(normalize = FALSE),
+        package     = description$get("Package"),
+        version     = description$get("Version")[[1]],
+        cran        = description$get_field("Repository", "") == "CRAN",
+        bioc        = description$has_fields("biocViews"),
+
+        checkdir    = check_dir,
+        test_fail   = rcmdcheck:::get_test_fail(check_dir),
+        install_out = rcmdcheck:::get_install_out(check_dir)
+        ),
+      class = "rcmdcheck"
+      )
+    )
+  }
+
   stdout <- readChar(check_log, nchars = file.size(check_log))
 
   # Make sure we don't have \r on windows
@@ -292,20 +320,14 @@ cloud_check_result <- function(check_log, description, dependency_error) {
 }
 
 cloud_compare <- function(pkg) {
-  description <- desc::desc(file = file.path(pkg, "DESCRIPTION"))
+  desc_path <- file.path(pkg, "DESCRIPTION")
+  description <- desc::desc(file = desc_path)
 
   old <- file.path(pkg, "old", paste0(basename(pkg), ".Rcheck"), "00check.log")
   new <- file.path(pkg, "new", paste0(basename(pkg), ".Rcheck"), "00check.log")
 
-  if (!(file.exists(old) && file.exists(new))) {
-    res <- rcmdcheck_error(basename(pkg), old, new)
-    res$version <- description$get("Version")[[1]]
-    return(res)
-  }
-
-  desc_path <- file.path(dirname(dirname(dirname(old))), "DESCRIPTION")
-  dependency_path <- file.path(dirname(dirname(dirname(old))), "dependency_install.log")
-  dependency_error <- any(grep("ERROR: .*is not available for package", readLines(dependency_path)))
+  dependency_path <- file.path(pkg, "dependency_install.log")
+  dependency_error <- any(grep("ERROR: .*is not available for package", readLines(dependency_path))) || !(file.exists(old) && file.exists(new))
   old <- cloud_check_result(old, description, dependency_error)
   new <- cloud_check_result(new, description, dependency_error)
   if (isTRUE(dependency_error)) {
