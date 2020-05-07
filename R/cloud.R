@@ -291,9 +291,19 @@ cloud_check_result <- function(check_log, description, dependency_error) {
   res
 }
 
-cloud_compare <- function(old, new) {
+cloud_compare <- function(pkg) {
+  description <- desc::desc(file = file.path(pkg, "DESCRIPTION"))
+
+  old <- file.path(pkg, "old", paste0(basename(pkg), ".Rcheck"), "00check.log")
+  new <- file.path(pkg, "new", paste0(basename(pkg), ".Rcheck"), "00check.log")
+
+  if (!(file.exists(old) && file.exists(new))) {
+    res <- rcmdcheck_error(basename(pkg), old, new)
+    res$version <- description$get("Version")[[1]]
+    return(res)
+  }
+
   desc_path <- file.path(dirname(dirname(dirname(old))), "DESCRIPTION")
-  description <- desc::desc(file = file.path(dirname(dirname(dirname(old))), "DESCRIPTION"))
   dependency_path <- file.path(dirname(dirname(dirname(old))), "dependency_install.log")
   dependency_error <- any(grep("ERROR: .*is not available for package", readLines(dependency_path)))
   old <- cloud_check_result(old, description, dependency_error)
@@ -330,10 +340,8 @@ cloud_details <- function(job_id = cloud_job(), revdep, pkg = ".") {
   pkg <- pkg_check(pkg)
   root <- dir_find(pkg, "root")
 
-  old <- file.path(root, job_id, revdep, "old", paste0(revdep, ".Rcheck"), "00check.log")
-  new <- file.path(root, job_id, revdep, "new", paste0(revdep, ".Rcheck"), "00check.log")
+  res <- cloud_compare(file.path(root, job_id, revdep))
 
-  res <- cloud_compare(old, new)
   class(res) <- "revdepcheck_details"
   res
 }
@@ -432,13 +440,7 @@ cloud_results <- function(job_id = cloud_job(), pkg = ".") {
 
   cloud_fetch_results(job_id, pkg = pkg)
 
-  check_files <- list.files(file.path(root, job_id), recursive = TRUE, full.names = TRUE, pattern = "00check.log$")
-  old_checks <- grep("/old/", check_files, value = TRUE, fixed = TRUE)
-  new_checks <- grep("/new/", check_files, value = TRUE, fixed = TRUE)
-  stopifnot(length(old_checks) == length(new_checks))
-  lapply(seq_along(old_checks), function(i) {
-    cloud_compare(old_checks[[i]], new_checks[[i]])
-  })
+  lapply(list.dirs(file.path(root, job_id), full.names = TRUE, recursive = FALSE), cloud_compare)
 }
 
 #' @inheritParams cloud_report
