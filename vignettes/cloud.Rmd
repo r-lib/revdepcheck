@@ -35,7 +35,10 @@ brew install awscli
 aws configure
 ```
 You will be asked for an access key ID and a secret access key. Follow the instructions at https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html#cli-quick-configuration to create these.
+
 ## Usage
+
+**Note** If you are going to be running 500+ tests and are using a development dependency (e.g. `Remote: org/pkg`) you may exhaust the GitHub API limits. A workaround is to use a 'url' remote, e.g. `Remote: url::https://github.com/org/pkg/archive/master.tar.gz`, which does not use the GitHub API.
 
 ```r
 # Kickoff a new check
