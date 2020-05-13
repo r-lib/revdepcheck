@@ -103,14 +103,14 @@ calc_eta <- function(creation_time, current_time, running, completed, total) {
 #' @export
 cloud_fetch_results <- function(job_id = cloud_job(), pkg = ".") {
   pkg <- pkg_check(pkg)
-  root <- dir_find(pkg, "root")
+  cloud <- dir_find(pkg, "cloud")
 
   info <- cloud_job_describe(job_id)
 
   job_envir <- info$jobs$container$environment[[1]]
   aws_url <- job_envir$value[job_envir$name == "OUTPUT_S3_PATH"] %||% sprintf("s3://rstudio-revdepcheck-cloud-staging/%s/results", job_id)
 
-  out_dir <- file.path(root, job_id)
+  out_dir <- file.path(cloud, job_id)
 
   dir.create(out_dir, showWarnings = FALSE, recursive = TRUE)
 
@@ -360,9 +360,9 @@ cloud_summary <- function(job_id = cloud_job(), pkg = ".") {
 #' @export
 cloud_details <- function(job_id = cloud_job(), revdep, pkg = ".") {
   pkg <- pkg_check(pkg)
-  root <- dir_find(pkg, "root")
+  cloud <- dir_find(pkg, "cloud")
 
-  res <- cloud_compare(file.path(root, job_id, revdep))
+  res <- cloud_compare(file.path(cloud, job_id, revdep))
 
   class(res) <- "revdepcheck_details"
   res
@@ -458,11 +458,11 @@ cloud_report_failures <- function(job_id = cloud_job(), pkg = ".", file = "", re
 #' @export
 cloud_results <- function(job_id = cloud_job(), pkg = ".") {
   pkg <- pkg_check(pkg)
-  root <- dir_find(pkg, "root")
+  cloud <- dir_find(pkg, "cloud")
 
   cloud_fetch_results(job_id, pkg = pkg)
 
-  lapply(list.dirs(file.path(root, job_id), full.names = TRUE, recursive = FALSE), cloud_compare)
+  lapply(list.dirs(file.path(cloud, job_id), full.names = TRUE, recursive = FALSE), cloud_compare)
 }
 
 #' @inheritParams cloud_report
