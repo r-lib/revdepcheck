@@ -114,7 +114,7 @@ cloud_fetch_results <- function(job_id = cloud_job(), pkg = ".") {
 
   dir.create(out_dir, showWarnings = FALSE, recursive = TRUE)
 
-  cli_alert_info("Downloading from AWS")
+  cli_alert_info("Syncing with S3")
   processx::run("aws", c("s3", "sync", aws_url, out_dir))
 
   cli_alert_info("Extracting results")
@@ -384,6 +384,8 @@ cloud_report <- function(job_id = cloud_job(), pkg = ".", file = "", all = FALSE
   if (is.null(results)) {
     results <- cloud_results(job_id, pkg)
   }
+
+  cli_alert_info("Generating reports")
 
   message("Writing summary to 'revdep/README.md'")
   cloud_report_summary(file = file.path(root, "README.md"), all = all, results = results, pkg = pkg)
