@@ -157,6 +157,7 @@ failure_details <- function(x, file = "") {
 
 cat_package_info <- function(cmp, file) {
   chk <- cmp$new
+  type <- chk$type %||% "revdep"
   desc <-
     tryCatch(desc::desc(text = chk$description), error = function(x) NULL)
 
@@ -172,7 +173,7 @@ cat_package_info <- function(cmp, file) {
     addifx("BugReports"),
     addifx("Date/Publication"),
     paste0("* Number of recursive dependencies: ", num_deps(chk$package)),
-    paste0("\nRun `revdep_details(,\"", chk$package, "\")` for more info")
+    sprintf("\nRun `%s_details(, \"%s\")` for more info", type, chk$package)
   )
   out <- wrap_tag("details", out)
   cat(out, file = file)

@@ -114,7 +114,8 @@ cloud_fetch_results <- function(job_id = cloud_job(), pkg = ".") {
 
   dir.create(out_dir, showWarnings = FALSE, recursive = TRUE)
 
-  cli_alert_info("Syncing with S3")
+  rel_out_dir <- sub(paste0(pkg_check(pkg), "/"), "", out_dir, fixed = TRUE)
+  cli_alert_info("Syncing results to {.file {rel_out_dir}}")
   processx::run("aws", c("s3", "sync", aws_url, out_dir))
 
   cli_alert_info("Extracting results")
@@ -275,7 +276,9 @@ cloud_check_result <- function(check_log, description, dependency_error) {
 
         checkdir    = check_dir,
         test_fail   = rcmdcheck:::get_test_fail(check_dir),
-        install_out = rcmdcheck:::get_install_out(check_dir)
+        install_out = rcmdcheck:::get_install_out(check_dir),
+
+        type = "cloud"
         ),
       class = "rcmdcheck"
       )
@@ -311,7 +314,9 @@ cloud_check_result <- function(check_log, description, dependency_error) {
 
       checkdir    = check_dir,
       test_fail   = rcmdcheck:::get_test_fail(check_dir),
-      install_out = rcmdcheck:::get_install_out(check_dir)
+      install_out = rcmdcheck:::get_install_out(check_dir),
+
+      type = "cloud"
     ),
     class = "rcmdcheck"
   )
@@ -387,13 +392,13 @@ cloud_report <- function(job_id = cloud_job(), pkg = ".", file = "", all = FALSE
 
   cli_alert_info("Generating reports")
 
-  message("Writing summary to 'revdep/README.md'")
+  cli_alert_info("Writing summary to {.file revdep/README.md}")
   cloud_report_summary(file = file.path(root, "README.md"), all = all, results = results, pkg = pkg)
 
-  message("Writing problems to 'revdep/problems.md'")
+  cli_alert_info("Writing problems to {.file revdep/problems.md}")
   cloud_report_problems(file = file.path(root, "problems.md"), all = all, results = results, pkg = pkg)
 
-  message("Writing failures to 'revdep/failures.md'")
+  cli_alert_info("Writing failures to {.file revdep/failures.md}")
   cloud_report_failures(file = file.path(root, "failures.md"), results = results, pkg = pkg)
 
   invisible()
@@ -464,6 +469,7 @@ cloud_results <- function(job_id = cloud_job(), pkg = ".") {
 
   cloud_fetch_results(job_id, pkg = pkg)
 
+  cli_alert_info("Comparing results")
   lapply(list.dirs(file.path(cloud, job_id), full.names = TRUE, recursive = FALSE), cloud_compare)
 }
 
@@ -504,7 +510,8 @@ cloud_job <- function(job_id = NULL) {
   if (is.null(cloud_data$job_id)) {
     stop("No current job, please specify the `job_id` explicitly, or run a job with `cloud_check()`", call. = FALSE)
   }
-  cloud_data$job_id
+
+  invisible(cloud_data$job_id)
 }
 
 cloud_data <- new.env(parent = emptyenv())
