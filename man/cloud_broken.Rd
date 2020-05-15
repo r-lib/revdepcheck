@@ -16,7 +16,9 @@ cloud_broken(
 
 \item{pkg}{Path to package.}
 
-\item{install_failures}{Whether to include packages that timed out.}
+\item{install_failures}{Whether to include packages that failed to install.}
+
+\item{timeout_failures}{Whether to include packages that timed out.}
 }
 \value{
 A character vector with the names of broken packages, to be passed to \code{cloud_check()}.

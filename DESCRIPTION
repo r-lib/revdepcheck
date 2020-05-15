@@ -37,6 +37,7 @@ Imports:
     rlang (>= 0.3.0),
     RSQLite,
     sessioninfo,
+    tibble,
     utils,
     whoami,
     withr,

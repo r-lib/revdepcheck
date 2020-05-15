@@ -630,7 +630,7 @@ cloud_job_mapping <- function(job_id = cloud_job()) {
 #'
 #' @inheritParams cloud_report
 #' @param install_failures Whether to include packages that failed to install.
-#' @param install_failures Whether to include packages that timed out.
+#' @param timeout_failures Whether to include packages that timed out.
 #' @family cloud
 #' @returns A character vector with the names of broken packages, to be passed to `cloud_check()`.
 #' @export
