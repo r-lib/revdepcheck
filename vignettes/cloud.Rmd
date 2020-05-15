@@ -71,8 +71,11 @@ cloud_email()
 cloud_broken()
 
 # Open a web browser to the AWS job pane for the current job
-# Useful for debugging why a particular job failed
 cloud_browse()
+
+# Open the browser to the AWS job for a particular package
+# Useful for debugging why a particular job failed
+cloud_browse(package = "xyz")
 ```
 
 The functions all keep track of the most recently submitted `job_id`, so assuming you only have one job in a given R session you can call the functions without additional parameters.
