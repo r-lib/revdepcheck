@@ -5,6 +5,7 @@
 \alias{cloud_report_summary}
 \alias{cloud_report_problems}
 \alias{cloud_report_failures}
+\alias{cloud_report_cran}
 \title{Markdown report of reverse dependency check results from the cloud}
 \usage{
 cloud_report(
@@ -37,6 +38,8 @@ cloud_report_failures(
   file = "",
   results = NULL
 )
+
+cloud_report_cran(job_id = cloud_job(), pkg = ".", results = NULL)
 }
 \arguments{
 \item{job_id}{The batch job_id, as returned by \code{\link[=cloud_check]{cloud_check()}}.}

@@ -456,6 +456,15 @@ cloud_report_failures <- function(job_id = cloud_job(), pkg = ".", file = "", re
   revdep_report_failures(pkg = pkg, file = file, results = results)
 }
 
+#' @rdname cloud_report
+#' @export
+cloud_report_cran <- function(job_id = cloud_job(), pkg = ".", results = NULL) {
+  if (is.null(results)) {
+    results <- cloud_results(job_id, pkg)
+  }
+  revdep_report_cran(pkg = pkg, results = results)
+}
+
 #' Retrieve cloud results
 #'
 #' Intended for expert use only, this can be used as input to the [cloud_report()] and other functions.
