@@ -648,6 +648,7 @@ cloud_broken <- function(job_id = cloud_job(), pkg = ".", install_failures = FAL
 #' @param package If `NULL` browses to the URL of the overall job. If a package
 #'   name, browses to the URL for that specific package job.
 #' @inheritParams cloud_report
+#' @export
 cloud_browse <- function(job_id = cloud_job(), package = NULL) {
   if (is.null(package)) {
     utils::browseURL(sprintf("https://console.aws.amazon.com/batch/home?region=us-east-1#/jobs/%s", job_id))
