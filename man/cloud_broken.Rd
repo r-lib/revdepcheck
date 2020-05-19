@@ -2,7 +2,8 @@
 % Please edit documentation in R/cloud.R
 \name{cloud_broken}
 \alias{cloud_broken}
-\title{Retrieve the names broken packages}
+\alias{cloud_failed}
+\title{Retrieve the names broken or failed packages}
 \usage{
 cloud_broken(
   job_id = cloud_job(),
@@ -10,6 +11,8 @@ cloud_broken(
   install_failures = FALSE,
   timeout_failures = FALSE
 )
+
+cloud_failed(job_id = cloud_job(), pkg = ".")
 }
 \arguments{
 \item{job_id}{The batch job_id, as returned by \code{\link[=cloud_check]{cloud_check()}}.}
@@ -24,7 +27,10 @@ cloud_broken(
 A character vector with the names of broken packages, to be passed to \code{cloud_check()}.
 }
 \description{
-Retrieve the names broken packages
+Broken packages are those whose checks got worse with the dev version.
+Failed packages are those whose cloud jobs failed, either because the spot
+instance was shut down by AWS or because the checks used too much memory and
+were killed.
 }
 \seealso{
 Other cloud: 

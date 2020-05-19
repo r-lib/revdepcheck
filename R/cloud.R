@@ -635,8 +635,12 @@ cloud_job_mapping <- function(job_id = cloud_job()) {
   tibble::tibble(package = unlist(info$revdep_packages), id = seq_along(info$revdep_packages) - 1)
 }
 
-#' Retrieve the names broken packages
+#' Retrieve the names broken or failed packages
 #'
+#' Broken packages are those whose checks got worse with the dev version.
+#' Failed packages are those whose cloud jobs failed, either because the spot
+#' instance was shut down by AWS or because the checks used too much memory and
+#' were killed.
 #' @inheritParams cloud_report
 #' @param install_failures Whether to include packages that failed to install.
 #' @param timeout_failures Whether to include packages that timed out.
@@ -648,6 +652,15 @@ cloud_broken <- function(job_id = cloud_job(), pkg = ".", install_failures = FAL
   broken <- map_lgl(results, is_broken, install_failures, timeout_failures)
 
   map_chr(results[broken], `[[`, "package")
+}
+
+#' @rdname cloud_broken
+#' @export
+cloud_failed <- function(job_id = cloud_job(), pkg = ".") {
+  failed_indexes <- cloud_job_list(job_id, status = "FAILED")$jobSummaryList$arrayProperties$index
+  mapping <- cloud_job_mapping(job_id)
+
+  mapping$package[mapping$id %in% failed_indexes]
 }
 
 #' Browse to the AWS url for the job
