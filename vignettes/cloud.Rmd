@@ -1,0 +1,85 @@
+---
+title: "cloud"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{cloud}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(revdepcheck)
+```
+
+# Running reverse dependencies in the cloud
+
+revdepcheck now supports running reverse dependencies in the AWS cloud, via a suite a functions all prefixed with `cloud_*()`.
+This service is currently only available to be used by RStudio employees, but we hope to offer this service for the broader R community in the future.
+
+## Setup
+
+Set the `RSTUDIO_CLOUD_REVDEP_KEY` environment variable to the value of your AWS authentication key.
+Add this key to your `.Renviron` file with `usethis::edit_r_environ()` and restart R.
+
+Then install and configure the `aws` command line tool.
+
+```shell
+brew install awscli
+aws configure
+```
+You will be asked for an access key ID and a secret access key. Follow the instructions at https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html#cli-quick-configuration to create these.
+
+## Usage
+
+**Note** If you are going to be running 500+ tests and are using a development dependency (e.g. `Remote: org/pkg`) you may exhaust the GitHub API limits. A workaround is to use a 'url' remote, e.g. `Remote: url::https://github.com/org/pkg/archive/master.tar.gz`, which does not use the GitHub API.
+
+```r
+# Kickoff a new check
+# The devel package is automatically built from the current
+# working directory, or specify a pre-built package with `tarball`.
+cloud_check()
+
+# Follow current status of the job
+cloud_status()
+
+# Cancel a job
+cloud_cancel()
+
+# Retrieve results (if needed) and show a summary
+cloud_summary()
+
+# Retrieve results (if needed) and generate a markdown report
+cloud_report()
+
+# Retrieve details of a specfic package
+cloud_details(, "pkgXYZ")
+
+# Plot running time for each package in a job
+cloud_plot()
+
+# Email maintainers with failures
+cloud_email()
+
+# Retrieve packages that broke in a given job
+cloud_broken()
+
+# Open a web browser to the AWS job pane for the current job
+cloud_browse()
+
+# Open the browser to the AWS job for a particular package
+# Useful for debugging why a particular job failed
+cloud_browse(package = "xyz")
+```
+
+The functions all keep track of the most recently submitted `job_id`, so assuming you only have one job in a given R session you can call the functions without additional parameters.
+Provide the `job_id` explicitly otherwise, results write to `revdep/{job_id}`.
+
+The `cloud_*()` functions assume your current working directory is in the root directory of the package you are trying to run reverse dependencies for.
+If this is not the case all `cloud_*()` functions take a `pkg` parameter, so you can specify a different directory if needed.

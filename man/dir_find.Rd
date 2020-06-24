@@ -9,7 +9,7 @@
 dir_find(
   pkgdir,
   what = c("root", "db", "old", "new", "pkg", "check", "checks", "lib", "pkgold",
-    "pkgnew"),
+    "pkgnew", "cloud"),
   package = NULL
 )
 

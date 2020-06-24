@@ -157,6 +157,7 @@ failure_details <- function(x, file = "") {
 
 cat_package_info <- function(cmp, file) {
   chk <- cmp$new
+  type <- chk$type %||% "revdep"
   desc <-
     tryCatch(desc::desc(text = chk$description), error = function(x) NULL)
 
@@ -172,7 +173,7 @@ cat_package_info <- function(cmp, file) {
     addifx("BugReports"),
     addifx("Date/Publication"),
     paste0("* Number of recursive dependencies: ", num_deps(chk$package)),
-    paste0("\nRun `revdep_details(,\"", chk$package, "\")` for more info")
+    sprintf("\nRun `%s_details(, \"%s\")` for more info", type, chk$package)
   )
   out <- wrap_tag("details", out)
   cat(out, file = file)
@@ -242,11 +243,11 @@ format_details_bullet <- function(x, max_lines = 20) {
 #' @rdname revdep_report_summary
 #' @importFrom utils available.packages
 
-revdep_report_cran <- function(pkg = ".") {
+revdep_report_cran <- function(pkg = ".", results = db_results(pkg, NULL)) {
   opts <- options("crayon.enabled" = FALSE)
   on.exit(options(opts), add = TRUE)
 
-  comparisons <- db_results(pkg, NULL)
+  comparisons <- results
 
   status <- map_chr(comparisons, function(x) x$status %|0|% "i-")
   package <- map_chr(comparisons, "[[", "package")
