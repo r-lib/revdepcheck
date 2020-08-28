@@ -14,7 +14,7 @@ cloud_report(
   file = "",
   all = FALSE,
   results = NULL,
-  failures = FALSE
+  failures = TRUE
 )
 
 cloud_report_summary(
@@ -57,9 +57,7 @@ the package are reported.}
 
 \item{results}{Results from \code{\link[=cloud_results]{cloud_results()}}. Expert use only.}
 
-\item{failure}{Save failures to disk? This is false by default, since
-presumably you're running \code{cloud_check()} because you have a lot of
-packages to check, and failure reports can be very long.}
+\item{failures}{Save failures to disk?}
 }
 \description{
 You can use these functions to get intermediate reports of a running cloud check.

@@ -379,13 +379,11 @@ cloud_details <- function(job_id = cloud_job(), revdep, pkg = ".") {
 #' @inheritParams revdep_report_summary
 #' @param results Results from [cloud_results()]. Expert use only.
 #' @param job_id The batch job_id, as returned by [cloud_check()].
-#' @param failure Save failures to disk? This is false by default, since
-#'   presumably you're running `cloud_check()` because you have a lot of
-#'   packages to check, and failure reports can be very long.
+#' @param failures Save failures to disk?
 #' @inheritParams revdep_report
 #' @family cloud
 #' @export
-cloud_report <- function(job_id = cloud_job(), pkg = ".", file = "", all = FALSE, results = NULL, failures = FALSE) {
+cloud_report <- function(job_id = cloud_job(), pkg = ".", file = "", all = FALSE, results = NULL, failures = TRUE) {
   pkg <- pkg_check(pkg)
   root <- dir_find(pkg, "root")
 
