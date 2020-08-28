@@ -14,7 +14,7 @@ revdep_report_problems(pkg = ".", file = "", all = FALSE, results = NULL)
 
 revdep_report_failures(pkg = ".", file = "", results = NULL)
 
-revdep_report_cran(pkg = ".", results = db_results(pkg, NULL))
+revdep_report_cran(pkg = ".", file = "", results = NULL)
 
 revdep_report(pkg = ".", all = FALSE, results = NULL)
 }

@@ -243,54 +243,60 @@ format_details_bullet <- function(x, max_lines = 20) {
 #' @rdname revdep_report_summary
 #' @importFrom utils available.packages
 
-revdep_report_cran <- function(pkg = ".", results = db_results(pkg, NULL)) {
+revdep_report_cran <- function(pkg = ".", file = "", results = NULL) {
   opts <- options("crayon.enabled" = FALSE)
   on.exit(options(opts), add = TRUE)
 
-  comparisons <- results
+  if (is_string(file) && !identical(file, "")) {
+    file <- file(file, encoding = "UTF-8", open = "w")
+    on.exit(close(file), add = TRUE)
+  }
 
-  status <- map_chr(comparisons, function(x) x$status %|0|% "i-")
-  package <- map_chr(comparisons, "[[", "package")
-  on_cran <- map_lgl(comparisons, on_cran)
+  results <- results %||% db_results(pkg, NULL)
+
+  status <- map_chr(results, function(x) x$status %|0|% "i-")
+  package <- map_chr(results, "[[", "package")
+  on_cran <- map_lgl(results, on_cran)
 
   broke <- status == "-" & on_cran
   failed <- !(status %in% c("+", "-")) & on_cran
 
-  cat_line("## revdepcheck results")
-  cat_line()
+  cat_line("## revdepcheck results", file = file)
+  cat_line(file = file)
   cat_line(
-    "We checked ", length(comparisons), " reverse dependencies",
+    "We checked ", length(results), " reverse dependencies",
     if (any(!on_cran))
       paste0(" (", sum(on_cran), " from CRAN + ", sum(!on_cran), " from BioConductor)"),
-    ", comparing R CMD check results across CRAN and dev versions of this package."
+    ", comparing R CMD check results across CRAN and dev versions of this package.",
+    file = file
   )
-  cat_line()
-  cat_line(" * We saw ", sum(broke), " new problems")
-  cat_line(" * We failed to check ", sum(failed), " packages")
+  cat_line(file = file)
+  cat_line(" * We saw ", sum(broke), " new problems", file = file)
+  cat_line(" * We failed to check ", sum(failed), " packages", file = file)
   if (any(broke | failed)) {
-      cat_line()
-      cat_line("Issues with CRAN packages are summarised below.")
+      cat_line(file = file)
+      cat_line("Issues with CRAN packages are summarised below.", file = file)
   }
-  cat_line()
+  cat_line(file = file)
 
   if (any(broke)) {
-    cat_line("### New problems")
-    cat_line("(This reports the first line of each new failure)")
-    cat_line()
+    cat_line("### New problems", file = file)
+    cat_line("(This reports the first line of each new failure)", file = file)
+    cat_line(file = file)
 
-    issues <- map(comparisons[broke], "[[", "cmp")
+    issues <- map(results[broke], "[[", "cmp")
     new <- map(issues, function(x) x$output[x$change == 1])
     first_line <- map(new, function(x) map_chr(strsplit(x, "\n"), "[[", 1))
     collapsed <- map_chr(first_line, function(x) paste0("  ", x, "\n", collapse = ""))
 
-    cat(paste0("* ", package[broke], "\n", collapsed, "\n", collapse = ""))
+    cat(paste0("* ", package[broke], "\n", collapsed, "\n", collapse = ""), file = file)
   }
 
   if (any(failed)) {
-    cat_line("### Failed to check")
-    cat_line()
+    cat_line("### Failed to check", file = file)
+    cat_line(file = file)
     desc <- unname(c(i = "failed to install", t = "check timed out")[status])
-    cat(paste0("* ", format(package[failed]), " (", desc[failed], ")\n"), sep = "")
+    cat(paste0("* ", format(package[failed]), " (", desc[failed], ")\n"), sep = "", file = file)
   }
 
   invisible()
@@ -300,9 +306,9 @@ on_cran <- function(x) {
   isTRUE(x$new$cran)
 }
 
-#' `revdep_report()` writes the `README.md` and `problems.md`. This is
-#' normally done automatically when the checks are complete, but you
-#' can also do it when checks are in progress to get a partial report.
+#' `revdep_report()` writes `README.md`, `problems.md`, `failures.md`, and
+#' `cran.md`. This is normally done automatically when the checks are complete,
+#' but you can also do it when checks are in progress to get a partial report.
 #'
 #' @export
 #' @rdname revdep_report_summary
@@ -335,6 +341,9 @@ revdep_report <- function(pkg = ".", all = FALSE, results = NULL) {
 
   message("Writing failures to 'revdep/failures.md'")
   revdep_report_failures(pkg, file = file.path(root, "failures.md"), results = results)
+
+  message("Writing CRAN report to 'revdep/cran.md'")
+  revdep_report_cran(pkg, file = file.path(root, "cran.md"), results = results)
 
   invisible()
 }
