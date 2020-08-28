@@ -379,10 +379,13 @@ cloud_details <- function(job_id = cloud_job(), revdep, pkg = ".") {
 #' @inheritParams revdep_report_summary
 #' @param results Results from [cloud_results()]. Expert use only.
 #' @param job_id The batch job_id, as returned by [cloud_check()].
+#' @param failure Save failures to disk? This is false by default, since
+#'   presumably you're running `cloud_check()` because you have a lot of
+#'   packages to check, and failure reports can be very long.
 #' @inheritParams revdep_report
 #' @family cloud
 #' @export
-cloud_report <- function(job_id = cloud_job(), pkg = ".", file = "", all = FALSE, results = NULL) {
+cloud_report <- function(job_id = cloud_job(), pkg = ".", file = "", all = FALSE, results = NULL, failures = FALSE) {
   pkg <- pkg_check(pkg)
   root <- dir_find(pkg, "root")
 
@@ -398,8 +401,15 @@ cloud_report <- function(job_id = cloud_job(), pkg = ".", file = "", all = FALSE
   cli_alert_info("Writing problems to {.file revdep/problems.md}")
   cloud_report_problems(file = file.path(root, "problems.md"), all = all, results = results, pkg = pkg)
 
-  cli_alert_info("Writing failures to {.file revdep/failures.md}")
-  cloud_report_failures(file = file.path(root, "failures.md"), results = results, pkg = pkg)
+  if (failures) {
+    cli_alert_info("Writing failures to {.file revdep/failures.md}")
+    cloud_report_failures(file = file.path(root, "failures.md"), results = results, pkg = pkg)
+  } else {
+    unlink(file.path(root, "failures.md"))
+  }
+
+  cli_alert_info("Writing CRAN comments to {.file cran-comments.md}")
+  revdep_report_cran(results = results, pkg = pkg)
 
   invisible()
 }
