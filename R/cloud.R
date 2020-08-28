@@ -407,8 +407,8 @@ cloud_report <- function(job_id = cloud_job(), pkg = ".", file = "", all = FALSE
     unlink(file.path(root, "failures.md"))
   }
 
-  cli_alert_info("Writing CRAN comments to {.file cran-comments.md}")
-  revdep_report_cran(results = results, pkg = pkg)
+  cli_alert_info("Writing CRAN comments to {.file cran.md}")
+  revdep_report_cran(file = file.path(root, "cran.md"), results = results, pkg = pkg)
 
   invisible()
 }
