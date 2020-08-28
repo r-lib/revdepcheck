@@ -35,7 +35,7 @@
 
 dir_find <- function(pkgdir,
                      what = c("root", "db", "old", "new", "pkg", "check",
-                              "checks", "lib", "pkgold", "pkgnew"),
+                              "checks", "lib", "pkgold", "pkgnew", "cloud"),
                      package = NULL) {
 
   pkgdir <- pkg_check(pkgdir)
@@ -63,7 +63,8 @@ dir_find <- function(pkgdir,
     pkgold = c(file.path(pkgdir, "revdep", idx("library"), package),
                file.path(pkgdir, "revdep", idx("library"), pkg, "old")),
     pkgnew = c(file.path(pkgdir, "revdep", idx("library"), package),
-               file.path(pkgdir, "revdep", idx("library"), pkg, "new"))
+               file.path(pkgdir, "revdep", idx("library"), pkg, "new")),
+    cloud = c(file.path(pkgdir, "revdep", idx("cloud")))
   )
 }
 

@@ -6,11 +6,11 @@ revdep_maintainers <- function(pkg = ".") {
   pkg <- pkg_check(pkg)
 
   m <- db_maintainers(pkg)
-  structure(m, class = "maintainers")
+  structure(m, class = "revdepcheck_maintainers")
 }
 
 #' @export
-print.maintainers <- function(x, ...) {
+print.revdepcheck_maintainers <- function(x, ...) {
   cat_line(paste0(names(x), " - ", x, collapse = ",\n"))
 }
 
