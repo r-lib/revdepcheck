@@ -14,6 +14,7 @@ URL: https://github.com/r-lib/revdepcheck#readme
 BugReports: https://github.com/r-lib/revdepcheck/issues
 Imports: 
     assertthat,
+    brio,
     curl,
     callr,
     cli,
@@ -51,7 +52,8 @@ Suggests:
 Remotes:
     r-lib/crancache,
     r-lib/crayon,
-    r-lib/rcmdcheck
+    r-lib/rcmdcheck,
+    r-lib/brio # https://github.com/r-lib/brio/commit/6043e7c834
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
