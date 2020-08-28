@@ -13,7 +13,8 @@ cloud_report(
   pkg = ".",
   file = "",
   all = FALSE,
-  results = NULL
+  results = NULL,
+  failures = TRUE
 )
 
 cloud_report_summary(
@@ -55,6 +56,8 @@ omitted by default, and only problems seen with the new version of
 the package are reported.}
 
 \item{results}{Results from \code{\link[=cloud_results]{cloud_results()}}. Expert use only.}
+
+\item{failures}{Save failures to disk?}
 }
 \description{
 You can use these functions to get intermediate reports of a running cloud check.
