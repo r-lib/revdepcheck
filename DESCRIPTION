@@ -52,7 +52,8 @@ Suggests:
 Remotes:
     r-lib/crancache,
     r-lib/crayon,
-    r-lib/rcmdcheck
+    r-lib/rcmdcheck,
+    r-lib/brio
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
