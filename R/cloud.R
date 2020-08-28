@@ -285,10 +285,11 @@ cloud_check_result <- function(check_log, description, dependency_error) {
     )
   }
 
-  stdout <- readChar(check_log, nchars = file.size(check_log))
-
-  # Make sure we don't have \r on windows
-  stdout <- rcmdcheck:::win2unix(stdout)
+  stdout <- brio::read_file(check_log)
+  # Fix invalid characters
+  stdout <- iconv(stdout, "UTF-8", "UTF-8", sub = "bytes")
+  # Strip \r
+  stdout <- gsub("\r\n", "\n", stdout, fixed = TRUE)
 
   entries <- strsplit(paste0("\n", stdout), "\n\\*+[ ]")[[1]][-1]
 
