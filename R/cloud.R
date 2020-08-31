@@ -488,7 +488,15 @@ cloud_results <- function(job_id = cloud_job(), pkg = ".") {
   cloud_fetch_results(job_id, pkg = pkg)
 
   cli_alert_info("Comparing results")
-  lapply(list.dirs(file.path(cloud, job_id), full.names = TRUE, recursive = FALSE), cloud_compare)
+  pkgs <- list.dirs(file.path(cloud, job_id), full.names = TRUE, recursive = FALSE)
+
+  pb <- progress_bar$new(format = "Processing package results :percent (:package)", total = length(pkgs))
+  out <- lapply(pkgs, function(pkg) {
+    pb$tick(tokens = list(package = basename(pkg)))
+    cloud_compare(pkg)
+  })
+  pb$terminate()
+  out
 }
 
 #' @inheritParams cloud_report
