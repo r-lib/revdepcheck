@@ -290,7 +290,7 @@ revdep_report_cran <- function(pkg = ".", file = "", results = NULL) {
   cat_line(
     "We checked ", length(results), " reverse dependencies",
     if (any(!on_cran))
-      paste0(" (", sum(on_cran), " from CRAN + ", sum(!on_cran), " from BioConductor)"),
+      paste0(" (", sum(on_cran), " from CRAN + ", sum(!on_cran), " from Bioconductor)"),
     ", comparing R CMD check results across CRAN and dev versions of this package.",
     file = file
   )
