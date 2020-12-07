@@ -4,7 +4,12 @@
 \alias{cloud_check}
 \title{Submit a reverse dependency checking job to the cloud}
 \usage{
-cloud_check(pkg = ".", tarball = NULL, revdep_packages = NULL)
+cloud_check(
+  pkg = ".",
+  tarball = NULL,
+  revdep_packages = NULL,
+  r_version = "4.0.2"
+)
 }
 \arguments{
 \item{pkg}{Path to package.}
@@ -14,6 +19,8 @@ automatically built for the package at \code{pkg} by \code{\link[pkgbuild:build]
 
 \item{revdep_packages}{A character vector of packages to check, if \code{NULL}
 equal to \code{\link[=cran_revdeps]{cran_revdeps()}}}
+
+\item{r_version}{The R version to use.}
 }
 \value{
 The AWS Batch job-id
