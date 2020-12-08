@@ -46,7 +46,7 @@ deps_install_opts <- function(pkgdir, pkgname, quiet = FALSE, env = character())
 }
 
 deps_opts <- function(pkgname, exclude = character()) {
-  ## We set repos, so that dependencies from BioConductor are installed
+  ## We set repos, so that dependencies from Bioconductor are installed
   ## automatically
   repos <- get_repos(bioc = TRUE)
 

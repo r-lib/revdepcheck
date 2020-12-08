@@ -12,7 +12,7 @@ cran_revdeps(package, dependencies = TRUE, bioc = FALSE)
 \item{dependencies}{Which types of revdeps should be checked. For CRAN
 release, we recommend using the default.}
 
-\item{bioc}{Also check revdeps that live in BioConductor?}
+\item{bioc}{Also check revdeps that live in Bioconductor?}
 }
 \description{
 Retrieve the reverse dependencies for a package

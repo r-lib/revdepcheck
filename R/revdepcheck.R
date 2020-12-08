@@ -39,7 +39,7 @@
 #' @param timeout Maximum time to wait (in seconds) for `R CMD check` to
 #'   complete. Default is 10 minutes.
 #' @param num_workers Number of parallel workers to use
-#' @param bioc Also check revdeps that live in BioConductor?
+#' @param bioc Also check revdeps that live in Bioconductor?
 #' @param env Environment variables to set for the install and check
 #'   processes. See [revdep_env_vars()].
 #'

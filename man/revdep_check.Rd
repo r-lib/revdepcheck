@@ -30,7 +30,7 @@ complete. Default is 10 minutes.}
 
 \item{num_workers}{Number of parallel workers to use}
 
-\item{bioc}{Also check revdeps that live in BioConductor?}
+\item{bioc}{Also check revdeps that live in Bioconductor?}
 
 \item{env}{Environment variables to set for the install and check
 processes. See \code{\link[=revdep_env_vars]{revdep_env_vars()}}.}
