@@ -6,7 +6,7 @@
 \usage{
 cloud_email(
   type = c("broken", "failed"),
-  job_id = cloud_job(),
+  job_id = cloud_job(pkg = pkg),
   pkg = ".",
   packages = NULL,
   draft = FALSE

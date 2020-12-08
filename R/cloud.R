@@ -527,8 +527,13 @@ cloud_email <- function(type = c("broken", "failed"), job_id = cloud_job(pkg = p
 
 #' Return the current cloud job
 #'
-#' This is automatically set by [cloud_check()] and only lasts for the current R session.
+#' The `job_id` is automatically set by [cloud_check()] and is remembered for
+#' the duration of the current R session. If there is no active `job_id`, but
+#' there are local cloud check results, `job_id` is inferred from the most
+#' recently modified cloud check results.
+#'
 #' @param job_id If not `NULL`, sets the active `job_id` to the input.
+#' @inheritParams cloud_report
 #' @export
 cloud_job <- function(job_id = NULL, pkg = ".") {
   cloud_data$job_id <- job_id %||% cloud_data$job_id
