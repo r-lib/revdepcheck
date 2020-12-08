@@ -548,7 +548,7 @@ cloud_job <- function(job_id = NULL, pkg = ".") {
   }
   latest <- cloud_dirs[which.max(file.info(cloud_dirs)$mtime)]
   cloud_data$job_id <- basename(latest)
-  cli_alert_success("Most recent batch job {.arg job_id}: {.val {cloud_data$job_id}}")
+  cli_alert_success("Most recent cloud job {.arg job_id}: {.val {cloud_data$job_id}}")
   invisible(cloud_data$job_id)
 }
 
