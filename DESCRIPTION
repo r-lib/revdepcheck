@@ -10,7 +10,8 @@ Authors@R: c(
 Description: Automated, isolated reserve dependency checking, with automatic
     comparison of the results to the current CRAN checks.
 License: MIT + file LICENSE
-URL: https://github.com/r-lib/revdepcheck#readme
+URL: https://r-lib.github.io/revdepcheck,
+    https://github.com/r-lib/revdepcheck#readme
 BugReports: https://github.com/r-lib/revdepcheck/issues
 Imports: 
     assertthat,
