@@ -101,7 +101,7 @@ calc_eta <- function(creation_time, current_time, running, completed, total) {
 #' @family cloud
 #' @inheritParams cloud_report
 #' @export
-cloud_fetch_results <- function(job_id = cloud_job(pkg), pkg = ".") {
+cloud_fetch_results <- function(job_id = cloud_job(pkg = pkg), pkg = ".") {
   pkg <- pkg_check(pkg)
   cloud <- dir_find(pkg, "cloud")
 
@@ -352,7 +352,7 @@ cloud_compare <- function(pkg) {
 #' @inheritParams cloud_report
 #' @family cloud
 #' @export
-cloud_summary <- function(job_id = cloud_job(pkg), pkg = ".") {
+cloud_summary <- function(job_id = cloud_job(pkg = pkg), pkg = ".") {
   results <- cloud_results(job_id = job_id, pkg = pkg)
   structure(
     results,
@@ -366,7 +366,7 @@ cloud_summary <- function(job_id = cloud_job(pkg), pkg = ".") {
 #' @inheritParams cloud_report
 #' @family cloud
 #' @export
-cloud_details <- function(job_id = cloud_job(pkg), revdep, pkg = ".") {
+cloud_details <- function(job_id = cloud_job(pkg = pkg), revdep, pkg = ".") {
   pkg <- pkg_check(pkg)
   cloud <- dir_find(pkg, "cloud")
 
@@ -386,7 +386,7 @@ cloud_details <- function(job_id = cloud_job(pkg), revdep, pkg = ".") {
 #' @inheritParams revdep_report
 #' @family cloud
 #' @export
-cloud_report <- function(job_id = cloud_job(pkg), pkg = ".", file = "", all = FALSE, results = NULL, failures = TRUE) {
+cloud_report <- function(job_id = cloud_job(pkg = pkg), pkg = ".", file = "", all = FALSE, results = NULL, failures = TRUE) {
   pkg <- pkg_check(pkg)
   root <- dir_find(pkg, "root")
 
@@ -417,7 +417,7 @@ cloud_report <- function(job_id = cloud_job(pkg), pkg = ".", file = "", all = FA
 
 #' @rdname cloud_report
 #' @export
-cloud_report_summary <- function(job_id = cloud_job(pkg), file = "", all = FALSE, pkg = ".", results = NULL) {
+cloud_report_summary <- function(job_id = cloud_job(pkg = pkg), file = "", all = FALSE, pkg = ".", results = NULL) {
   if (is.null(results)) {
     results <- cloud_results(job_id, pkg)
   }
@@ -451,7 +451,7 @@ cloud_report_summary <- function(job_id = cloud_job(pkg), file = "", all = FALSE
 
 #' @rdname cloud_report
 #' @export
-cloud_report_problems <- function(job_id = cloud_job(pkg), pkg = ".", file = "", all = FALSE, results = NULL) {
+cloud_report_problems <- function(job_id = cloud_job(pkg = pkg), pkg = ".", file = "", all = FALSE, results = NULL) {
   if (is.null(results)) {
     results <- cloud_results(job_id, pkg)
   }
@@ -460,7 +460,7 @@ cloud_report_problems <- function(job_id = cloud_job(pkg), pkg = ".", file = "",
 
 #' @rdname cloud_report
 #' @export
-cloud_report_failures <- function(job_id = cloud_job(pkg), pkg = ".", file = "", results = NULL) {
+cloud_report_failures <- function(job_id = cloud_job(pkg = pkg), pkg = ".", file = "", results = NULL) {
   if (is.null(results)) {
     results <- cloud_results(job_id, pkg)
   }
@@ -469,7 +469,7 @@ cloud_report_failures <- function(job_id = cloud_job(pkg), pkg = ".", file = "",
 
 #' @rdname cloud_report
 #' @export
-cloud_report_cran <- function(job_id = cloud_job(pkg), pkg = ".", results = NULL) {
+cloud_report_cran <- function(job_id = cloud_job(pkg = pkg), pkg = ".", results = NULL) {
   if (is.null(results)) {
     results <- cloud_results(job_id, pkg)
   }
@@ -483,7 +483,7 @@ cloud_report_cran <- function(job_id = cloud_job(pkg), pkg = ".", results = NULL
 #' @family cloud
 #' @keywords internal
 #' @export
-cloud_results <- function(job_id = cloud_job(pkg), pkg = ".") {
+cloud_results <- function(job_id = cloud_job(pkg = pkg), pkg = ".") {
   pkg <- pkg_check(pkg)
   cloud <- dir_find(pkg, "cloud")
 
@@ -504,7 +504,7 @@ cloud_results <- function(job_id = cloud_job(pkg), pkg = ".") {
 #' @inheritParams cloud_report
 #' @inherit revdep_email
 #' @export
-cloud_email <- function(type = c("broken", "failed"), job_id = cloud_job(pkg), pkg = ".", packages = NULL, draft = FALSE) {
+cloud_email <- function(type = c("broken", "failed"), job_id = cloud_job(pkg = pkg), pkg = ".", packages = NULL, draft = FALSE) {
   type <- match.arg(type)
 
   package_results <- cloud_results(job_id, pkg)
@@ -530,7 +530,7 @@ cloud_email <- function(type = c("broken", "failed"), job_id = cloud_job(pkg), p
 #' This is automatically set by [cloud_check()] and only lasts for the current R session.
 #' @param job_id If not `NULL`, sets the active `job_id` to the input.
 #' @export
-cloud_job <- function(pkg = ".", job_id = NULL) {
+cloud_job <- function(job_id = NULL, pkg = ".") {
   cloud_data$job_id <- job_id %||% cloud_data$job_id
   if (!is.null(cloud_data$job_id)) {
     return(invisible(cloud_data$job_id))
@@ -671,7 +671,7 @@ cloud_job_mapping <- function(job_id = cloud_job()) {
 #' @family cloud
 #' @returns A character vector with the names of broken packages, to be passed to `cloud_check()`.
 #' @export
-cloud_broken <- function(job_id = cloud_job(pkg), pkg = ".", install_failures = FALSE, timeout_failures = FALSE) {
+cloud_broken <- function(job_id = cloud_job(pkg = pkg), pkg = ".", install_failures = FALSE, timeout_failures = FALSE) {
   results <- cloud_results(job_id = job_id, pkg = pkg)
   broken <- map_lgl(results, is_broken, install_failures, timeout_failures)
 
@@ -680,7 +680,7 @@ cloud_broken <- function(job_id = cloud_job(pkg), pkg = ".", install_failures = 
 
 #' @rdname cloud_broken
 #' @export
-cloud_failed <- function(job_id = cloud_job(pkg), pkg = ".") {
+cloud_failed <- function(job_id = cloud_job(pkg = pkg), pkg = ".") {
   failed_indexes <- cloud_job_list(job_id, status = "FAILED")$jobSummaryList$arrayProperties$index
   mapping <- cloud_job_mapping(job_id)
 
