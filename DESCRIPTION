@@ -15,12 +15,12 @@ BugReports: https://github.com/r-lib/revdepcheck/issues
 Imports: 
     assertthat,
     brio,
-    curl,
     callr,
     cli,
     clisymbols,
     crancache (>= 0.0.0.9001),
     crayon,
+    curl,
     DBI,
     desc (>= 1.1.1.9002),
     glue,
@@ -45,18 +45,20 @@ Imports:
     withr,
     yaml
 Suggests: 
+    covr,
     debugme,
     forcats,
     ggplot2,
-    testthat,
-    rmarkdown
+    rmarkdown,
+    testthat
+VignetteBuilder: 
+    knitr
 Remotes:
+    r-lib/brio,
     r-lib/crancache,
     r-lib/crayon,
-    r-lib/rcmdcheck,
-    r-lib/brio
+    r-lib/rcmdcheck
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
-VignetteBuilder: knitr
