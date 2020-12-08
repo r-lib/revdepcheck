@@ -112,7 +112,9 @@ cloud_fetch_results <- function(job_id = cloud_job(pkg = pkg), pkg = ".") {
 
   out_dir <- file.path(cloud, job_id)
 
-  dir.create(out_dir, showWarnings = FALSE, recursive = TRUE)
+  if (!dir.exists(out_dir)) {
+    dir.create(out_dir, showWarnings = FALSE, recursive = TRUE)
+  }
 
   rel_out_dir <- sub(paste0(pkg_check(pkg), "/"), "", out_dir, fixed = TRUE)
   cli_alert_info("Syncing results to {.file {rel_out_dir}}")
@@ -200,6 +202,9 @@ cloud_check <- function(pkg = ".", tarball = NULL, revdep_packages = NULL, r_ver
   cli_alert("Run {.fun cloud_status} to monitor job status")
 
   cloud_job(job_id = job_id)
+  cloud <- dir_find(pkg, "cloud")
+  out_dir <- file.path(cloud, job_id)
+  dir.create(out_dir, showWarnings = FALSE, recursive = TRUE)
 
   invisible(job_id)
 }
