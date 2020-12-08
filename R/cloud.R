@@ -542,10 +542,16 @@ cloud_job <- function(job_id = NULL, pkg = ".") {
   }
 
   pkg <- pkg_check(pkg)
-  cloud_dirs <- list.dirs(dir_find(pkg, "cloud"), recursive = FALSE)
-  if (length(cloud_dirs) < 1) {
-    stop("No previous `cloud_check()` results found, can't discover `job_id`", call. = FALSE)
+  cloud <- dir_find(pkg, "cloud")
+  if (dir.exists(cloud)) {
+    cloud_dirs <- list.dirs(cloud, recursive = FALSE)
+  } else {
+    cloud_dirs <- character()
   }
+  if (length(cloud_dirs) < 1) {
+    stop("Can't find any previous `cloud_check()` results locally, can't discover `job_id`", call. = FALSE)
+  }
+
   latest <- cloud_dirs[which.max(file.info(cloud_dirs)$mtime)]
   cloud_data$job_id <- basename(latest)
   cli_alert_success("Most recent cloud job {.arg job_id}: {.val {cloud_data$job_id}}")
