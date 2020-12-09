@@ -40,7 +40,10 @@
 
 
 <meta property="og:title" content="Return the current cloud job — cloud_job" />
-<meta property="og:description" content="This is automatically set by cloud_check() and only lasts for the current R session." />
+<meta property="og:description" content="The job_id is automatically set by cloud_check() and is remembered for
+the duration of the current R session. If there is no active job_id, but
+there are local cloud check results, job_id is inferred from the most
+recently modified cloud check results." />
 
 
 
@@ -129,10 +132,13 @@
     </div>
 
     <div class="ref-description">
-    <p>This is automatically set by <code><a href='cloud_check.html'>cloud_check()</a></code> and only lasts for the current R session.</p>
+    <p>The <code>job_id</code> is automatically set by <code><a href='cloud_check.html'>cloud_check()</a></code> and is remembered for
+the duration of the current R session. If there is no active <code>job_id</code>, but
+there are local cloud check results, <code>job_id</code> is inferred from the most
+recently modified cloud check results.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>cloud_job</span><span class='op'>(</span>job_id <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>cloud_job</span><span class='op'>(</span>job_id <span class='op'>=</span> <span class='cn'>NULL</span>, pkg <span class='op'>=</span> <span class='st'>"."</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -140,6 +146,10 @@
     <tr>
       <th>job_id</th>
       <td><p>If not <code>NULL</code>, sets the active <code>job_id</code> to the input.</p></td>
+    </tr>
+    <tr>
+      <th>pkg</th>
+      <td><p>Path to package.</p></td>
     </tr>
     </table>
 
