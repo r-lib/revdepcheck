@@ -6,13 +6,13 @@
 \title{Retrieve the names broken or failed packages}
 \usage{
 cloud_broken(
-  job_id = cloud_job(),
+  job_id = cloud_job(pkg = pkg),
   pkg = ".",
   install_failures = FALSE,
   timeout_failures = FALSE
 )
 
-cloud_failed(job_id = cloud_job(), pkg = ".")
+cloud_failed(job_id = cloud_job(pkg = pkg), pkg = ".")
 }
 \arguments{
 \item{job_id}{The batch job_id, as returned by \code{\link[=cloud_check]{cloud_check()}}.}

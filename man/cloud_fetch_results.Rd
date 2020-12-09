@@ -4,7 +4,7 @@
 \alias{cloud_fetch_results}
 \title{Fetch results from the cloud}
 \usage{
-cloud_fetch_results(job_id = cloud_job(), pkg = ".")
+cloud_fetch_results(job_id = cloud_job(pkg = pkg), pkg = ".")
 }
 \arguments{
 \item{job_id}{The batch job_id, as returned by \code{\link[=cloud_check]{cloud_check()}}.}

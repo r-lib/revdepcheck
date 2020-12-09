@@ -4,7 +4,7 @@
 \alias{cloud_summary}
 \title{Display revdep results}
 \usage{
-cloud_summary(job_id = cloud_job(), pkg = ".")
+cloud_summary(job_id = cloud_job(pkg = pkg), pkg = ".")
 }
 \arguments{
 \item{job_id}{The batch job_id, as returned by \code{\link[=cloud_check]{cloud_check()}}.}

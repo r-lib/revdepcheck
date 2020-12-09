@@ -9,7 +9,7 @@
 \title{Markdown report of reverse dependency check results from the cloud}
 \usage{
 cloud_report(
-  job_id = cloud_job(),
+  job_id = cloud_job(pkg = pkg),
   pkg = ".",
   file = "",
   all = FALSE,
@@ -18,7 +18,7 @@ cloud_report(
 )
 
 cloud_report_summary(
-  job_id = cloud_job(),
+  job_id = cloud_job(pkg = pkg),
   file = "",
   all = FALSE,
   pkg = ".",
@@ -26,7 +26,7 @@ cloud_report_summary(
 )
 
 cloud_report_problems(
-  job_id = cloud_job(),
+  job_id = cloud_job(pkg = pkg),
   pkg = ".",
   file = "",
   all = FALSE,
@@ -34,13 +34,13 @@ cloud_report_problems(
 )
 
 cloud_report_failures(
-  job_id = cloud_job(),
+  job_id = cloud_job(pkg = pkg),
   pkg = ".",
   file = "",
   results = NULL
 )
 
-cloud_report_cran(job_id = cloud_job(), pkg = ".", results = NULL)
+cloud_report_cran(job_id = cloud_job(pkg = pkg), pkg = ".", results = NULL)
 }
 \arguments{
 \item{job_id}{The batch job_id, as returned by \code{\link[=cloud_check]{cloud_check()}}.}
