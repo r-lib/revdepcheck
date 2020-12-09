@@ -112,9 +112,7 @@ cloud_fetch_results <- function(job_id = cloud_job(pkg = pkg), pkg = ".") {
 
   out_dir <- file.path(cloud, job_id)
 
-  if (!dir.exists(out_dir)) {
-    dir.create(out_dir, showWarnings = FALSE, recursive = TRUE)
-  }
+  dir.create(out_dir, showWarnings = FALSE, recursive = TRUE)
 
   rel_out_dir <- sub(paste0(pkg_check(pkg), "/"), "", out_dir, fixed = TRUE)
   cli_alert_info("Syncing results to {.file {rel_out_dir}}")
