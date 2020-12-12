@@ -338,7 +338,7 @@ cloud_compare <- function(pkg) {
   new <- file.path(pkg, "new", paste0(basename(pkg), ".Rcheck"), "00check.log")
 
   dependency_path <- file.path(pkg, "dependency_install.log")
-  dependency_error <- any(grep("ERROR: .*is not available for package", readLines(dependency_path))) || !(file.exists(old) && file.exists(new))
+  dependency_error <- any(grep("ERROR: .*is not available for package", readLines(dependency_path, warn = FALSE))) || !(file.exists(old) && file.exists(new))
   old <- cloud_check_result(old, description, dependency_error)
   new <- cloud_check_result(new, description, dependency_error)
   if (isTRUE(dependency_error)) {
