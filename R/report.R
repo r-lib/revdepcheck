@@ -143,11 +143,11 @@ failure_details <- function(x, file = "") {
         cat_header("Installation", level = 2, file = file)
         cat_header("Devel", level = 3, file = file)
         cat_line("```", file = file)
-        cat_line(line_trunc(x$new$install_out), file = file)
+        cat_line(line_trunc(x$new$install_out), sep = "\n", file = file)
         cat_line("```", file = file)
         cat_header("CRAN", level = 3, file = file)
         cat_line("```", file = file)
-        cat_line(line_trunc(x$old[[1]]$install_out), file = file)
+        cat_line(line_trunc(x$old[[1]]$install_out), sep = "\n", file = file)
         cat_line("```", file = file)
       }
     }
