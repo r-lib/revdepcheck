@@ -124,13 +124,13 @@ failure_details <- function(x, file = "") {
     cat_header("Error before installation", level = 2, file = file)
     cat_header("Devel", level = 3, file = file)
     cat_line("```", file = file)
-    cat_line(x$new$stdout, sep = "\n", file = file)
-    cat_line(x$new$stderr, sep = "\n", file = file)
+    cat_line(line_trunc(x$new$stdout), sep = "\n", file = file)
+    cat_line(line_trunc(x$new$stderr), sep = "\n", file = file)
     cat_line("```", file = file)
     cat_header("CRAN", level = 3, file = file)
     cat_line("```", file = file)
-    cat_line(x$old$stdout, sep = "\n", file = file)
-    cat_line(x$old$stderr, sep = "\n", file = file)
+    cat_line(line_trunc(x$old$stdout), sep = "\n", file = file)
+    cat_line(line_trunc(x$old$stderr), sep = "\n", file = file)
     cat_line("```", file = file)
 
     } else {
@@ -143,11 +143,11 @@ failure_details <- function(x, file = "") {
         cat_header("Installation", level = 2, file = file)
         cat_header("Devel", level = 3, file = file)
         cat_line("```", file = file)
-        cat_line(x$new$install_out, file = file)
+        cat_line(line_trunc(x$new$install_out), file = file)
         cat_line("```", file = file)
         cat_header("CRAN", level = 3, file = file)
         cat_line("```", file = file)
-        cat_line(x$old[[1]]$install_out, file = file)
+        cat_line(line_trunc(x$old[[1]]$install_out), file = file)
         cat_line("```", file = file)
       }
     }
@@ -242,13 +242,9 @@ format_details_bullet <- function(x, max_lines = 20) {
   lines <- strsplit(x, "\n")[[1]]
 
   title <- trimws(lines[[1]])
-  details <- lines[-1]
+  details <- line_trunc(lines[-1], 10)
 
-  n <- length(details)
-  if (n > max_lines) {
-    details <- c("...", details[(n - max_lines):n])
-  }
-  if (n > 0) {
+  if (length(details) > 0) {
     details <- c("```", details, "```")
   }
 
