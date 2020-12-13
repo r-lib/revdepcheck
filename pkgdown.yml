@@ -3,7 +3,7 @@ pkgdown: 1.6.1
 pkgdown_sha: ~
 articles:
   cloud: cloud.html
-last_built: 2020-12-09T15:52Z
+last_built: 2020-12-13T14:58Z
 urls:
   reference: https://r-lib.github.io/revdepcheck/reference
   article: https://r-lib.github.io/revdepcheck/articles
