@@ -651,7 +651,7 @@ cloud_job_info <- function(job_id = cloud_job()) {
 }
 
 cloud_job_describe <- function(job_id = cloud_job()) {
-  res <- processx::run("aws", c("batch", "describe-jobs", "--jobs", job_id))
+  res <- processx::run("aws", c("batch", "describe-jobs", "--region", "us-east-1", "--jobs", job_id))
 
   jsonlite::fromJSON(txt = res$stdout)
 }
@@ -659,7 +659,7 @@ cloud_job_describe <- function(job_id = cloud_job()) {
 cloud_job_list <- function(job_id = cloud_job(), status = c("RUNNING", "SUBMITTED", "PENDENG", "RUNNABLE", "STARTING", "RUNNING", "SUCCEEDED", "FAILED")) {
   status <- match.arg(status)
 
-  res <- processx::run("aws", c("batch", "list-jobs", "--array-job-id", job_id, "--job-status", status))
+  res <- processx::run("aws", c("batch", "list-jobs", "--region", "us-east-1", "--array-job-id", job_id, "--job-status", status))
   jsonlite::fromJSON(txt = res$stdout)
 }
 
