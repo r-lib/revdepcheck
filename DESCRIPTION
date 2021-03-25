@@ -20,10 +20,10 @@ Imports:
     cli,
     clisymbols,
     crancache (>= 0.0.0.9001),
-    crayon,
+    crayon (>= 1.4.1),
     curl,
     DBI,
-    desc (>= 1.1.1.9002),
+    desc (>= 1.3.0),
     glue,
     gmailr,
     hms,
@@ -34,9 +34,9 @@ Imports:
     prettyunits,
     processx (>= 3.3.0),
     progress,
-    rcmdcheck (>= 1.3.2.9002),
+    rcmdcheck (>= 1.3.3),
     rematch2,
-    remotes (>= 1.0.0.9000),
+    remotes (>= 2.2.0),
     rlang (>= 0.3.0),
     RSQLite,
     sessioninfo,
@@ -55,10 +55,7 @@ Suggests:
 VignetteBuilder: 
     knitr
 Remotes:
-    r-lib/brio,
-    r-lib/crancache,
-    r-lib/crayon,
-    r-lib/rcmdcheck
+    r-lib/crancache
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
