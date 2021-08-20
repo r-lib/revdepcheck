@@ -32,9 +32,25 @@ Then install and configure the `aws` command line tool.
 
 ```shell
 brew install awscli
-aws configure
+aws configure sso
 ```
-You will be asked for an access key ID and a secret access key. Follow the instructions at https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html#cli-quick-configuration to create these. This is **not** the same credential as the key configured above as the `RSTUDIO_CLOUD_REVDEP_KEY` environment variable.
+
+This will start an interactive process for generating a configuration file in `~/.aws/config`.
+
+- You will be asked for an SSO start URL. Enter https://rstudio.awsapps.com/start.
+- You will be asked for an SSO Region. Enter us-east-2.
+- Your browser will open to an Okta single sign on page. Sign in then return to the terminal.
+- Select RStudio Main as the AWS account (Note that RStudio Tidyverse is not the correct account for this).
+- Select us-east-1 as the default region (this may already be the default).
+- Select json as the default output format (this may already be the default).
+- Specify a profile name, or leave it as TidyverseTeam.
+
+Open the newly generated config text file in `~/.aws/config`. Make the newly generated profile your default by naming it `[default]` if it isn't already. Save and close the file.
+
+For more information, look here:
+
+- [Tettra post on AWS SSO](https://app.tettra.co/teams/rstudio/pages/aws-single-sign-on#header-ek8lr-interactive-setup)
+- [Okta post on AWS SSO](https://www.okta.com/blog/2020/05/how-okta-aws-sso-simplifies-admin-and-adds-cli-support/)
 
 ## Usage
 
