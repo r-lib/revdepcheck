@@ -104,8 +104,23 @@
 <p>Set the <code>RSTUDIO_CLOUD_REVDEP_KEY</code> environment variable to the value of your AWS authentication key, provided to you by RStudio DevOps. Add this key to your <code>.Renviron</code> file with <code>usethis::edit_r_environ()</code> and restart R.</p>
 <p>Then install and configure the <code>aws</code> command line tool.</p>
 <pre class="shell"><code>brew install awscli
-aws configure</code></pre>
-<p>You will be asked for an access key ID and a secret access key. Follow the instructions at <a href="https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html#cli-quick-configuration" class="uri">https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html#cli-quick-configuration</a> to create these. This is <strong>not</strong> the same credential as the key configured above as the <code>RSTUDIO_CLOUD_REVDEP_KEY</code> environment variable.</p>
+aws configure sso</code></pre>
+<p>This will start an interactive process for generating a configuration file in <code>~/.aws/config</code>.</p>
+<ul>
+<li>You will be asked for an SSO start URL. Enter <a href="https://rstudio.awsapps.com/start" class="uri">https://rstudio.awsapps.com/start</a>.</li>
+<li>You will be asked for an SSO Region. Enter us-east-2.</li>
+<li>Your browser will open to an Okta single sign on page. Sign in then return to the terminal.</li>
+<li>Select RStudio Main as the AWS account (Note that RStudio Tidyverse is not the correct account for this).</li>
+<li>Select us-east-1 as the default region (this may already be the default).</li>
+<li>Select json as the default output format (this may already be the default).</li>
+<li>Specify a profile name, or leave it as TidyverseTeam.</li>
+</ul>
+<p>Open the newly generated config text file in <code>~/.aws/config</code>. Make the newly generated profile your default by naming it <code>[default]</code> if it isn’t already. Save and close the file.</p>
+<p>For more information, look here:</p>
+<ul>
+<li><a href="https://app.tettra.co/teams/rstudio/pages/aws-single-sign-on#header-ek8lr-interactive-setup">Tettra post on AWS SSO</a></li>
+<li><a href="https://www.okta.com/blog/2020/05/how-okta-aws-sso-simplifies-admin-and-adds-cli-support/">Okta post on AWS SSO</a></li>
+</ul>
 </div>
 <div id="usage" class="section level2">
 <h2 class="hasAnchor">
