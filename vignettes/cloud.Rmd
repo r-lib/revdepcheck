@@ -47,6 +47,20 @@ This will start an interactive process for generating a configuration file in `~
 
 Open the newly generated config text file in `~/.aws/config`. Make the newly generated profile your default by naming it `[default]` if it isn't already. Save and close the file.
 
+At this point, the AWS configuration should be complete. However, at irregular intervals AWS may require you to sign in to Okta again. If you run a cloud function that uses the AWS command line interface (like `cloud_status()`) and see an error like:
+
+```
+The SSO session associated with this profile has expired or is otherwise invalid. To refresh this SSO session run aws sso login with the corresponding profile.
+```
+
+then you should open your terminal and run the following:
+
+```shell
+aws sso login
+```
+
+This should open your browser to another Okta single sign on page. After signing in, the cloud function should work again. If you didn't set the newly created profile as the `[default]`, then you will need to provide the profile name when running `aws sso login`.
+
 For more information, look here:
 
 - [Tettra post on AWS SSO](https://app.tettra.co/teams/rstudio/pages/aws-single-sign-on#header-ek8lr-interactive-setup)
