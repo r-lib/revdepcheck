@@ -162,19 +162,28 @@ handle_event <- function(state, which) {
   if (proc$is_alive()) {
     state$workers[[which]]$stdout <-
       c(state$workers[[which]]$stdout, out <- proc$read_output(n = 10000))
-    state$workers[[which]]$stderr <-
-      c(state$workers[[which]]$stderr, err <- proc$read_error(n = 10000))
+    if (proc$has_error_connection()) {
+      state$workers[[which]]$stderr <-
+        c(state$workers[[which]]$stderr, err <- proc$read_error(n = 10000))
+    } else {
+      state$workers[[which]]$stderr <- ""
+    }
   } else {
     state$workers[[which]]$stdout <-
       c(state$workers[[which]]$stdout, out <- proc$read_all_output())
-    state$workers[[which]]$stderr <-
-      c(state$workers[[which]]$stderr, err <- proc$read_all_error())
+    if (proc$has_error_connection()) {
+      state$workers[[which]]$stderr <-
+        c(state$workers[[which]]$stderr, err <- proc$read_all_error())
+    } else {
+      state$workers[[which]]$stderr <- ""
+    }
   }
 
   "!DEBUG read out `nchar(out)`/`nchar(err)` characters"
 
   ## If there is still output, then wait a bit more
-  if (proc$is_incomplete_output() || proc$is_incomplete_error()) {
+  if (proc$is_incomplete_output() ||
+      (proc$has_error_connection() && proc$is_incomplete_error())) {
     return(state)
   }
 
