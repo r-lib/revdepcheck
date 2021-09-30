@@ -116,6 +116,11 @@ aws configure sso</code></pre>
 <li>Specify a profile name, or leave it as TidyverseTeam.</li>
 </ul>
 <p>Open the newly generated config text file in <code>~/.aws/config</code>. Make the newly generated profile your default by naming it <code>[default]</code> if it isn’t already. Save and close the file.</p>
+<p>At this point, the AWS configuration should be complete. However, at irregular intervals AWS may require you to sign in to Okta again. If you run a cloud function that uses the AWS command line interface (like <code><a href="../reference/cloud_status.html">cloud_status()</a></code>) and see an error like:</p>
+<pre><code>The SSO session associated with this profile has expired or is otherwise invalid. To refresh this SSO session run aws sso login with the corresponding profile.</code></pre>
+<p>then you should open your terminal and run the following:</p>
+<pre class="shell"><code>aws sso login</code></pre>
+<p>This should open your browser to another Okta single sign on page. After signing in, the cloud function should work again. If you didn’t set the newly created profile as the <code>[default]</code>, then you will need to provide the profile name when running <code>aws sso login</code>.</p>
 <p>For more information, look here:</p>
 <ul>
 <li><a href="https://app.tettra.co/teams/rstudio/pages/aws-single-sign-on#header-ek8lr-interactive-setup">Tettra post on AWS SSO</a></li>
@@ -126,7 +131,7 @@ aws configure sso</code></pre>
 <h2 class="hasAnchor">
 <a href="#usage" class="anchor"></a>Usage</h2>
 <p><strong>Note</strong> If you are going to be running 500+ tests and are using a development dependency (e.g. <code>Remote: org/pkg</code>) you may exhaust the GitHub API limits. A workaround is to use a ‘url’ remote, e.g. <code>Remote: url::https://github.com/org/pkg/archive/master.tar.gz</code>, which does not use the GitHub API.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># Kickoff a new check</span>
 <span class="co"># The devel package is automatically built from the current</span>
 <span class="co"># working directory, or specify a pre-built package with `tarball`.</span>
