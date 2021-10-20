@@ -6,7 +6,7 @@
 \usage{
 cloud_email(
   type = c("broken", "failed"),
-  job_id = cloud_job(pkg = pkg),
+  job_name = cloud_job(pkg = pkg),
   pkg = ".",
   packages = NULL,
   draft = FALSE
@@ -18,7 +18,7 @@ is a new \verb{R CMD check} failure that did not currently occur) or
 "failed" (i.e. the check failure either during installation or because
 of a timeout).}
 
-\item{job_id}{The batch job_id, as returned by \code{\link[=cloud_check]{cloud_check()}}.}
+\item{job_name}{The job name, as returned by \code{\link[=cloud_check]{cloud_check()}}.}
 
 \item{pkg}{Path to package.}
 

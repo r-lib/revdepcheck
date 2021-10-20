@@ -4,10 +4,10 @@
 \alias{cloud_browse}
 \title{Browse to the AWS url for the job}
 \usage{
-cloud_browse(job_id = cloud_job(), package = NULL)
+cloud_browse(job_name = cloud_job(), package = NULL)
 }
 \arguments{
-\item{job_id}{The batch job_id, as returned by \code{\link[=cloud_check]{cloud_check()}}.}
+\item{job_name}{The job name, as returned by \code{\link[=cloud_check]{cloud_check()}}.}
 
 \item{package}{If \code{NULL} browses to the URL of the overall job. If a package
 name, browses to the URL for that specific package job.}
