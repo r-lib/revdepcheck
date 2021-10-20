@@ -4,16 +4,16 @@
 \alias{cloud_job}
 \title{Return the current cloud job}
 \usage{
-cloud_job(job_id = NULL, pkg = ".")
+cloud_job(job_name = NULL, pkg = ".")
 }
 \arguments{
-\item{job_id}{If not \code{NULL}, sets the active \code{job_id} to the input.}
+\item{job_name}{If not \code{NULL}, sets the active \code{job_name} to the input.}
 
 \item{pkg}{Path to package.}
 }
 \description{
-The \code{job_id} is automatically set by \code{\link[=cloud_check]{cloud_check()}} and is remembered for
-the duration of the current R session. If there is no active \code{job_id}, but
-there are local cloud check results, \code{job_id} is inferred from the most
+The \code{job_name} is automatically set by \code{\link[=cloud_check]{cloud_check()}} and is remembered for
+the duration of the current R session. If there is no active \code{job_name}, but
+there are local cloud check results, \code{job_name} is inferred from the most
 recently modified cloud check results.
 }

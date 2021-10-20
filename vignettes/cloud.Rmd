@@ -25,46 +25,8 @@ This service is currently only available to be used by RStudio employees, but we
 
 ## Setup
 
-Set the `RSTUDIO_CLOUD_REVDEP_KEY` environment variable to the value of your AWS authentication key, provided to you by RStudio DevOps.
+Set the `RSTUDIO_CLOUD_REVDEP_KEY` environment variable to the value of your cloud authentication key, provided to you by RStudio DevOps.
 Add this key to your `.Renviron` file with `usethis::edit_r_environ()` and restart R.
-
-Then install and configure the `aws` command line tool.
-
-```shell
-brew install awscli
-aws configure sso
-```
-
-This will start an interactive process for generating a configuration file in `~/.aws/config`.
-
-- You will be asked for an SSO start URL. Enter https://rstudio.awsapps.com/start.
-- You will be asked for an SSO Region. Enter us-east-2.
-- Your browser will open to an Okta single sign on page. Sign in then return to the terminal.
-- Select RStudio Main as the AWS account (Note that RStudio Tidyverse is not the correct account for this).
-- Select us-east-1 as the default region (this may already be the default).
-- Select json as the default output format (this may already be the default).
-- Specify a profile name, or leave it as TidyverseTeam.
-
-Open the newly generated config text file in `~/.aws/config`. Make the newly generated profile your default by naming it `[default]` if it isn't already. Save and close the file.
-
-At this point, the AWS configuration should be complete. However, at irregular intervals AWS may require you to sign in to Okta again. If you run a cloud function that uses the AWS command line interface (like `cloud_status()`) and see an error like:
-
-```
-The SSO session associated with this profile has expired or is otherwise invalid. To refresh this SSO session run aws sso login with the corresponding profile.
-```
-
-then you should open your terminal and run the following:
-
-```shell
-aws sso login
-```
-
-This should open your browser to another Okta single sign on page. After signing in, the cloud function should work again. If you didn't set the newly created profile as the `[default]`, then you will need to provide the profile name when running `aws sso login`.
-
-For more information, look here:
-
-- [Tettra post on AWS SSO](https://app.tettra.co/teams/rstudio/pages/aws-single-sign-on#header-ek8lr-interactive-setup)
-- [Okta post on AWS SSO](https://www.okta.com/blog/2020/05/how-okta-aws-sso-simplifies-admin-and-adds-cli-support/)
 
 ## Usage
 

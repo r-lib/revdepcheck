@@ -4,10 +4,10 @@
 \alias{cloud_results}
 \title{Retrieve cloud results}
 \usage{
-cloud_results(job_id = cloud_job(pkg = pkg), pkg = ".")
+cloud_results(job_name = cloud_job(pkg = pkg), pkg = ".")
 }
 \arguments{
-\item{job_id}{The batch job_id, as returned by \code{\link[=cloud_check]{cloud_check()}}.}
+\item{job_name}{The job name, as returned by \code{\link[=cloud_check]{cloud_check()}}.}
 
 \item{pkg}{Path to package.}
 }

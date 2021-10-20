@@ -4,10 +4,10 @@
 \alias{cloud_details}
 \title{Display detailed revdep results from a cloud run}
 \usage{
-cloud_details(job_id = cloud_job(pkg = pkg), revdep, pkg = ".")
+cloud_details(job_name = cloud_job(pkg = pkg), revdep, pkg = ".")
 }
 \arguments{
-\item{job_id}{The batch job_id, as returned by \code{\link[=cloud_check]{cloud_check()}}.}
+\item{job_name}{The job name, as returned by \code{\link[=cloud_check]{cloud_check()}}.}
 
 \item{revdep}{Name of the revdep package}
 

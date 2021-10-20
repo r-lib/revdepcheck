@@ -4,10 +4,10 @@
 \alias{cloud_job_mapping}
 \title{Get the batch job ID for a checked package}
 \usage{
-cloud_job_mapping(job_id = cloud_job())
+cloud_job_mapping(job_name = cloud_job())
 }
 \arguments{
-\item{job_id}{The batch job_id, as returned by \code{\link[=cloud_check]{cloud_check()}}.}
+\item{job_name}{The job name, as returned by \code{\link[=cloud_check]{cloud_check()}}.}
 }
 \description{
 Get the batch job ID for a checked package

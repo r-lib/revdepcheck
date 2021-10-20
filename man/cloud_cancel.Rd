@@ -4,10 +4,10 @@
 \alias{cloud_cancel}
 \title{Cancel a running cloud run}
 \usage{
-cloud_cancel(job_id = cloud_job())
+cloud_cancel(job_name = cloud_job())
 }
 \arguments{
-\item{job_id}{The batch job_id, as returned by \code{\link[=cloud_check]{cloud_check()}}.}
+\item{job_name}{The job name, as returned by \code{\link[=cloud_check]{cloud_check()}}.}
 }
 \description{
 Cancel a running cloud run

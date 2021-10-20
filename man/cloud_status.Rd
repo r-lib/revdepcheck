@@ -4,10 +4,10 @@
 \alias{cloud_status}
 \title{Monitor the status of a cloud job}
 \usage{
-cloud_status(job_id = cloud_job(), update_interval = 10)
+cloud_status(job_name = cloud_job(), update_interval = 10)
 }
 \arguments{
-\item{job_id}{The batch job_id, as returned by \code{\link[=cloud_check]{cloud_check()}}.}
+\item{job_name}{The job name, as returned by \code{\link[=cloud_check]{cloud_check()}}.}
 
 \item{update_interval}{The number of seconds between querying for updates}
 }
