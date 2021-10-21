@@ -101,7 +101,7 @@ calc_eta <- function(creation_time, current_time, running, completed, total) {
 #' @keywords internal
 #' @family cloud
 #' @inheritParams cloud_report
-#' @importFrom httr write_disk content_type accept
+#' @importFrom curl new_handle handle_setheaders new_pool multi_add multi_run handle_setopt
 #' @importFrom cli cli_progress_bar cli_progress_update cli_progress_done pb_percent
 #' @export
 cloud_fetch_results <- function(job_name = cloud_job(pkg = pkg), pkg = ".") {
@@ -117,26 +117,43 @@ cloud_fetch_results <- function(job_name = cloud_job(pkg = pkg), pkg = ".") {
   rel_out_dir <- sub(paste0(pkg_check(pkg), "/"), "", out_dir, fixed = TRUE)
   cli_alert_info("Syncing results to {.file {rel_out_dir}}")
 
-  pb <- cli_progress_bar(format = "Syncing package results: {pb_percent} ({package})", total = length(info$revdep_packages))
-  for (package in info$revdep_packages) {
+  packages <- info$revdep_packages
+
+  out_files <- file.path(out_dir, paste0(packages, ".tar.gz"))
+
+  to_download <- !file.exists(out_files)
+
+  pb <- cli_progress_bar(format = "Downloading package results: {pb_percent}", total = sum(to_download))
+  handle_success <- function(res) {
+    if (res$status_code >= 400) {
+      out_file <- sprintf("%s/%s.tar.gz", out_dir, basename(dirname(res$url)))
+      unlink(out_file)
+    }
     cli_progress_update(id = pb)
-    out_file <- file.path(out_dir, paste0(package, ".tar.gz"))
-    if (!file.exists(out_file)) {
-      get_response <- GET("https://xgyefaepu5.execute-api.us-east-1.amazonaws.com",
-        config = add_headers("x-api-key" = Sys.getenv("RSTUDIO_CLOUD_REVDEP_KEY")),
-        path = file.path("staging", "check", info$id, "packages", package, "results.tar.gz"),
-        accept("application/x-gzip"),
-        write_disk(out_file)
-      )
-      if (status_code(get_response) >= 300) {
-        unlink(out_file)
-      }
-    }
-    if (file.exists(out_file) && !dir.exists(file.path(out_dir, package))) {
-      utils::untar(out_file, exdir = out_dir)
-    }
   }
+  pool <- new_pool()
+  for (i in which(to_download)) {
+    out_file <- out_files[[i]]
+    package <- packages[[i]]
+    url <- sprintf("https://xgyefaepu5.execute-api.us-east-1.amazonaws.com/staging/check/%s/packages/%s/results.tar.gz", job_name, package)
+
+    handle <- new_handle()
+    handle_setopt(handle, url = enc2utf8(url))
+    handle_setheaders(handle, "x-api-key" = Sys.getenv("RSTUDIO_CLOUD_REVDEP_KEY"), Accept = "application/x-gzip")
+    multi_add(handle = handle, done = handle_success, pool = pool, data = out_file)
+  }
+  out <- multi_run(pool = pool)
   cli_progress_done(id = pb)
+
+  to_extract <- file.exists(out_files) & !dir.exists(file.path(out_dir, packages))
+
+  pb2 <- cli_progress_bar(format = "Extracting package results: {pb_percent}", total = sum(to_extract))
+  for (i in which(to_extract)) {
+    out_file <- out_files[[i]]
+    utils::untar(out_file, exdir = out_dir)
+    cli_progress_update(id = pb2)
+  }
+  cli_progress_done(id = pb2)
 }
 
 #' Submit a reverse dependency checking job to the cloud
