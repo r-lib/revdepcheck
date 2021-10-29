@@ -163,13 +163,14 @@ cloud_fetch_results <- function(job_name = cloud_job(pkg = pkg), pkg = ".") {
 #' @param revdep_packages A character vector of packages to check, if `NULL`
 #'   equal to [cran_revdeps()]
 #' @param r_version The R version to use.
+#' @param check_args Additional argument to pass to `R CMD check`
 #' @returns The AWS Batch job-id
 #' @inheritParams revdep_check
 #' @importFrom cli cli_alert_info cli_alert_success cli_alert_danger
 #' @importFrom httr GET PATCH POST stop_for_status add_headers content
 #' @family cloud
 #' @export
-cloud_check <- function(pkg = ".", tarball = NULL, revdep_packages = NULL, r_version = "4.0.3") {
+cloud_check <- function(pkg = ".", tarball = NULL, revdep_packages = NULL, r_version = "4.0.3", check_args = "--no-manual") {
   if (is.null(tarball)) {
     pkg <- pkg_check(pkg)
     tarball <- pkgbuild::build(path = pkg)
@@ -190,7 +191,8 @@ cloud_check <- function(pkg = ".", tarball = NULL, revdep_packages = NULL, r_ver
       package_name = package_name,
       package_version = package_version,
       revdep_packages = revdep_packages,
-      r_version = r_version
+      r_version = r_version,
+      check_args = check_args
     ),
     encode = "json"
   )
