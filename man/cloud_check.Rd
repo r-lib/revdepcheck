@@ -8,7 +8,8 @@ cloud_check(
   pkg = ".",
   tarball = NULL,
   revdep_packages = NULL,
-  r_version = "4.0.3"
+  r_version = "4.0.3",
+  check_args = "--no-manual"
 )
 }
 \arguments{
@@ -21,6 +22,8 @@ automatically built for the package at \code{pkg} by \code{\link[pkgbuild:build]
 equal to \code{\link[=cran_revdeps]{cran_revdeps()}}}
 
 \item{r_version}{The R version to use.}
+
+\item{check_args}{Additional argument to pass to \verb{R CMD check}}
 }
 \value{
 The AWS Batch job-id
