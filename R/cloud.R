@@ -369,6 +369,9 @@ cloud_check_result <- function(check_log, description, dependency_error) {
 
 cloud_compare <- function(pkg) {
   desc_path <- file.path(pkg, "DESCRIPTION")
+  if (!file.exists(desc_path)) {
+    return(rcmdcheck_error(basename(pkg), old = NULL, new = NULL))
+  }
   description <- desc::desc(file = desc_path)
 
   old <- file.path(pkg, "old", paste0(basename(pkg), ".Rcheck"), "00check.log")
