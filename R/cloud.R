@@ -749,13 +749,13 @@ cloud_browse <- function(job_name = cloud_job(), package = NULL) {
   job_id <- info$batch_job_id
 
   if (is.null(package)) {
-    utils::browseURL(sprintf("https://console.aws.amazon.com/batch/home?region=us-east-1#/jobs/%s", job_id))
+    utils::browseURL(sprintf("https://console.aws.amazon.com/batch/home?region=us-east-1#jobs/array-job/%s", job_id))
     return(invisible())
   }
 
-  mapping <- cloud_job_mapping(job_id)
+  mapping <- cloud_job_mapping(job_name)
 
   array_num <- mapping$id[mapping$package == package]
 
-  utils::browseURL(sprintf("https://console.aws.amazon.com/batch/home?region=us-east-1#/jobs/%s/child/%s:%i", job_id, job_id, array_num))
+  utils::browseURL(sprintf("https://console.aws.amazon.com/batch/home?region=us-east-1#jobs/detail/%s:%i", job_id, array_num))
 }
