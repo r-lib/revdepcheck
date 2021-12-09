@@ -8,7 +8,7 @@ cloud_check(
   pkg = ".",
   tarball = NULL,
   revdep_packages = NULL,
-  r_version = "4.0.3",
+  r_version = "4.1.1",
   check_args = "--no-manual"
 )
 }

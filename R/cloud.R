@@ -170,7 +170,11 @@ cloud_fetch_results <- function(job_name = cloud_job(pkg = pkg), pkg = ".") {
 #' @importFrom httr GET PATCH POST stop_for_status add_headers content
 #' @family cloud
 #' @export
-cloud_check <- function(pkg = ".", tarball = NULL, revdep_packages = NULL, r_version = "4.0.3", check_args = "--no-manual") {
+cloud_check <- function(pkg = ".",
+  tarball = NULL,
+  revdep_packages = NULL,
+  r_version = "4.1.1",
+  check_args = "--no-manual") {
   if (is.null(tarball)) {
     pkg <- pkg_check(pkg)
     tarball <- pkgbuild::build(path = pkg)
