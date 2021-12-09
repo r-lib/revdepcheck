@@ -189,6 +189,10 @@ cloud_check <- function(pkg = ".",
     revdep_packages <- setdiff(cran_revdeps(package_name), package_name)
   }
 
+  if (length(revdep_packages) == 1) {
+    stop("`revdepcheck::cloud_check()` can't work with exactly 1 revdep package (AWS batch jobs must have more than one job)", call. = FALSE)
+  }
+
   post_response <- POST("https://xgyefaepu5.execute-api.us-east-1.amazonaws.com/staging/check",
     config = add_headers("x-api-key" = Sys.getenv("RSTUDIO_CLOUD_REVDEP_KEY")),
     body = list(
