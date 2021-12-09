@@ -1,7 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>https://r-lib.github.io/revdepcheck/404.html</loc>
+  </url>
+  <url>
+    <loc>https://r-lib.github.io/revdepcheck/LICENSE-text.html</loc>
+  </url>
+  <url>
+    <loc>https://r-lib.github.io/revdepcheck/LICENSE.html</loc>
+  </url>
+  <url>
+    <loc>https://r-lib.github.io/revdepcheck/articles/cloud.html</loc>
+  </url>
+  <url>
+    <loc>https://r-lib.github.io/revdepcheck/articles/index.html</loc>
+  </url>
+  <url>
+    <loc>https://r-lib.github.io/revdepcheck/authors.html</loc>
+  </url>
+  <url>
     <loc>https://r-lib.github.io/revdepcheck/index.html</loc>
+  </url>
+  <url>
+    <loc>https://r-lib.github.io/revdepcheck/news/index.html</loc>
   </url>
   <url>
     <loc>https://r-lib.github.io/revdepcheck/reference/cloud_broken.html</loc>
@@ -55,6 +76,9 @@
     <loc>https://r-lib.github.io/revdepcheck/reference/dir_find.html</loc>
   </url>
   <url>
+    <loc>https://r-lib.github.io/revdepcheck/reference/index.html</loc>
+  </url>
+  <url>
     <loc>https://r-lib.github.io/revdepcheck/reference/revdep_add.html</loc>
   </url>
   <url>
@@ -80,8 +104,5 @@
   </url>
   <url>
     <loc>https://r-lib.github.io/revdepcheck/reference/schedule_next_task.html</loc>
-  </url>
-  <url>
-    <loc>https://r-lib.github.io/revdepcheck/articles/cloud.html</loc>
   </url>
 </urlset>
