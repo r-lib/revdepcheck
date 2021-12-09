@@ -26,7 +26,7 @@ equal to \code{\link[=cran_revdeps]{cran_revdeps()}}}
 \item{check_args}{Additional argument to pass to \verb{R CMD check}}
 }
 \value{
-The AWS Batch job-id
+The AWS Batch job name
 }
 \description{
 Submit a reverse dependency checking job to the cloud

@@ -21,7 +21,7 @@ cloud_status <- function(job_name = cloud_job(), update_interval = 10) {
     status <- cloud_job_status(job_name)
 
     if (length(status) == 0) {
-      stop("No job with Id: '", job_name, call. = FALSE)
+      stop("No job with name: '", job_name, call. = FALSE)
     }
 
     size <- status$size
@@ -48,15 +48,15 @@ cloud_status <- function(job_name = cloud_job(), update_interval = 10) {
 
     if (results[["failed"]] > 0) {
         cli_status_clear(id = status_id, result = "failed", msg_failed = paste0("{.emph FAILED}: ", status_bar_text))
-        cli_alert("run {.fun cloud_summary} for interactive results")
-        cli_alert("run {.fun cloud_report} for markdown reports")
+        cli_alert("run {.fun revdepcheck::cloud_summary} for interactive results")
+        cli_alert("run {.fun revdepcheck::cloud_report} for markdown reports")
         return(FALSE)
     }
 
     if (num_completed == length(info$revdep_packages)) {
         cli_status_clear(id = status_id, result = "done", msg_done = paste0("{.emph SUCCEEDED}: ", status_bar_text))
-        cli_alert("run {.fun cloud_summary} for interactive results")
-        cli_alert("run {.fun cloud_report} for markdown reports")
+        cli_alert("run {.fun revdepcheck::cloud_summary} for interactive results")
+        cli_alert("run {.fun revdepcheck::cloud_report} for markdown reports")
         return(TRUE)
     }
 
@@ -95,7 +95,7 @@ calc_eta <- function(creation_time, current_time, running, completed, total) {
 #' Fetch results from the cloud
 #'
 #' Intended mainly for internal and expert use. This function when needed by
-#' [cloud_report()] and `[cloud_summary()]`, so it is unlikely you will need to
+#' [cloud_report()] and [cloud_summary()], so it is unlikely you will need to
 #' call it explicitly.
 #'
 #' @keywords internal
@@ -164,7 +164,7 @@ cloud_fetch_results <- function(job_name = cloud_job(pkg = pkg), pkg = ".") {
 #'   equal to [cran_revdeps()]
 #' @param r_version The R version to use.
 #' @param check_args Additional argument to pass to `R CMD check`
-#' @returns The AWS Batch job-id
+#' @returns The AWS Batch job name
 #' @inheritParams revdep_check
 #' @importFrom cli cli_alert_info cli_alert_success cli_alert_danger
 #' @importFrom httr GET PATCH POST stop_for_status add_headers content
@@ -232,7 +232,7 @@ cloud_check <- function(pkg = ".",
 
   cli_alert_success("Created job {.arg job_name}: {.val {job_name}}")
 
-  cli_alert("Run {.fun cloud_status} to monitor job status")
+  cli_alert("Run {.fun revdepcheck::cloud_status} to monitor job status")
 
   cloud_job(job_name = job_name)
   cloud <- dir_find(pkg, "cloud")
@@ -585,7 +585,7 @@ cloud_job <- function(job_name = NULL, pkg = ".") {
     cloud_dirs <- character()
   }
   if (length(cloud_dirs) < 1) {
-    stop("Can't find any previous `cloud_check()` results locally, can't discover `job_name`", call. = FALSE)
+    stop("Can't find any previous `revdepcheck::cloud_check()` results locally, can't discover `job_name`", call. = FALSE)
   }
 
   latest <- cloud_dirs[which.max(file.info(cloud_dirs)$mtime)]
@@ -699,7 +699,7 @@ cloud_job_status <- function(job_name = cloud_job(pkg = pkg), status = c("ALL", 
   content(response)
 }
 
-#' Get the batch job ID for a checked package
+#' Get a tibble of batch sub-job ids for all checked packages
 #'
 #' @inheritParams cloud_report
 #' @export

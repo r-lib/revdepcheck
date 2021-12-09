@@ -13,7 +13,7 @@ cloud_fetch_results(job_name = cloud_job(pkg = pkg), pkg = ".")
 }
 \description{
 Intended mainly for internal and expert use. This function when needed by
-\code{\link[=cloud_report]{cloud_report()}} and \verb{[cloud_summary()]}, so it is unlikely you will need to
+\code{\link[=cloud_report]{cloud_report()}} and \code{\link[=cloud_summary]{cloud_summary()}}, so it is unlikely you will need to
 call it explicitly.
 }
 \seealso{
