@@ -17,7 +17,7 @@ Imports:
     assertthat,
     brio,
     callr,
-    cli,
+    cli (>= 3.1.0),
     clisymbols,
     crancache (>= 0.0.0.9001),
     crayon (>= 1.4.1),
@@ -55,8 +55,7 @@ Suggests:
 VignetteBuilder: 
     knitr
 Remotes:
-    r-lib/crancache,
-    r-lib/cli
+    r-lib/crancache
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
