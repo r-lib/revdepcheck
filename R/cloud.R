@@ -127,7 +127,13 @@ cloud_fetch_results <- function(job_name = cloud_job(pkg = pkg), pkg = ".") {
   pb2 <- cli_progress_bar(format = "Extracting package results: {pb_percent}", total = sum(to_extract))
   for (i in which(to_extract)) {
     out_file <- out_files[[i]]
-    utils::untar(out_file, exdir = out_dir)
+    files <- suppressWarnings(utils::untar(out_file, exdir = out_dir, list = TRUE))
+    if (length(files) == 0) {
+      # Retry downloading next time
+      unlink(out_file)
+    } else {
+      utils::untar(out_file, exdir = out_dir)
+    }
     cli_progress_update(id = pb2)
   }
   cli_progress_done(id = pb2)
