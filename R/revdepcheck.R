@@ -137,12 +137,16 @@ revdep_install <- function(pkg = ".", quiet = FALSE, env = character()) {
   message("Installing CRAN version of ", pkgname)
   package_name <- pkg_name(pkg)[[1]]
 
+  # we don't want to fail on aarch64 because there are no binary bioc
+  # packages for that
+  fail_on_warn <- Sys.info()[["sysname"]] != "Darwin" || R.Version()$arch != "aarch64"
+
   with_envvar(
     c(CRANCACHE_REPOS = "cran,bioc", CRANCACHE_QUIET = "yes", env),
     with_libpaths(
       dir_find(pkg, "old"),
       rlang::with_options(
-        warn = 2,
+        warn = if (fail_on_warn) 2 else 1,
         install_packages(pkgname, quiet = quiet, repos = get_repos(bioc = TRUE), upgrade = "always")
       )
     )
@@ -156,7 +160,7 @@ revdep_install <- function(pkg = ".", quiet = FALSE, env = character()) {
     with_libpaths(
       dir_find(pkg, "new"),
       rlang::with_options(
-        warn = 2,
+        warn = if (fail_on_warn) 2 else 1,
         install_local(pkg, quiet = quiet, repos = get_repos(bioc = TRUE), force = TRUE, upgrade = "always")
       )
     )
