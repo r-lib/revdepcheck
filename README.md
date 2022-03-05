@@ -4,7 +4,7 @@
 
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/r-lib/revdepcheck/workflows/R-CMD-check/badge.svg)](https://github.com/r-lib/revdepcheck/actions)
-[![Codecov test coverage](https://codecov.io/gh/r-lib/revdepcheck/branch/master/graph/badge.svg)](https://codecov.io/gh/r-lib/revdepcheck?branch=master)
+[![Codecov test coverage](https://codecov.io/gh/r-lib/revdepcheck/branch/main/graph/badge.svg)](https://codecov.io/gh/r-lib/revdepcheck?branch=main)
 [![](http://www.r-pkg.org/badges/version/revdepcheck)](http://www.r-pkg.org/pkg/revdepcheck)
 [![CRAN RStudio mirror downloads](http://cranlogs.r-pkg.org/badges/revdepcheck)](http://www.r-pkg.org/pkg/revdepcheck)
 <!-- badges: end -->
