@@ -4,17 +4,17 @@
 #' @param package The package to search for reverse dependencies
 #' @inheritParams revdep_check
 #' @export
-cran_revdeps <- function(package, dependencies = TRUE, bioc = FALSE) {
-  pkgs <- cran_revdeps_versions(package, dependencies, bioc)$package
+cran_revdeps <- function(package, dependencies = TRUE, bioc = FALSE, cran = TRUE) {
+  pkgs <- cran_revdeps_versions(package, dependencies, bioc, cran)$package
   pkgs[order(tolower(pkgs))]
 }
 
 #' @importFrom remotes bioc_install_repos
 #' @importFrom crancache available_packages
 
-cran_revdeps_versions <- function(package, dependencies = TRUE, bioc = FALSE) {
+cran_revdeps_versions <- function(package, dependencies = TRUE, bioc = FALSE, cran = TRUE) {
   stopifnot(is_string(package))
-  repos <- get_repos(bioc)
+  repos <- get_repos(bioc, cran)
 
   allpkgs <- available_packages(repos = repos)
   alldeps <- allpkgs[, dependencies, drop = FALSE]
@@ -29,12 +29,13 @@ cran_revdeps_versions <- function(package, dependencies = TRUE, bioc = FALSE) {
   )
 }
 
-get_repos <- function(bioc) {
+get_repos <- function(bioc, cran) {
   repos <- c(
     getOption("repos"),
     if (bioc) bioc_install_repos()
   )
-  if (! "CRAN" %in% names(repos) || repos["CRAN"] == "@CRAN@") {
+  
+  if ((! "CRAN" %in% names(repos) || repos["CRAN"] == "@CRAN@") && cran) {
     repos["CRAN"] <- "https://cloud.r-project.org"
   }
 

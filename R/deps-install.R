@@ -48,7 +48,7 @@ deps_install_opts <- function(pkgdir, pkgname, quiet = FALSE, env = character())
 deps_opts <- function(pkgname, exclude = character()) {
   ## We set repos, so that dependencies from Bioconductor are installed
   ## automatically
-  repos <- get_repos(bioc = TRUE)
+  repos <- get_repos(bioc = TRUE, cran = TRUE)
 
   ## We have to do this "manually", because some of the dependencies
   ## might be also dependencies of crancache, so they will be already

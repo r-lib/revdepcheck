@@ -8,7 +8,7 @@ download_opts <- function(pkgdir, pkgname) {
 
   r_process_options(
     func = func,
-    args = list(pkgname = pkgname, dir = dir, repos = get_repos(bioc = TRUE)),
+    args = list(pkgname = pkgname, dir = dir, repos = get_repos(bioc = TRUE, cran = TRUE)),
     system_profile = FALSE,
     user_profile = FALSE,
     env = c(CRANCACHE_REPOS = "cran,bioc", CRANCACHE_QUIET = "yes")

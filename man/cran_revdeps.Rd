@@ -4,7 +4,7 @@
 \alias{cran_revdeps}
 \title{Retrieve the reverse dependencies for a package}
 \usage{
-cran_revdeps(package, dependencies = TRUE, bioc = FALSE)
+cran_revdeps(package, dependencies = TRUE, bioc = FALSE, cran = TRUE)
 }
 \arguments{
 \item{package}{The package to search for reverse dependencies}
@@ -13,6 +13,9 @@ cran_revdeps(package, dependencies = TRUE, bioc = FALSE)
 release, we recommend using the default.}
 
 \item{bioc}{Also check revdeps that live in Bioconductor?}
+
+\item{cran}{Should cran mirror be attached to getOpion("repos") if it
+is not already present.}
 }
 \description{
 Retrieve the reverse dependencies for a package

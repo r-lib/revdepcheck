@@ -179,7 +179,7 @@ cat_package_info <- function(cmp, file) {
 }
 
 num_deps <- function(pkg) {
-  repos <- get_repos(bioc = TRUE)
+  repos <- get_repos(bioc = TRUE, cran = TRUE)
   length(cran_deps(pkg, repos))
 }
 

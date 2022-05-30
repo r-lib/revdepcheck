@@ -1,3 +1,9 @@
+# 1.0.0.9002
+
+* Add `cran` parameter to the `get_repos()` internal and propagate it to the
+  upstream functions including `revdep_check()`. It allow user to decide
+  whether htey want to always append CRAN mirror to repos or not (@maksymis)
+
 # 1.0.0.9000
 
 * `cloud_results()` gains a progress bar so you can see what's happening
