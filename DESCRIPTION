@@ -55,7 +55,7 @@ Suggests:
 VignetteBuilder: 
     knitr
 Remotes:
-    r-lib/crancache
+    git::https://github.com/r-lib/crancache.git@main,
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
