@@ -40,7 +40,10 @@ get_repos <- function(bioc, cran) {
   }
 
   ## Drop duplicated repos (by name only)
-  names <- names(repos)
+  ## If the repos is not a named vector, names would be a NULL
+  ## and duplicated(names) would be a logical(0) resulting in dropping entire 
+  ## vector
+  names <- names(repos) %|0|% rep("", times = length(repos))
   repos <- repos[!(nzchar(names) & duplicated(names))]
 
   repos
