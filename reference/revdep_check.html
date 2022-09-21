@@ -77,38 +77,51 @@ up disk space and leaving you in a clean state for the next release.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">revdep_check</span><span class="op">(</span>
-  pkg <span class="op">=</span> <span class="st">"."</span>,
-  dependencies <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Depends"</span>, <span class="st">"Imports"</span>, <span class="st">"Suggests"</span>, <span class="st">"LinkingTo"</span><span class="op">)</span>,
-  quiet <span class="op">=</span> <span class="cn">TRUE</span>,
-  timeout <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/difftime.html" class="external-link">as.difftime</a></span><span class="op">(</span><span class="fl">10</span>, units <span class="op">=</span> <span class="st">"mins"</span><span class="op">)</span>,
-  num_workers <span class="op">=</span> <span class="fl">1</span>,
-  bioc <span class="op">=</span> <span class="cn">TRUE</span>,
-  env <span class="op">=</span> <span class="fu"><a href="revdep_env_vars.html">revdep_env_vars</a></span><span class="op">(</span><span class="op">)</span>
-<span class="op">)</span>
-
-<span class="fu">revdep_reset</span><span class="op">(</span>pkg <span class="op">=</span> <span class="st">"."</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">revdep_check</span><span class="op">(</span></span>
+<span>  pkg <span class="op">=</span> <span class="st">"."</span>,</span>
+<span>  dependencies <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Depends"</span>, <span class="st">"Imports"</span>, <span class="st">"Suggests"</span>, <span class="st">"LinkingTo"</span><span class="op">)</span>,</span>
+<span>  quiet <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  timeout <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/difftime.html" class="external-link">as.difftime</a></span><span class="op">(</span><span class="fl">10</span>, units <span class="op">=</span> <span class="st">"mins"</span><span class="op">)</span>,</span>
+<span>  num_workers <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  bioc <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  env <span class="op">=</span> <span class="fu"><a href="revdep_env_vars.html">revdep_env_vars</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">revdep_reset</span><span class="op">(</span>pkg <span class="op">=</span> <span class="st">"."</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>pkg</dt>
 <dd><p>Path to package.</p></dd>
+
+
 <dt>dependencies</dt>
 <dd><p>Which types of revdeps should be checked. For CRAN
 release, we recommend using the default.</p></dd>
+
+
 <dt>quiet</dt>
 <dd><p>Suppress output from internal processes?</p></dd>
+
+
 <dt>timeout</dt>
 <dd><p>Maximum time to wait (in seconds) for <code>R CMD check</code> to
 complete. Default is 10 minutes.</p></dd>
+
+
 <dt>num_workers</dt>
 <dd><p>Number of parallel workers to use</p></dd>
+
+
 <dt>bioc</dt>
 <dd><p>Also check revdeps that live in Bioconductor?</p></dd>
+
+
 <dt>env</dt>
 <dd><p>Environment variables to set for the install and check
 processes. See <code><a href="revdep_env_vars.html">revdep_env_vars()</a></code>.</p></dd>
+
 </dl></div>
     <div id="details">
     <h2>Details</h2>
@@ -144,7 +157,7 @@ If you want to start again from scratch, run <code>revdep_reset()</code>.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

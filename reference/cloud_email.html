@@ -73,13 +73,13 @@ review the template before any emails are sent; or you can use
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">cloud_email</span><span class="op">(</span>
-  type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"broken"</span>, <span class="st">"failed"</span><span class="op">)</span>,
-  job_name <span class="op">=</span> <span class="fu"><a href="cloud_job.html">cloud_job</a></span><span class="op">(</span>pkg <span class="op">=</span> <span class="va">pkg</span><span class="op">)</span>,
-  pkg <span class="op">=</span> <span class="st">"."</span>,
-  packages <span class="op">=</span> <span class="cn">NULL</span>,
-  draft <span class="op">=</span> <span class="cn">FALSE</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">cloud_email</span><span class="op">(</span></span>
+<span>  type <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"broken"</span>, <span class="st">"failed"</span><span class="op">)</span>,</span>
+<span>  job_name <span class="op">=</span> <span class="fu"><a href="cloud_job.html">cloud_job</a></span><span class="op">(</span>pkg <span class="op">=</span> <span class="va">pkg</span><span class="op">)</span>,</span>
+<span>  pkg <span class="op">=</span> <span class="st">"."</span>,</span>
+<span>  packages <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  draft <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -89,16 +89,25 @@ review the template before any emails are sent; or you can use
 is a new <code>R CMD check</code> failure that did not currently occur) or
 "failed" (i.e. the check failure either during installation or because
 of a timeout).</p></dd>
+
+
 <dt>job_name</dt>
 <dd><p>The job name, as returned by <code><a href="cloud_check.html">cloud_check()</a></code>.</p></dd>
+
+
 <dt>pkg</dt>
 <dd><p>Path to package.</p></dd>
+
+
 <dt>packages</dt>
 <dd><p>A character vector of package names. Use this if some emails
 failed to send in the previous round. If omitted uses all packages.</p></dd>
+
+
 <dt>draft</dt>
 <dd><p>If <code>TRUE</code>, create a gmail draft rather than sending the email
 directly.</p></dd>
+
 </dl></div>
     <div id="details">
     <h2>Details</h2>
@@ -119,7 +128,7 @@ file created in your working directory.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

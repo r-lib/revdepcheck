@@ -69,30 +69,39 @@ were killed.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">cloud_broken</span><span class="op">(</span>
-  job_name <span class="op">=</span> <span class="fu"><a href="cloud_job.html">cloud_job</a></span><span class="op">(</span>pkg <span class="op">=</span> <span class="va">pkg</span><span class="op">)</span>,
-  pkg <span class="op">=</span> <span class="st">"."</span>,
-  install_failures <span class="op">=</span> <span class="cn">FALSE</span>,
-  timeout_failures <span class="op">=</span> <span class="cn">FALSE</span>
-<span class="op">)</span>
-
-<span class="fu">cloud_failed</span><span class="op">(</span>job_name <span class="op">=</span> <span class="fu"><a href="cloud_job.html">cloud_job</a></span><span class="op">(</span>pkg <span class="op">=</span> <span class="va">pkg</span><span class="op">)</span>, pkg <span class="op">=</span> <span class="st">"."</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">cloud_broken</span><span class="op">(</span></span>
+<span>  job_name <span class="op">=</span> <span class="fu"><a href="cloud_job.html">cloud_job</a></span><span class="op">(</span>pkg <span class="op">=</span> <span class="va">pkg</span><span class="op">)</span>,</span>
+<span>  pkg <span class="op">=</span> <span class="st">"."</span>,</span>
+<span>  install_failures <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  timeout_failures <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">cloud_failed</span><span class="op">(</span>job_name <span class="op">=</span> <span class="fu"><a href="cloud_job.html">cloud_job</a></span><span class="op">(</span>pkg <span class="op">=</span> <span class="va">pkg</span><span class="op">)</span>, pkg <span class="op">=</span> <span class="st">"."</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>job_name</dt>
 <dd><p>The job name, as returned by <code><a href="cloud_check.html">cloud_check()</a></code>.</p></dd>
+
+
 <dt>pkg</dt>
 <dd><p>Path to package.</p></dd>
+
+
 <dt>install_failures</dt>
 <dd><p>Whether to include packages that failed to install.</p></dd>
+
+
 <dt>timeout_failures</dt>
 <dd><p>Whether to include packages that timed out.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A character vector with the names of broken packages, to be passed to <code><a href="cloud_check.html">cloud_check()</a></code>.</p>
+    
+
+<p>A character vector with the names of broken packages, to be passed to <code><a href="cloud_check.html">cloud_check()</a></code>.</p>
     </div>
     <div id="see-also">
     <h2>See also</h2>
@@ -120,7 +129,7 @@ were killed.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

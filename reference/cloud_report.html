@@ -63,59 +63,70 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">cloud_report</span><span class="op">(</span>
-  job_name <span class="op">=</span> <span class="fu"><a href="cloud_job.html">cloud_job</a></span><span class="op">(</span>pkg <span class="op">=</span> <span class="va">pkg</span><span class="op">)</span>,
-  pkg <span class="op">=</span> <span class="st">"."</span>,
-  file <span class="op">=</span> <span class="st">""</span>,
-  all <span class="op">=</span> <span class="cn">FALSE</span>,
-  results <span class="op">=</span> <span class="cn">NULL</span>,
-  failures <span class="op">=</span> <span class="cn">TRUE</span>
-<span class="op">)</span>
-
-<span class="fu">cloud_report_summary</span><span class="op">(</span>
-  job_name <span class="op">=</span> <span class="fu"><a href="cloud_job.html">cloud_job</a></span><span class="op">(</span>pkg <span class="op">=</span> <span class="va">pkg</span><span class="op">)</span>,
-  file <span class="op">=</span> <span class="st">""</span>,
-  all <span class="op">=</span> <span class="cn">FALSE</span>,
-  pkg <span class="op">=</span> <span class="st">"."</span>,
-  results <span class="op">=</span> <span class="cn">NULL</span>
-<span class="op">)</span>
-
-<span class="fu">cloud_report_problems</span><span class="op">(</span>
-  job_name <span class="op">=</span> <span class="fu"><a href="cloud_job.html">cloud_job</a></span><span class="op">(</span>pkg <span class="op">=</span> <span class="va">pkg</span><span class="op">)</span>,
-  pkg <span class="op">=</span> <span class="st">"."</span>,
-  file <span class="op">=</span> <span class="st">""</span>,
-  all <span class="op">=</span> <span class="cn">FALSE</span>,
-  results <span class="op">=</span> <span class="cn">NULL</span>
-<span class="op">)</span>
-
-<span class="fu">cloud_report_failures</span><span class="op">(</span>
-  job_name <span class="op">=</span> <span class="fu"><a href="cloud_job.html">cloud_job</a></span><span class="op">(</span>pkg <span class="op">=</span> <span class="va">pkg</span><span class="op">)</span>,
-  pkg <span class="op">=</span> <span class="st">"."</span>,
-  file <span class="op">=</span> <span class="st">""</span>,
-  results <span class="op">=</span> <span class="cn">NULL</span>
-<span class="op">)</span>
-
-<span class="fu">cloud_report_cran</span><span class="op">(</span>job_name <span class="op">=</span> <span class="fu"><a href="cloud_job.html">cloud_job</a></span><span class="op">(</span>pkg <span class="op">=</span> <span class="va">pkg</span><span class="op">)</span>, pkg <span class="op">=</span> <span class="st">"."</span>, results <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">cloud_report</span><span class="op">(</span></span>
+<span>  job_name <span class="op">=</span> <span class="fu"><a href="cloud_job.html">cloud_job</a></span><span class="op">(</span>pkg <span class="op">=</span> <span class="va">pkg</span><span class="op">)</span>,</span>
+<span>  pkg <span class="op">=</span> <span class="st">"."</span>,</span>
+<span>  file <span class="op">=</span> <span class="st">""</span>,</span>
+<span>  all <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  results <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  failures <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">cloud_report_summary</span><span class="op">(</span></span>
+<span>  job_name <span class="op">=</span> <span class="fu"><a href="cloud_job.html">cloud_job</a></span><span class="op">(</span>pkg <span class="op">=</span> <span class="va">pkg</span><span class="op">)</span>,</span>
+<span>  file <span class="op">=</span> <span class="st">""</span>,</span>
+<span>  all <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  pkg <span class="op">=</span> <span class="st">"."</span>,</span>
+<span>  results <span class="op">=</span> <span class="cn">NULL</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">cloud_report_problems</span><span class="op">(</span></span>
+<span>  job_name <span class="op">=</span> <span class="fu"><a href="cloud_job.html">cloud_job</a></span><span class="op">(</span>pkg <span class="op">=</span> <span class="va">pkg</span><span class="op">)</span>,</span>
+<span>  pkg <span class="op">=</span> <span class="st">"."</span>,</span>
+<span>  file <span class="op">=</span> <span class="st">""</span>,</span>
+<span>  all <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  results <span class="op">=</span> <span class="cn">NULL</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">cloud_report_failures</span><span class="op">(</span></span>
+<span>  job_name <span class="op">=</span> <span class="fu"><a href="cloud_job.html">cloud_job</a></span><span class="op">(</span>pkg <span class="op">=</span> <span class="va">pkg</span><span class="op">)</span>,</span>
+<span>  pkg <span class="op">=</span> <span class="st">"."</span>,</span>
+<span>  file <span class="op">=</span> <span class="st">""</span>,</span>
+<span>  results <span class="op">=</span> <span class="cn">NULL</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">cloud_report_cran</span><span class="op">(</span>job_name <span class="op">=</span> <span class="fu"><a href="cloud_job.html">cloud_job</a></span><span class="op">(</span>pkg <span class="op">=</span> <span class="va">pkg</span><span class="op">)</span>, pkg <span class="op">=</span> <span class="st">"."</span>, results <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>job_name</dt>
 <dd><p>The job name, as returned by <code><a href="cloud_check.html">cloud_check()</a></code>.</p></dd>
+
+
 <dt>pkg</dt>
 <dd><p>Path to package.</p></dd>
+
+
 <dt>file</dt>
 <dd><p>File to write output to. Default will write to console.</p></dd>
+
+
 <dt>all</dt>
 <dd><p>Whether to report all problems, including the ones that
 were already present in the old version of the package. This potentially
 generated a lot of output, most of which was irrelevant, so they are
 omitted by default, and only problems seen with the new version of
 the package are reported.</p></dd>
+
+
 <dt>results</dt>
 <dd><p>Results from <code><a href="cloud_results.html">cloud_results()</a></code>. Expert use only.</p></dd>
+
+
 <dt>failures</dt>
 <dd><p>Save failures to disk?</p></dd>
+
 </dl></div>
     <div id="see-also">
     <h2>See also</h2>
@@ -143,7 +154,7 @@ the package are reported.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

@@ -73,32 +73,39 @@ your package).</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">revdep_add</span><span class="op">(</span>pkg <span class="op">=</span> <span class="st">"."</span>, <span class="va">packages</span><span class="op">)</span>
-
-<span class="fu">revdep_add_broken</span><span class="op">(</span>
-  pkg <span class="op">=</span> <span class="st">"."</span>,
-  install_failures <span class="op">=</span> <span class="cn">FALSE</span>,
-  timeout_failures <span class="op">=</span> <span class="cn">FALSE</span>
-<span class="op">)</span>
-
-<span class="fu">revdep_add_new</span><span class="op">(</span>pkg <span class="op">=</span> <span class="st">"."</span><span class="op">)</span>
-
-<span class="fu">revdep_todo</span><span class="op">(</span>pkg <span class="op">=</span> <span class="st">"."</span><span class="op">)</span>
-
-<span class="fu">revdep_rm</span><span class="op">(</span>pkg <span class="op">=</span> <span class="st">"."</span>, <span class="va">packages</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">revdep_add</span><span class="op">(</span>pkg <span class="op">=</span> <span class="st">"."</span>, <span class="va">packages</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">revdep_add_broken</span><span class="op">(</span></span>
+<span>  pkg <span class="op">=</span> <span class="st">"."</span>,</span>
+<span>  install_failures <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  timeout_failures <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">revdep_add_new</span><span class="op">(</span>pkg <span class="op">=</span> <span class="st">"."</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">revdep_todo</span><span class="op">(</span>pkg <span class="op">=</span> <span class="st">"."</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">revdep_rm</span><span class="op">(</span>pkg <span class="op">=</span> <span class="st">"."</span>, <span class="va">packages</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>pkg</dt>
 <dd><p>Path to package.</p></dd>
+
+
 <dt>packages</dt>
 <dd><p>Character vector of package names to add</p></dd>
+
+
 <dt>install_failures</dt>
 <dd><p>Whether to re-add packages that failed to
 install.</p></dd>
+
+
 <dt>timeout_failures</dt>
 <dd><p>Whether to re-add packages that timed out.</p></dd>
+
 </dl></div>
 
   </div>
@@ -113,7 +120,7 @@ install.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>

@@ -84,22 +84,24 @@ of the revdep-checked package, together with its dependencies.</p></li>
 </ul></div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">dir_find</span><span class="op">(</span>
-  <span class="va">pkgdir</span>,
-  what <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"root"</span>, <span class="st">"db"</span>, <span class="st">"old"</span>, <span class="st">"new"</span>, <span class="st">"pkg"</span>, <span class="st">"check"</span>, <span class="st">"checks"</span>, <span class="st">"lib"</span>, <span class="st">"pkgold"</span>,
-    <span class="st">"pkgnew"</span>, <span class="st">"cloud"</span><span class="op">)</span>,
-  package <span class="op">=</span> <span class="cn">NULL</span>
-<span class="op">)</span>
-
-<span class="fu">dir_setup</span><span class="op">(</span><span class="va">pkgdir</span><span class="op">)</span>
-
-<span class="fu">dir_setup_package</span><span class="op">(</span><span class="va">pkgdir</span>, <span class="va">package</span><span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">dir_find</span><span class="op">(</span></span>
+<span>  <span class="va">pkgdir</span>,</span>
+<span>  what <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"root"</span>, <span class="st">"db"</span>, <span class="st">"old"</span>, <span class="st">"new"</span>, <span class="st">"pkg"</span>, <span class="st">"check"</span>, <span class="st">"checks"</span>, <span class="st">"lib"</span>, <span class="st">"pkgold"</span>,</span>
+<span>    <span class="st">"pkgnew"</span>, <span class="st">"cloud"</span><span class="op">)</span>,</span>
+<span>  package <span class="op">=</span> <span class="cn">NULL</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">dir_setup</span><span class="op">(</span><span class="va">pkgdir</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">dir_setup_package</span><span class="op">(</span><span class="va">pkgdir</span>, <span class="va">package</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>pkgdir</dt>
 <dd><p>Path to the package we are revdep-checking.</p></dd>
+
+
 <dt>what</dt>
 <dd><p>Directory to query:</p><ul><li><p><code>"root"</code>: the root of the check directory,</p></li>
 <li><p><code>"db"</code>: the database file,</p></li>
@@ -114,13 +116,18 @@ the old version.</p></li>
 <li><p><code>"pkgnew"</code>: package libraries to use when checking <code>package</code> with
 the new version.</p></li>
 </ul></dd>
+
+
 <dt>package</dt>
 <dd><p>The name of the package, if <code>what</code> is <code>"pkg"</code>, <code>"check"</code>,
 <code>"pkgold"</code> or <code>"pkgnew"</code>.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>Character scalar, the requested path.</p>
+    
+
+<p>Character scalar, the requested path.</p>
     </div>
 
   </div>
@@ -135,7 +142,7 @@ the new version.</p></li>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.2.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer></div>
