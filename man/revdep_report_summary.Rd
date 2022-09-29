@@ -10,13 +10,26 @@
 \usage{
 revdep_report_summary(pkg = ".", file = "", all = FALSE, results = NULL)
 
-revdep_report_problems(pkg = ".", file = "", all = FALSE, results = NULL)
+revdep_report_problems(
+  pkg = ".",
+  file = "",
+  all = FALSE,
+  results = NULL,
+  bioc = TRUE,
+  cran = TRUE
+)
 
-revdep_report_failures(pkg = ".", file = "", results = NULL)
+revdep_report_failures(
+  pkg = ".",
+  file = "",
+  results = NULL,
+  bioc = TRUE,
+  cran = TRUE
+)
 
 revdep_report_cran(pkg = ".", file = "", results = NULL)
 
-revdep_report(pkg = ".", all = FALSE, results = NULL)
+revdep_report(pkg = ".", all = FALSE, results = NULL, bioc = TRUE, cran = TRUE)
 }
 \arguments{
 \item{pkg}{Path to package.}
@@ -30,6 +43,11 @@ omitted by default, and only problems seen with the new version of
 the package are reported.}
 
 \item{results}{Cached results from \code{db_results()}. Expert use only.}
+
+\item{bioc}{Also check revdeps that live in Bioconductor?}
+
+\item{cran}{Should cran mirror be attached to getOpion("repos") if it
+is not already present.}
 }
 \description{
 You can use these functions to get intermediate reports of a \code{\link[=revdep_check]{revdep_check()}}

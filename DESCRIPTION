@@ -1,6 +1,6 @@
 Package: revdepcheck
 Title: Automated Reverse Dependency Checking
-Version: 1.0.0.9001
+Version: 1.0.0.9002
 Authors@R: c(
     person("Gábor", "Csárdi", , "csardi.gabor@gmail.com", c("cre", "aut", "cph")),
     person("Hadley", "Wickham", role = "aut"),
@@ -55,8 +55,8 @@ Suggests:
 VignetteBuilder: 
     knitr
 Remotes:
-    r-lib/crancache
+    git::https://github.com/r-lib/crancache.git@main,
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.1
