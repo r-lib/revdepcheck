@@ -23,6 +23,19 @@ db <- function(package) {
   }
 }
 
+db_disconnect <- function(package) {
+  if (!exists(package, envir = dbenv)) {
+    return()
+  }
+
+  con <- dbenv[[package]]
+  if (dbIsValid(con)) {
+    DBI::dbDisconnect(con)
+  }
+
+  rm(list = package, envir = dbenv)
+}
+
 db_check_version <- function(package) {
   db <- db(package)
   ## If not metadata table, we just assume that the DB is empty
@@ -130,14 +143,14 @@ db_metadata_get <- function(package, name) {
 
 db_clean <- function(package) {
   ## Do not use the cache, might be from an old run
-  if (exists(package, envir = dbenv)) rm(list = package, envir = dbenv)
+  db_disconnect(package)
 
   dbExecute(db(package), "DELETE FROM revdeps")
   dbExecute(db(package), "DELETE FROM metadata")
   db_metadata_init(package)
 
   ## Remove the cache
-  if (exists(package, envir = dbenv)) rm(list = package, envir = dbenv)
+  db_disconnect(package)
 }
 
 #' @importFrom DBI dbGetQuery

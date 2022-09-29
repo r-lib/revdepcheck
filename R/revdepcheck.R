@@ -245,8 +245,7 @@ report_exists <- function(pkg) {
 revdep_reset <- function(pkg = ".") {
   pkg <- pkg_check(pkg)
 
-  if (exists(pkg, envir = dbenv))
-    rm(list = pkg, envir = dbenv)
+  db_disconnect(pkg)
 
   unlink(dir_find(pkg, "lib"), recursive = TRUE)
   unlink(dir_find(pkg, "checks"), recursive = TRUE)
