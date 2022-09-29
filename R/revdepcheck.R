@@ -78,8 +78,9 @@ revdep_check <- function(pkg = ".",
       install = revdep_install(pkg, quiet = quiet, env = env, 
                                bioc = bioc, cran = cran),
       run =     revdep_run(pkg, quiet = quiet, timeout = timeout,
-                           num_workers = num_workers, env = env),
-      report =  revdep_final_report(pkg),
+                           num_workers = num_workers, env = env,
+                           bioc = bioc, cran = cran),
+      report =  revdep_final_report(pkg, bioc = bioc, cran = cran),
       done =    break
     )
     did_something <- TRUE
@@ -185,7 +186,8 @@ revdep_install <- function(pkg = ".", quiet = FALSE, env = character(),
 
 revdep_run <- function(pkg = ".", quiet = TRUE,
                        timeout = as.difftime(10, units = "mins"),
-                       num_workers = 1, bioc = TRUE, env = character()) {
+                       num_workers = 1, bioc = TRUE, env = character(),
+                       cran = TRUE) {
 
   pkg <- pkg_check(pkg)
   pkgname <- pkg_name(pkg)
@@ -205,7 +207,9 @@ revdep_run <- function(pkg = ".", quiet = TRUE,
       quiet = quiet,
       timeout = timeout,
       num_workers = num_workers,
-      env = env),
+      env = env,
+      bioc = bioc,
+      cran = cran),
     packages = data.frame(
       package = todo,
       state = if (length(todo)) "todo" else character(),
@@ -224,10 +228,10 @@ revdep_run <- function(pkg = ".", quiet = TRUE,
   invisible()
 }
 
-revdep_final_report <- function(pkg = ".") {
+revdep_final_report <- function(pkg = ".", bioc = TRUE, cran = TRUE) {
   db_metadata_set(pkg, "todo", "done")
   status("REPORT")
-  revdep_report(pkg)
+  revdep_report(pkg, bioc = bioc, cran = cran)
 }
 
 report_exists <- function(pkg) {

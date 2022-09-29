@@ -1,4 +1,4 @@
-download_opts <- function(pkgdir, pkgname) {
+download_opts <- function(pkgdir, pkgname, bioc, cran) {
   dir <- dir_find(pkgdir, "check", pkgname)
 
   func <- function(pkgname, dir, repos) {
@@ -8,7 +8,7 @@ download_opts <- function(pkgdir, pkgname) {
 
   r_process_options(
     func = func,
-    args = list(pkgname = pkgname, dir = dir, repos = get_repos(bioc = TRUE, cran = TRUE)),
+    args = list(pkgname = pkgname, dir = dir, repos = get_repos(bioc = bioc, cran = cran)),
     system_profile = FALSE,
     user_profile = FALSE,
     env = c(CRANCACHE_REPOS = "cran,bioc", CRANCACHE_QUIET = "yes")
@@ -18,9 +18,11 @@ download_opts <- function(pkgdir, pkgname) {
 download_task <- function(state, task) {
   pkgdir <- state$options$pkgdir
   pkgname <- task$args[[1]]
-
+  bioc <- state$options$bioc
+  cran <- state$options$cran
+  
   "!DEBUG Downloading source of `pkgname`"
-  px_opts <- download_opts(pkgdir, pkgname)
+  px_opts <- download_opts(pkgdir, pkgname, bioc, cran)
   px <- r_process$new(px_opts)
 
   ## update state

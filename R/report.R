@@ -70,14 +70,16 @@ revdep_report_section <- function(title, rows, file) {
 #' @export
 #' @rdname revdep_report_summary
 
-revdep_report_problems <- function(pkg = ".", file = "", all = FALSE, results = NULL) {
+revdep_report_problems <- function(pkg = ".", file = "", all = FALSE, results = NULL, 
+                                   bioc = TRUE, cran = TRUE) {
   ## We show the packages that
   ## 1. are newly broken
   ## 2. still broken, if all == TRUE
   problem <- function(x) {
     any(x$cmp$change == 1) || (all && any(x$cmp$change == 0))
   }
-  revdep_report_if(pkg = pkg, file = file, predicate = problem, results = results)
+  revdep_report_if(pkg = pkg, file = file, predicate = problem, results = results,
+                   bioc = bioc, cran = cran)
 }
 
 #' `revdep_report_failures()` generates a report about packages that failed
@@ -86,14 +88,17 @@ revdep_report_problems <- function(pkg = ".", file = "", all = FALSE, results = 
 #' @export
 #' @rdname revdep_report_summary
 
-revdep_report_failures <- function(pkg = ".", file = "", results = NULL) {
+revdep_report_failures <- function(pkg = ".", file = "", results = NULL, 
+                                   bioc = TRUE, cran = TRUE) {
   problem <- function(x) {
     !x$status %in% c("+", "-")
   }
-  revdep_report_if(pkg = pkg, file = file, predicate = problem, results = results)
+  revdep_report_if(pkg = pkg, file = file, predicate = problem, results = results, 
+                   bioc = bioc, cran = cran)
 }
 
-revdep_report_if <- function(pkg = ".", file = "", predicate, results = NULL) {
+revdep_report_if <- function(pkg = ".", file = "", predicate, results = NULL, 
+                             bioc = TRUE, cran = TRUE) {
 
   if (is_string(file) && !identical(file, "")) {
     file <- file(file, encoding = "UTF-8", open = "w")
@@ -107,7 +112,7 @@ revdep_report_if <- function(pkg = ".", file = "", predicate, results = NULL) {
   show <- map_lgl(results, predicate)
 
   if (sum(show)) {
-    map(results[show], failure_details, file = file)
+    map(results[show], failure_details, file = file, bioc = bioc, cran = cran)
   } else {
     cat("*Wow, no problems at all. :)*", file = file)
   }
@@ -115,9 +120,9 @@ revdep_report_if <- function(pkg = ".", file = "", predicate, results = NULL) {
   invisible()
 }
 
-failure_details <- function(x, file = "") {
+failure_details <- function(x, file = "", bioc = TRUE, cran = TRUE) {
   cat_header(x$package, file = file)
-  cat_package_info(x, file = file)
+  cat_package_info(x, file = file, bioc = bioc, cran = cran)
   cat_line(file = file)
 
   if (x$status == "E") {
@@ -155,7 +160,7 @@ failure_details <- function(x, file = "") {
   invisible()
 }
 
-cat_package_info <- function(cmp, file) {
+cat_package_info <- function(cmp, file, bioc = TRUE, cran = TRUE) {
   chk <- cmp$new
   type <- chk$type %||% "revdep"
   desc <-
@@ -171,15 +176,15 @@ cat_package_info <- function(cmp, file) {
     paste0("* GitHub: ", pkg_github(desc)),
     paste0("* Source code: ", pkg_source_link(chk)),
     addifx("Date/Publication"),
-    paste0("* Number of recursive dependencies: ", num_deps(chk$package)),
+    paste0("* Number of recursive dependencies: ", num_deps(chk$package, bioc = bioc, cran = cran)),
     sprintf("\nRun `%s_details(, \"%s\")` for more info", type, chk$package)
   )
   out <- wrap_tag("details", out)
   cat(out, file = file)
 }
 
-num_deps <- function(pkg) {
-  repos <- get_repos(bioc = TRUE, cran = TRUE)
+num_deps <- function(pkg, bioc = TRUE, cran = TRUE) {
+  repos <- get_repos(bioc = bioc, cran = cran)
   length(cran_deps(pkg, repos))
 }
 
@@ -333,7 +338,7 @@ on_cran <- function(x) {
 #' @export
 #' @rdname revdep_report_summary
 
-revdep_report <- function(pkg = ".", all = FALSE, results = NULL) {
+revdep_report <- function(pkg = ".", all = FALSE, results = NULL, bioc = TRUE, cran = TRUE) {
   pkg <- pkg_check(pkg)
   root <- dir_find(pkg, "root")
 
@@ -357,10 +362,12 @@ revdep_report <- function(pkg = ".", all = FALSE, results = NULL) {
   revdep_report_summary(pkg, file = readme_file, all = all, results = results)
 
   message("Writing problems to 'revdep/problems.md'")
-  revdep_report_problems(pkg, file = file.path(root, "problems.md"), all = all, results = results)
+  revdep_report_problems(pkg, file = file.path(root, "problems.md"), all = all, 
+                         results = results, bioc = bioc, cran = cran)
 
   message("Writing failures to 'revdep/failures.md'")
-  revdep_report_failures(pkg, file = file.path(root, "failures.md"), results = results)
+  revdep_report_failures(pkg, file = file.path(root, "failures.md"), results = results, 
+                         bioc = bioc, cran = cran)
 
   message("Writing CRAN report to 'revdep/cran.md'")
   revdep_report_cran(pkg, file = file.path(root, "cran.md"), results = results)
