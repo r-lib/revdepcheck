@@ -48,15 +48,15 @@ cloud_status <- function(job_name = cloud_job(), update_interval = 10) {
 
     if (results[["failed"]] > 0) {
         cli_status_clear(id = status_id, result = "failed", msg_failed = paste0("{.emph FAILED}: ", status_bar_text))
-        cli_alert("run {.fun revdepcheck::cloud_summary} for interactive results")
-        cli_alert("run {.fun revdepcheck::cloud_report} for markdown reports")
+        cli_alert("run {.run revdepcheck::cloud_summary()} for interactive results")
+        cli_alert("run {.run revdepcheck::cloud_report()} for markdown reports")
         return(FALSE)
     }
 
     if (num_completed == length(info$revdep_packages)) {
         cli_status_clear(id = status_id, result = "done", msg_done = paste0("{.emph SUCCEEDED}: ", status_bar_text))
-        cli_alert("run {.fun revdepcheck::cloud_summary} for interactive results")
-        cli_alert("run {.fun revdepcheck::cloud_report} for markdown reports")
+        cli_alert("run {.run revdepcheck::cloud_summary()} for interactive results")
+        cli_alert("run {.run revdepcheck::cloud_report()} for markdown reports")
         return(TRUE)
     }
 
@@ -234,9 +234,8 @@ cloud_check <- function(pkg = ".",
 
   job_name <- patch_content$id
 
-  cli_alert_success("Created job {.arg job_name}: {.val {job_name}}")
-
-  cli_alert("Run {.fun revdepcheck::cloud_status} to monitor job status")
+  cli_alert_success("Created job {.val {job_name}}")
+  cli_alert("Run {.run revdepcheck::cloud_status()} to monitor job status")
 
   cloud_job(job_name = job_name)
   cloud <- dir_find(pkg, "cloud")
