@@ -172,7 +172,7 @@ cat_package_info <- function(cmp, file) {
     paste0("* Source code: ", pkg_source_link(chk)),
     addifx("Date/Publication"),
     paste0("* Number of recursive dependencies: ", num_deps(chk$package)),
-    sprintf("\nRun `%s_details(, \"%s\")` for more info", type, chk$package)
+    sprintf("\nRun `revdepcheck::%s_details(, \"%s\")` for more info", type, chk$package)
   )
   out <- wrap_tag("details", out)
   cat(out, file = file)
