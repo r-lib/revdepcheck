@@ -20,7 +20,7 @@ cran_revdeps_versions <- function(package, dependencies = TRUE, bioc = FALSE) {
   alldeps <- allpkgs[, dependencies, drop = FALSE]
   alldeps[is.na(alldeps)] <- ""
   deps <- apply(alldeps, 1, paste, collapse = ",")
-  rd <- grepl(paste0("\\b", package, "\\b"), deps)
+  rd <- grepl(paste0("\\b(?<!\\.)", package, "(?!\\.)\\b"), deps, perl = TRUE)
 
   data.frame(
     stringsAsFactors = FALSE,
