@@ -42,9 +42,7 @@ cloud_status <- function(job_name = cloud_job(), update_interval = 10) {
 
     elapsed <- hms::as_hms(as.integer(difftime(current_time, started_time, units = "secs")))
 
-    eta <- calc_eta(started_time, current_time, num_running, num_completed, size)
-
-    status_bar_text <- "[{num_queued}/{col_blue(num_running)}/{col_green(results[['succeeded']])}/{col_red(results[['failed']])} - {.strong {size}}] {elapsed} | ETA: {eta}"
+    status_bar_text <- "[{num_queued}/{col_blue(num_running)}/{col_green(results[['succeeded']])}/{col_red(results[['failed']])} - {.strong {size}}] {elapsed}"
 
     if (results[["failed"]] > 0) {
         cli_status_clear(id = status_id, result = "failed", msg_failed = paste0("{.emph FAILED}: ", status_bar_text))
@@ -69,27 +67,6 @@ cloud_status <- function(job_name = cloud_job(), update_interval = 10) {
   }
 
   return(invisible(res))
-}
-
-calc_eta <- function(creation_time, current_time, running, completed, total) {
-  if (completed >= total) {
-    return("Done")
-  }
-
-  infinity <- "\U221E"
-
-  if (running == 0) {
-    return(infinity)
-  }
-
-  time_diff <- as.integer(difftime(current_time, creation_time, units = "secs"))
-  to_go <- total - completed
-  secs_to_go <- time_diff / completed * to_go
-  if (secs_to_go == Inf) {
-    return(infinity)
-  }
-
-  prettyunits::pretty_sec(secs_to_go)
 }
 
 #' Fetch results from the cloud
