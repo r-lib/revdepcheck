@@ -42,9 +42,7 @@ cloud_status <- function(job_name = cloud_job(), update_interval = 10) {
 
     elapsed <- hms::as_hms(as.integer(difftime(current_time, started_time, units = "secs")))
 
-    eta <- calc_eta(started_time, current_time, num_running, num_completed, size)
-
-    status_bar_text <- "[{num_queued}/{col_blue(num_running)}/{col_green(results[['succeeded']])}/{col_red(results[['failed']])} - {.strong {size}}] {elapsed} | ETA: {eta}"
+    status_bar_text <- "[{num_queued}/{col_blue(num_running)}/{col_green(results[['succeeded']])}/{col_red(results[['failed']])} - {.strong {size}}] {elapsed}"
 
     if (results[["failed"]] > 0) {
         cli_status_clear(id = status_id, result = "failed", msg_failed = paste0("{.emph FAILED}: ", status_bar_text))
@@ -69,27 +67,6 @@ cloud_status <- function(job_name = cloud_job(), update_interval = 10) {
   }
 
   return(invisible(res))
-}
-
-calc_eta <- function(creation_time, current_time, running, completed, total) {
-  if (completed >= total) {
-    return("Done")
-  }
-
-  infinity <- "\U221E"
-
-  if (running == 0) {
-    return(infinity)
-  }
-
-  time_diff <- as.integer(difftime(current_time, creation_time, units = "secs"))
-  to_go <- total - completed
-  secs_to_go <- time_diff / completed * to_go
-  if (secs_to_go == Inf) {
-    return(infinity)
-  }
-
-  prettyunits::pretty_sec(secs_to_go)
 }
 
 #' Fetch results from the cloud
@@ -176,8 +153,9 @@ cloud_check <- function(pkg = ".",
   r_version = "4.1.1",
   check_args = "--no-manual") {
   if (is.null(tarball)) {
+    cli::cli_alert_info("Building package tarball")
     pkg <- pkg_check(pkg)
-    tarball <- pkgbuild::build(path = pkg)
+    tarball <- pkgbuild::build(path = pkg, quiet = TRUE)
   }
 
   package_name <- desc::desc_get_field("Package", file = tarball)
@@ -211,37 +189,33 @@ cloud_check <- function(pkg = ".",
   presigned_url <- post_content[["_source_presigned_url"]]
   job_name <- post_content[["id"]]
 
-  cli_alert_success("Creating cloud job {.arg job_name}: {.val {job_name}}")
+  cli_alert_info("Creating cloud job {.val {job_name}}")
 
-  cli_alert_info("Uploading {.file {tarball}}")
-
+  cli_alert_info("Uploading package tarball")
   curl::curl_upload(tarball, presigned_url, verbose = FALSE)
+  cli_alert_success("Uploaded package tarball")
 
-  cli_alert_success("Uploaded {.file {tarball}}")
-
-  cli_alert_info("Spawning batch job for cloud job {.arg job_name}: {.val {job_name}}")
-
+  cli_alert_info("Spawning batch job")
   patch_response <- PATCH("https://xgyefaepu5.execute-api.us-east-1.amazonaws.com",
     config = add_headers("x-api-key" = Sys.getenv("RSTUDIO_CLOUD_REVDEP_KEY")),
     path = paste0("staging/check", "/", job_name),
     body = list(status = "running"),
     encode = "json"
   )
-
   cloud_stop_for_status(patch_response)
+  cli_alert_success("Spawned batch job")
 
   patch_content <- content(patch_response)
-
   job_name <- patch_content$id
 
-  cli_alert_success("Created job {.val {job_name}}")
-  cli_alert("Run {.run revdepcheck::cloud_status()} to monitor job status")
-
+  # Create output directory and set as active job
   cloud_job(job_name = job_name)
   cloud <- dir_find(pkg, "cloud")
   out_dir <- file.path(cloud, job_name)
   dir.create(out_dir, showWarnings = FALSE, recursive = TRUE, mode = "744")
   cloud_job(job_name)
+
+  cli_alert("Run {.run revdepcheck::cloud_status()} to monitor job status")
 
   invisible(job_name)
 }
