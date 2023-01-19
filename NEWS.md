@@ -1,5 +1,10 @@
 # 1.0.0.9000
 
+* `cloud_check()` gains the ability to add additional packages as the source
+  of reverse dependencies.
+
+* `cran_revdeps()` now accepts multiple packge names.
+
 * `cloud_results()` gains a progress bar so you can see what's happening
   for large revdep runs (#273)
   

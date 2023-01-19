@@ -141,6 +141,8 @@ cloud_fetch_results <- function(job_name = cloud_job(pkg = pkg), pkg = ".") {
 #'   equal to [cran_revdeps()]
 #' @param r_version The R version to use.
 #' @param check_args Additional argument to pass to `R CMD check`
+#' @param extra_revdeps Additional packages to use as source for reverse
+#'   dependencies.
 #' @returns The AWS Batch job name
 #' @inheritParams revdep_check
 #' @importFrom cli cli_alert_info cli_alert_success cli_alert_danger
@@ -150,6 +152,7 @@ cloud_fetch_results <- function(job_name = cloud_job(pkg = pkg), pkg = ".") {
 cloud_check <- function(pkg = ".",
   tarball = NULL,
   revdep_packages = NULL,
+  extra_revdeps = NULL,
   r_version = "4.1.1",
   check_args = "--no-manual") {
   if (is.null(tarball)) {
@@ -164,7 +167,10 @@ cloud_check <- function(pkg = ".",
   # Lookup revdeps with R, as the RSPM db seems not quite right, for instance
   # it seems to include archived packages.
   if (is.null(revdep_packages)) {
-    revdep_packages <- setdiff(cran_revdeps(package_name), package_name)
+    revdep_packages <- setdiff(
+      cran_revdeps(c(package_name, extra_revdeps)),
+      package_name
+    )
   }
 
   if (length(revdep_packages) == 1) {
