@@ -67,6 +67,7 @@
 <span>  pkg <span class="op">=</span> <span class="st">"."</span>,</span>
 <span>  tarball <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  revdep_packages <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  extra_revdeps <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  r_version <span class="op">=</span> <span class="st">"4.1.1"</span>,</span>
 <span>  check_args <span class="op">=</span> <span class="st">"--no-manual"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -80,12 +81,17 @@
 
 <dt>tarball</dt>
 <dd><p>A pre-built package tarball, if <code>NULL</code> a tarball will be
-automatically built for the package at <code>pkg</code> by <code><a href="https://rdrr.io/pkg/pkgbuild/man/build.html" class="external-link">pkgbuild::build()</a></code>.</p></dd>
+automatically built for the package at <code>pkg</code> by <code><a href="https://r-lib.github.io/pkgbuild/reference/build.html" class="external-link">pkgbuild::build()</a></code>.</p></dd>
 
 
 <dt>revdep_packages</dt>
 <dd><p>A character vector of packages to check, if <code>NULL</code>
 equal to <code><a href="cran_revdeps.html">cran_revdeps()</a></code></p></dd>
+
+
+<dt>extra_revdeps</dt>
+<dd><p>Additional packages to use as source for reverse
+dependencies.</p></dd>
 
 
 <dt>r_version</dt>
@@ -128,7 +134,7 @@ equal to <code><a href="cran_revdeps.html">cran_revdeps()</a></code></p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer></div>
