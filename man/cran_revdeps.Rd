@@ -7,7 +7,7 @@
 cran_revdeps(package, dependencies = TRUE, bioc = FALSE)
 }
 \arguments{
-\item{package}{The package to search for reverse dependencies}
+\item{package}{The package (or packages) to search for reverse dependencies.}
 
 \item{dependencies}{Which types of revdeps should be checked. For CRAN
 release, we recommend using the default.}
