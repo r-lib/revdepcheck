@@ -8,6 +8,7 @@ cloud_check(
   pkg = ".",
   tarball = NULL,
   revdep_packages = NULL,
+  extra_revdeps = NULL,
   r_version = "4.1.1",
   check_args = "--no-manual"
 )
@@ -20,6 +21,9 @@ automatically built for the package at \code{pkg} by \code{\link[pkgbuild:build]
 
 \item{revdep_packages}{A character vector of packages to check, if \code{NULL}
 equal to \code{\link[=cran_revdeps]{cran_revdeps()}}}
+
+\item{extra_revdeps}{Additional packages to use as source for reverse
+dependencies.}
 
 \item{r_version}{The R version to use.}
 
