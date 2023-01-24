@@ -314,8 +314,7 @@ cloud_check_result <- function(check_log, description, dependency_error) {
         # DESCRIPTION can exist but be empty, e.g. for a Bioconductor package
         # or a when package's minimum R version isn't met
         # at the VERY LEAST, let's get a package name
-        package     = description$get("Package") %|%
-                        sub("[.]Rcheck", "", basename(check_dir)),
+        package     = description$get_field("Package", sub("[.]Rcheck$", "", basename(check_dir))),
         version     = description$get("Version")[[1]],
         cran        = description$get_field("Repository", "") == "CRAN",
         bioc        = description$has_fields("biocViews"),
@@ -389,7 +388,7 @@ cloud_compare <- function(pkg) {
     # DESCRIPTION can exist but be empty, e.g. for a Bioconductor package
     # or a when package's minimum R version isn't met
     # at the VERY LEAST, let's get a package name
-    res <- rcmdcheck_error(description$get("Package") %|% basename(pkg), old, new)
+    res <- rcmdcheck_error(description$get_field("Package", basename(pkg)), old, new)
     res$version <- description$get("Version")[[1]]
     return(res)
   }
