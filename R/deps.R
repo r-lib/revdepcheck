@@ -8,13 +8,11 @@
 #' @inheritParams revdep_check
 #' @export
 cran_revdeps <- function(package, dependencies = TRUE, bioc = FALSE) {
-  pkgs <- lapply(package, function(pkg) cran_revdeps_versions(pkg, dependencies, bioc)$package)
-  pkgs <- unique(unlist(pkgs))
-  pkgs[order(tolower(pkgs))]
+  cran_revdeps_versions(package, dependencies, bioc)$package
 }
 
-cran_revdeps_versions <- function(package, dependencies = TRUE, bioc = FALSE) {
-  stopifnot(is_string(package))
+cran_revdeps_versions <- function(packages, dependencies = TRUE, bioc = FALSE) {
+  stopifnot(is.character(packages))
 
   cache <- pkgcache::cranlike_metadata_cache$new(
     repos = list(CRAN = "https://cloud.r-project.org"),
@@ -22,7 +20,7 @@ cran_revdeps_versions <- function(package, dependencies = TRUE, bioc = FALSE) {
     bioc = FALSE
   )
 
-  revdeps <- cache$revdeps(package, dependencies = dependencies, recursive = FALSE)
+  revdeps <- cache$revdeps(packages, dependencies = dependencies, recursive = FALSE)
   revdeps[c("package", "version")]
 }
 
