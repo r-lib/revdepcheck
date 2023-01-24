@@ -15,5 +15,6 @@ release, we recommend using the default.}
 \item{bioc}{Also check revdeps that live in Bioconductor?}
 }
 \description{
-Retrieve the reverse dependencies for a package
+Uses a hard coded CRAN mirror of \url{https://cloud.r-project.org} to ensure
+that all users get the same results.
 }

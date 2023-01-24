@@ -1,6 +1,9 @@
 
 #' Retrieve the reverse dependencies for a package
 #'
+#' Uses a hard coded CRAN mirror of <https://cloud.r-project.org> to ensure
+#' that all users get the same results.
+#'
 #' @param package The package (or packages) to search for reverse dependencies.
 #' @inheritParams revdep_check
 #' @export
@@ -12,22 +15,17 @@ cran_revdeps <- function(package, dependencies = TRUE, bioc = FALSE) {
 
 #' @importFrom remotes bioc_install_repos
 #' @importFrom crancache available_packages
-
 cran_revdeps_versions <- function(package, dependencies = TRUE, bioc = FALSE) {
   stopifnot(is_string(package))
-  repos <- get_repos(bioc)
 
-  allpkgs <- available_packages(repos = repos)
-  alldeps <- allpkgs[, dependencies, drop = FALSE]
-  alldeps[is.na(alldeps)] <- ""
-  deps <- apply(alldeps, 1, paste, collapse = ",")
-  rd <- grepl(paste0("\\b", package, "\\b"), deps)
-
-  data.frame(
-    stringsAsFactors = FALSE,
-    package = unname(allpkgs[rd, "Package"]),
-    version = unname(allpkgs[rd, "Version"])
+  cache <- pkgcache::cranlike_metadata_cache$new(
+    repos = list(CRAN = "https://cloud.r-project.org"),
+    platforms = "source",
+    bioc = FALSE
   )
+
+  revdeps <- cache$revdeps(package, dependencies = dependencies, recursive = FALSE)
+  revdeps[c("package", "version")]
 }
 
 get_repos <- function(bioc) {
