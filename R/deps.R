@@ -13,8 +13,6 @@ cran_revdeps <- function(package, dependencies = TRUE, bioc = FALSE) {
   pkgs[order(tolower(pkgs))]
 }
 
-#' @importFrom remotes bioc_install_repos
-#' @importFrom crancache available_packages
 cran_revdeps_versions <- function(package, dependencies = TRUE, bioc = FALSE) {
   stopifnot(is_string(package))
 
@@ -31,7 +29,7 @@ cran_revdeps_versions <- function(package, dependencies = TRUE, bioc = FALSE) {
 get_repos <- function(bioc) {
   repos <- c(
     getOption("repos"),
-    if (bioc) bioc_install_repos()
+    if (bioc) remotes::bioc_install_repos()
   )
   if (! "CRAN" %in% names(repos) || repos["CRAN"] == "@CRAN@") {
     repos["CRAN"] <- "https://cloud.r-project.org"
