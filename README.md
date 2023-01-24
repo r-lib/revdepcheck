@@ -27,10 +27,10 @@
 
 ## Installation
 
-Once on CRAN, install the package as usual:
+This package is not available on CRAN yet. Install it with:
 
 ```r
-install.packages("revdepcheck")
+devtools::install_github('r-lib/revdepcheck')
 ```
 
 ## Usage
