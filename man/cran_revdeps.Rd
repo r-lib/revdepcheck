@@ -15,6 +15,6 @@ release, we recommend using the default.}
 \item{bioc}{Also check revdeps that live in Bioconductor?}
 }
 \description{
-Uses a hard coded CRAN mirror of \url{https://cloud.r-project.org} to ensure
-that all users get the same results.
+Uses the value of \code{getOption("repo")[["CRAN"]]} to determine where to find
+CRAN metadata.
 }

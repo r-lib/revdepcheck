@@ -1,8 +1,8 @@
 
 #' Retrieve the reverse dependencies for a package
 #'
-#' Uses a hard coded CRAN mirror of <https://cloud.r-project.org> to ensure
-#' that all users get the same results.
+#' Uses the value of `getOption("repo")[["CRAN"]]` to determine where to find
+#' CRAN metadata.
 #'
 #' @param package The package (or packages) to search for reverse dependencies.
 #' @inheritParams revdep_check
@@ -15,9 +15,8 @@ cran_revdeps_versions <- function(packages, dependencies = TRUE, bioc = FALSE) {
   stopifnot(is.character(packages))
 
   cache <- pkgcache::cranlike_metadata_cache$new(
-    repos = list(CRAN = "https://cloud.r-project.org"),
-    platforms = "source",
-    bioc = FALSE
+    repos = get_repos(bioc = bioc),
+    platforms = "source"
   )
 
   revdeps <- cache$revdeps(packages, dependencies = dependencies, recursive = FALSE)
