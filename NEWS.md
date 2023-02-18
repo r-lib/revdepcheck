@@ -1,4 +1,6 @@
-# 1.0.0.9000
+# revdepcheck (development version)
+
+* updated pkgdown template and url to https://revdepcheck.r-lib.org.
 
 * `cloud_check()` gains the ability to add additional packages as the source
   of reverse dependencies.
@@ -18,6 +20,6 @@
   and problems.md.
 
 
-# 1.0.0
+# revdepcheck 1.0.0
 
 First public release.
