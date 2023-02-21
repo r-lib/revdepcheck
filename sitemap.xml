@@ -1,108 +1,108 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://r-lib.github.io/revdepcheck/404.html</loc>
+    <loc>https://revdepcheck.r-lib.org/404.html</loc>
   </url>
   <url>
-    <loc>https://r-lib.github.io/revdepcheck/LICENSE-text.html</loc>
+    <loc>https://revdepcheck.r-lib.org/LICENSE-text.html</loc>
   </url>
   <url>
-    <loc>https://r-lib.github.io/revdepcheck/LICENSE.html</loc>
+    <loc>https://revdepcheck.r-lib.org/LICENSE.html</loc>
   </url>
   <url>
-    <loc>https://r-lib.github.io/revdepcheck/articles/cloud.html</loc>
+    <loc>https://revdepcheck.r-lib.org/articles/cloud.html</loc>
   </url>
   <url>
-    <loc>https://r-lib.github.io/revdepcheck/articles/index.html</loc>
+    <loc>https://revdepcheck.r-lib.org/articles/index.html</loc>
   </url>
   <url>
-    <loc>https://r-lib.github.io/revdepcheck/authors.html</loc>
+    <loc>https://revdepcheck.r-lib.org/authors.html</loc>
   </url>
   <url>
-    <loc>https://r-lib.github.io/revdepcheck/index.html</loc>
+    <loc>https://revdepcheck.r-lib.org/index.html</loc>
   </url>
   <url>
-    <loc>https://r-lib.github.io/revdepcheck/news/index.html</loc>
+    <loc>https://revdepcheck.r-lib.org/news/index.html</loc>
   </url>
   <url>
-    <loc>https://r-lib.github.io/revdepcheck/reference/cloud_broken.html</loc>
+    <loc>https://revdepcheck.r-lib.org/reference/cloud_broken.html</loc>
   </url>
   <url>
-    <loc>https://r-lib.github.io/revdepcheck/reference/cloud_browse.html</loc>
+    <loc>https://revdepcheck.r-lib.org/reference/cloud_browse.html</loc>
   </url>
   <url>
-    <loc>https://r-lib.github.io/revdepcheck/reference/cloud_cancel.html</loc>
+    <loc>https://revdepcheck.r-lib.org/reference/cloud_cancel.html</loc>
   </url>
   <url>
-    <loc>https://r-lib.github.io/revdepcheck/reference/cloud_check.html</loc>
+    <loc>https://revdepcheck.r-lib.org/reference/cloud_check.html</loc>
   </url>
   <url>
-    <loc>https://r-lib.github.io/revdepcheck/reference/cloud_details.html</loc>
+    <loc>https://revdepcheck.r-lib.org/reference/cloud_details.html</loc>
   </url>
   <url>
-    <loc>https://r-lib.github.io/revdepcheck/reference/cloud_email.html</loc>
+    <loc>https://revdepcheck.r-lib.org/reference/cloud_email.html</loc>
   </url>
   <url>
-    <loc>https://r-lib.github.io/revdepcheck/reference/cloud_fetch_results.html</loc>
+    <loc>https://revdepcheck.r-lib.org/reference/cloud_fetch_results.html</loc>
   </url>
   <url>
-    <loc>https://r-lib.github.io/revdepcheck/reference/cloud_job.html</loc>
+    <loc>https://revdepcheck.r-lib.org/reference/cloud_job.html</loc>
   </url>
   <url>
-    <loc>https://r-lib.github.io/revdepcheck/reference/cloud_job_mapping.html</loc>
+    <loc>https://revdepcheck.r-lib.org/reference/cloud_job_mapping.html</loc>
   </url>
   <url>
-    <loc>https://r-lib.github.io/revdepcheck/reference/cloud_plot.html</loc>
+    <loc>https://revdepcheck.r-lib.org/reference/cloud_plot.html</loc>
   </url>
   <url>
-    <loc>https://r-lib.github.io/revdepcheck/reference/cloud_report.html</loc>
+    <loc>https://revdepcheck.r-lib.org/reference/cloud_report.html</loc>
   </url>
   <url>
-    <loc>https://r-lib.github.io/revdepcheck/reference/cloud_results.html</loc>
+    <loc>https://revdepcheck.r-lib.org/reference/cloud_results.html</loc>
   </url>
   <url>
-    <loc>https://r-lib.github.io/revdepcheck/reference/cloud_status.html</loc>
+    <loc>https://revdepcheck.r-lib.org/reference/cloud_status.html</loc>
   </url>
   <url>
-    <loc>https://r-lib.github.io/revdepcheck/reference/cloud_summary.html</loc>
+    <loc>https://revdepcheck.r-lib.org/reference/cloud_summary.html</loc>
   </url>
   <url>
-    <loc>https://r-lib.github.io/revdepcheck/reference/cran_revdeps.html</loc>
+    <loc>https://revdepcheck.r-lib.org/reference/cran_revdeps.html</loc>
   </url>
   <url>
-    <loc>https://r-lib.github.io/revdepcheck/reference/db_setup.html</loc>
+    <loc>https://revdepcheck.r-lib.org/reference/db_setup.html</loc>
   </url>
   <url>
-    <loc>https://r-lib.github.io/revdepcheck/reference/dir_find.html</loc>
+    <loc>https://revdepcheck.r-lib.org/reference/dir_find.html</loc>
   </url>
   <url>
-    <loc>https://r-lib.github.io/revdepcheck/reference/index.html</loc>
+    <loc>https://revdepcheck.r-lib.org/reference/index.html</loc>
   </url>
   <url>
-    <loc>https://r-lib.github.io/revdepcheck/reference/revdep_add.html</loc>
+    <loc>https://revdepcheck.r-lib.org/reference/revdep_add.html</loc>
   </url>
   <url>
-    <loc>https://r-lib.github.io/revdepcheck/reference/revdep_check.html</loc>
+    <loc>https://revdepcheck.r-lib.org/reference/revdep_check.html</loc>
   </url>
   <url>
-    <loc>https://r-lib.github.io/revdepcheck/reference/revdep_details.html</loc>
+    <loc>https://revdepcheck.r-lib.org/reference/revdep_details.html</loc>
   </url>
   <url>
-    <loc>https://r-lib.github.io/revdepcheck/reference/revdep_email.html</loc>
+    <loc>https://revdepcheck.r-lib.org/reference/revdep_email.html</loc>
   </url>
   <url>
-    <loc>https://r-lib.github.io/revdepcheck/reference/revdep_env_vars.html</loc>
+    <loc>https://revdepcheck.r-lib.org/reference/revdep_env_vars.html</loc>
   </url>
   <url>
-    <loc>https://r-lib.github.io/revdepcheck/reference/revdep_maintainers.html</loc>
+    <loc>https://revdepcheck.r-lib.org/reference/revdep_maintainers.html</loc>
   </url>
   <url>
-    <loc>https://r-lib.github.io/revdepcheck/reference/revdep_report_summary.html</loc>
+    <loc>https://revdepcheck.r-lib.org/reference/revdep_report_summary.html</loc>
   </url>
   <url>
-    <loc>https://r-lib.github.io/revdepcheck/reference/run_event_loop.html</loc>
+    <loc>https://revdepcheck.r-lib.org/reference/run_event_loop.html</loc>
   </url>
   <url>
-    <loc>https://r-lib.github.io/revdepcheck/reference/schedule_next_task.html</loc>
+    <loc>https://revdepcheck.r-lib.org/reference/schedule_next_task.html</loc>
   </url>
 </urlset>
