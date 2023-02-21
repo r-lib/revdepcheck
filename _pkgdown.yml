@@ -1,7 +1,8 @@
 url: https://revdepcheck.r-lib.org
 
+# don't use dev mode: auto since revdepcheck is not released on CRAN
 development:
-  mode: auto
+  mode: release
 
 template:
   package: tidytemplate
