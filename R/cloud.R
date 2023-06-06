@@ -153,7 +153,7 @@ cloud_check <- function(pkg = ".",
   tarball = NULL,
   revdep_packages = NULL,
   extra_revdeps = NULL,
-  r_version = "4.2.1",
+  r_version = "4.3.0",
   check_args = "--no-manual") {
   if (is.null(tarball)) {
     cli::cli_alert_info("Building package tarball")
