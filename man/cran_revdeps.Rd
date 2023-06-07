@@ -4,7 +4,7 @@
 \alias{cran_revdeps}
 \title{Retrieve the reverse dependencies for a package}
 \usage{
-cran_revdeps(package, dependencies = TRUE, bioc = TRUE)
+cran_revdeps(package, dependencies = TRUE, bioc = FALSE)
 }
 \arguments{
 \item{package}{The package (or packages) to search for reverse dependencies.}
