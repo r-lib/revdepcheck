@@ -143,6 +143,10 @@ cloud_fetch_results <- function(job_name = cloud_job(pkg = pkg), pkg = ".") {
 #' @param check_args Additional argument to pass to `R CMD check`
 #' @param extra_revdeps Additional packages to use as source for reverse
 #'   dependencies.
+#' @param bioc Also check revdeps that live in Bioconductor? Default `TRUE`.
+#'   Note that the cloud revdep check service does not currently include system
+#'   dependencies of Bioconductor packages, so there is potential for more
+#'   failed checks.
 #' @returns The AWS Batch job name
 #' @inheritParams revdep_check
 #' @importFrom cli cli_alert_info cli_alert_success cli_alert_danger

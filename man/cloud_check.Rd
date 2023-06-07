@@ -30,7 +30,10 @@ dependencies.}
 
 \item{check_args}{Additional argument to pass to \verb{R CMD check}}
 
-\item{bioc}{Also check revdeps that live in Bioconductor?}
+\item{bioc}{Also check revdeps that live in Bioconductor? Default \code{TRUE}.
+Note that the cloud revdep check service does not currently include system
+dependencies of Bioconductor packages, so there is potential for more
+failed checks.}
 }
 \value{
 The AWS Batch job name
