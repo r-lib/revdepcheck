@@ -10,7 +10,8 @@ cloud_check(
   revdep_packages = NULL,
   extra_revdeps = NULL,
   r_version = "4.2.1",
-  check_args = "--no-manual"
+  check_args = "--no-manual",
+  bioc = TRUE
 )
 }
 \arguments{
@@ -28,6 +29,8 @@ dependencies.}
 \item{r_version}{The R version to use.}
 
 \item{check_args}{Additional argument to pass to \verb{R CMD check}}
+
+\item{bioc}{Also check revdeps that live in Bioconductor?}
 }
 \value{
 The AWS Batch job name

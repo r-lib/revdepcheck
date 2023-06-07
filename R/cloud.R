@@ -154,7 +154,8 @@ cloud_check <- function(pkg = ".",
   revdep_packages = NULL,
   extra_revdeps = NULL,
   r_version = "4.2.1",
-  check_args = "--no-manual") {
+  check_args = "--no-manual",
+  bioc = TRUE) {
   if (is.null(tarball)) {
     cli::cli_alert_info("Building package tarball")
     pkg <- pkg_check(pkg)
@@ -168,7 +169,7 @@ cloud_check <- function(pkg = ".",
   # it seems to include archived packages.
   if (is.null(revdep_packages)) {
     revdep_packages <- setdiff(
-      cran_revdeps(c(package_name, extra_revdeps)),
+      cran_revdeps(c(package_name, extra_revdeps), bioc = bioc),
       package_name
     )
   }
