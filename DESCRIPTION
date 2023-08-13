@@ -1,6 +1,6 @@
 Package: revdepcheck
 Title: Automated Reverse Dependency Checking
-Version: 1.0.0.9001
+Version: 1.0.0.9003
 Authors@R: c(
     person("Gábor", "Csárdi", , "csardi.gabor@gmail.com", c("cre", "aut", "cph")),
     person("Hadley", "Wickham", role = "aut"),
@@ -30,6 +30,7 @@ Imports:
     httr,
     jsonlite,
     knitr,
+    memoise,
     pkgbuild,
     prettyunits,
     processx (>= 3.3.0),

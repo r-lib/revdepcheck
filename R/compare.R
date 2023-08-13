@@ -1,6 +1,4 @@
 
-#' @importFrom rcmdcheck compare_checks
-
 try_compare_checks <- function(package, old, new) {
   if (!inherits(old, "rcmdcheck") || !inherits(new, "rcmdcheck")) {
     rcmdcheck_error(package, old, new)

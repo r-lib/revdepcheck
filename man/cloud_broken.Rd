@@ -3,6 +3,7 @@
 \name{cloud_broken}
 \alias{cloud_broken}
 \alias{cloud_failed}
+\alias{cloud_problems}
 \title{Retrieve the names broken or failed packages}
 \usage{
 cloud_broken(
@@ -13,6 +14,8 @@ cloud_broken(
 )
 
 cloud_failed(job_name = cloud_job(pkg = pkg), pkg = ".")
+
+cloud_problems(job_name = cloud_job(pkg = pkg), pkg = ".")
 }
 \arguments{
 \item{job_name}{The job name, as returned by \code{\link[=cloud_check]{cloud_check()}}.}

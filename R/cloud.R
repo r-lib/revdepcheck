@@ -123,6 +123,11 @@ cloud_fetch_results <- function(job_name = cloud_job(pkg = pkg), pkg = ".") {
   cli_progress_done(id = pb)
 
   to_extract <- file.exists(out_files) & !dir.exists(file.path(out_dir, packages))
+  if (!any(to_extract) && cloud_has_results_cache(job_name, pkg)) {
+    return()
+  }
+
+  cloud_write_results_cache(NULL, job_name, pkg)
 
   pb2 <- cli_progress_bar(format = "Extracting package results: {pb_percent}", total = sum(to_extract))
   for (i in which(to_extract)) {
@@ -137,6 +142,32 @@ cloud_fetch_results <- function(job_name = cloud_job(pkg = pkg), pkg = ".") {
     cli_progress_update(id = pb2)
   }
   cli_progress_done(id = pb2)
+
+  results <- cloud_compute_results(job_name, pkg)
+  cloud_write_results_cache(results, job_name, pkg)
+}
+
+cloud_has_results_cache <- function(job_name, pkg) {
+  cloud <- dir_find(pkg, "cloud")
+  path <- file.path(cloud, paste0(job_name, ".rds"))
+  file.exists(path)
+}
+
+cloud_read_results_cache <- function(job_name, pkg) {
+  cloud <- dir_find(pkg, "cloud")
+  path <- file.path(cloud, paste0(job_name, ".rds"))
+  readRDS(path)
+}
+
+cloud_write_results_cache <- function(results, job_name, pkg) {
+  cloud <- dir_find(pkg, "cloud")
+  path <- file.path(cloud, paste0(job_name, ".rds"))
+
+  if (is.null(results)) {
+    unlink(path, force = TRUE)
+  } else {
+    saveRDS(results, path, compress = FALSE)
+  }
 }
 
 #' Submit a reverse dependency checking job to the cloud
@@ -382,8 +413,10 @@ cloud_compare <- function(pkg) {
     res$version <- description$get("Version")[[1]]
     return(res)
   }
-  rcmdcheck::compare_checks(old, new)
+  compare_checks(old, new)
 }
+
+compare_checks <- NULL
 
 #' Display revdep results
 #'
@@ -524,9 +557,13 @@ cloud_report_cran <- function(job_name = cloud_job(pkg = pkg), pkg = ".", result
 #' @export
 cloud_results <- function(job_name = cloud_job(pkg = pkg), pkg = ".") {
   pkg <- pkg_check(pkg)
-  cloud <- dir_find(pkg, "cloud")
 
   cloud_fetch_results(job_name, pkg = pkg)
+  cloud_read_results_cache(job_name, pkg)
+}
+
+cloud_compute_results <- function(job_name, pkg) {
+  cloud <- dir_find(pkg, "cloud")
 
   cli_alert_info("Comparing results")
   pkgs <- list.dirs(file.path(cloud, job_name), full.names = TRUE, recursive = FALSE)
@@ -735,6 +772,20 @@ cloud_broken <- function(job_name = cloud_job(pkg = pkg), pkg = ".", install_fai
 #' @export
 cloud_failed <- function(job_name = cloud_job(pkg = pkg), pkg = ".") {
   unlist(cloud_job_status(job_name, status = "FAILED")$packages)
+}
+
+#' @rdname cloud_broken
+#' @export
+cloud_problems <- function(job_name = cloud_job(pkg = pkg), pkg = ".") {
+  ## We show the packages that are newly broken
+  is_problem <- function(x) {
+    any(x$cmp$change == 1)
+  }
+
+  results <- cloud_results(job_name = job_name, pkg = pkg)
+  problem <- map_lgl(results, is_problem)
+
+  map_chr(results[problem], `[[`, "package")
 }
 
 #' Browse to the AWS url for the job
