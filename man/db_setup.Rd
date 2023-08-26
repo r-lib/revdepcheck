@@ -7,7 +7,7 @@
 db_setup(package)
 }
 \arguments{
-\item{package}{The name of the package under revdep cheking.}
+\item{package}{The name of the package under revdep checking.}
 }
 \value{
 Nothing

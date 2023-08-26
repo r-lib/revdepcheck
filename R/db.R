@@ -54,7 +54,7 @@ db_check_version <- function(package) {
 
 #' Make sure that the database exists
 #'
-#' @param package The name of the package under revdep cheking.
+#' @param package The name of the package under revdep checking.
 #' @return Nothing
 #'
 #' @keywords internal
