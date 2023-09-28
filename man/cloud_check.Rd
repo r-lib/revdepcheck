@@ -9,7 +9,7 @@ cloud_check(
   tarball = NULL,
   revdep_packages = NULL,
   extra_revdeps = NULL,
-  r_version = "4.2.1",
+  r_version = "4.3.1",
   check_args = "--no-manual"
 )
 }
