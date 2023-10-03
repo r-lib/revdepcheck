@@ -143,6 +143,10 @@ cloud_fetch_results <- function(job_name = cloud_job(pkg = pkg), pkg = ".") {
 #' @param check_args Additional argument to pass to `R CMD check`
 #' @param extra_revdeps Additional packages to use as source for reverse
 #'   dependencies.
+#' @param bioc Also check revdeps that live in Bioconductor? Default `TRUE`.
+#'   Note that the cloud revdep check service does not currently include system
+#'   dependencies of Bioconductor packages, so there is potential for more
+#'   failed checks.
 #' @returns The AWS Batch job name
 #' @inheritParams revdep_check
 #' @importFrom cli cli_alert_info cli_alert_success cli_alert_danger
@@ -154,7 +158,8 @@ cloud_check <- function(pkg = ".",
   revdep_packages = NULL,
   extra_revdeps = NULL,
   r_version = "4.3.1",
-  check_args = "--no-manual") {
+  check_args = "--no-manual",
+  bioc = TRUE) {
   if (is.null(tarball)) {
     cli::cli_alert_info("Building package tarball")
     pkg <- pkg_check(pkg)
@@ -168,7 +173,7 @@ cloud_check <- function(pkg = ".",
   # it seems to include archived packages.
   if (is.null(revdep_packages)) {
     revdep_packages <- setdiff(
-      cran_revdeps(c(package_name, extra_revdeps)),
+      cran_revdeps(c(package_name, extra_revdeps), bioc = bioc),
       package_name
     )
   }

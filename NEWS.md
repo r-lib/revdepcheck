@@ -1,5 +1,8 @@
 # revdepcheck (development version)
 
+* `cloud_check()` gains the ability to check Bioconductor packages via a new
+  `bioc` argument, with default `TRUE` (#362)
+
 * updated pkgdown template and url to https://revdepcheck.r-lib.org.
 
 * `cloud_check()` gains the ability to add additional packages as the source
