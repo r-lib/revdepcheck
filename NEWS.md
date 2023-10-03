@@ -1,5 +1,7 @@
 # revdepcheck (development version)
 
+* `cloud_check(r_version = "4.3.1")` is the updated default (#361).
+
 * `cloud_check()` gains the ability to check Bioconductor packages via a new
   `bioc` argument, with default `TRUE` (#362)
 
