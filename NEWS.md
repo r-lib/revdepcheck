@@ -3,7 +3,7 @@
 * `cloud_check(r_version = "4.3.1")` is the updated default (#361).
 
 * `cloud_check()` gains the ability to check Bioconductor packages via a new
-  `bioc` argument, with a default of `FALSE` do to a relatively high likelihood
+  `bioc` argument, with a default of `FALSE` due to a relatively high likelihood
   of failed checks since Bioconductor system dependencies are currently not
   installed in the cloud check service (#362, #369).
 
