@@ -11,7 +11,7 @@ cloud_check(
   extra_revdeps = NULL,
   r_version = "4.3.1",
   check_args = "--no-manual",
-  bioc = TRUE
+  bioc = FALSE
 )
 }
 \arguments{
@@ -30,7 +30,7 @@ dependencies.}
 
 \item{check_args}{Additional argument to pass to \verb{R CMD check}}
 
-\item{bioc}{Also check revdeps that live in Bioconductor? Default \code{TRUE}.
+\item{bioc}{Also check revdeps that live in Bioconductor? Default \code{FALSE}.
 Note that the cloud revdep check service does not currently include system
 dependencies of Bioconductor packages, so there is potential for more
 failed checks.}
