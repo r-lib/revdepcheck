@@ -53,7 +53,7 @@
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="revdepcheck-development-version">revdepcheck (development version)<a class="anchor" aria-label="anchor" href="#revdepcheck-development-version"></a></h2>
 <ul><li><p><code>cloud_check(r_version = "4.3.1")</code> is the updated default (<a href="https://github.com/r-lib/revdepcheck/issues/361" class="external-link">#361</a>).</p></li>
-<li><p><code><a href="../reference/cloud_check.html">cloud_check()</a></code> gains the ability to check Bioconductor packages via a new <code>bioc</code> argument, with default <code>TRUE</code> (<a href="https://github.com/r-lib/revdepcheck/issues/362" class="external-link">#362</a>)</p></li>
+<li><p><code><a href="../reference/cloud_check.html">cloud_check()</a></code> gains the ability to check Bioconductor packages via a new <code>bioc</code> argument, with a default of <code>FALSE</code> due to a relatively high likelihood of failed checks since Bioconductor system dependencies are currently not installed in the cloud check service (<a href="https://github.com/r-lib/revdepcheck/issues/362" class="external-link">#362</a>, <a href="https://github.com/r-lib/revdepcheck/issues/369" class="external-link">#369</a>).</p></li>
 <li><p>updated pkgdown template and url to <a href="https://revdepcheck.r-lib.org" class="uri">https://revdepcheck.r-lib.org</a>.</p></li>
 <li><p><code><a href="../reference/cloud_check.html">cloud_check()</a></code> gains the ability to add additional packages as the source of reverse dependencies.</p></li>
 <li><p><code><a href="../reference/cran_revdeps.html">cran_revdeps()</a></code> now accepts multiple packge names.</p></li>
