@@ -65,6 +65,7 @@ You can use these functions to get intermediate reports of a running cloud check
 \seealso{
 Other cloud: 
 \code{\link{cloud_broken}()},
+\code{\link{cloud_browse}()},
 \code{\link{cloud_cancel}()},
 \code{\link{cloud_check}()},
 \code{\link{cloud_details}()},

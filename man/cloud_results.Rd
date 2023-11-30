@@ -17,6 +17,7 @@ Intended for expert use only, this can be used as input to the \code{\link[=clou
 \seealso{
 Other cloud: 
 \code{\link{cloud_broken}()},
+\code{\link{cloud_browse}()},
 \code{\link{cloud_cancel}()},
 \code{\link{cloud_check}()},
 \code{\link{cloud_details}()},

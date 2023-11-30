@@ -738,6 +738,7 @@ cloud_failed <- function(job_name = cloud_job(pkg = pkg), pkg = ".") {
 #' @param package If `NULL` browses to the URL of the overall job. If a package
 #'   name, browses to the URL for that specific package job.
 #' @inheritParams cloud_report
+#' @family cloud
 #' @export
 cloud_browse <- function(job_name = cloud_job(), package = NULL) {
 

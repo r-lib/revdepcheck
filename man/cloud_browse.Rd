@@ -16,3 +16,17 @@ name, browses to the URL for that specific package job.}
 This is useful for closer inspection of individual jobs while they are
 running or after the fact.
 }
+\seealso{
+Other cloud: 
+\code{\link{cloud_broken}()},
+\code{\link{cloud_cancel}()},
+\code{\link{cloud_check}()},
+\code{\link{cloud_details}()},
+\code{\link{cloud_fetch_results}()},
+\code{\link{cloud_plot}()},
+\code{\link{cloud_report}()},
+\code{\link{cloud_results}()},
+\code{\link{cloud_status}()},
+\code{\link{cloud_summary}()}
+}
+\concept{cloud}
