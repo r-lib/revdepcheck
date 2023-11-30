@@ -44,6 +44,7 @@ Submit a reverse dependency checking job to the cloud
 \seealso{
 Other cloud: 
 \code{\link{cloud_broken}()},
+\code{\link{cloud_browse}()},
 \code{\link{cloud_cancel}()},
 \code{\link{cloud_details}()},
 \code{\link{cloud_fetch_results}()},
