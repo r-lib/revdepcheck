@@ -56,7 +56,7 @@ revdep_report_summary <- function(pkg = ".", file = "", all = FALSE, results = N
 }
 
 revdep_report_section <- function(title, rows, file) {
-  if (nrow(rows) == 0) {
+  if (NROW(rows) == 0) {
     return()
   }
 
@@ -226,7 +226,7 @@ normalize_space <- function(x) {
 }
 
 cat_failure_section <- function(title, rows, file) {
-  if (nrow(rows) == 0) {
+if (NROW(rows) == 0) {
     return()
   }
 
