@@ -80,10 +80,13 @@ revdep_report_problems <- function(
   pkg = ".",
   file = "",
   all = FALSE,
-  results = NULL,
-  bioc = TRUE,
-  cran = TRUE
+  results = NULL
 ) {
+  if (is.character(file) && file != "") {
+    file <- withr::local_connection(file(file, "wt"))
+    withr::local_options(cli.num_colors = 1)
+  }
+
   ## We show the packages that
   ## 1. are newly broken
   ## 2. still broken, if all == TRUE
