@@ -55,7 +55,8 @@ Suggests:
 VignetteBuilder: 
     knitr
 Remotes:
-    r-lib/crancache
+    r-lib/crancache,
+    r-lib/remotes
 Config/Needs/website: tidyverse/tidytemplate
 Encoding: UTF-8
 LazyData: true
