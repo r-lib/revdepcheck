@@ -15,5 +15,6 @@ release, we recommend using the default.}
 \item{bioc}{Also check revdeps that live in Bioconductor?}
 }
 \description{
-Retrieve the reverse dependencies for a package
+Uses the value of \code{getOption("repo")[["CRAN"]]} to determine where to find
+CRAN metadata.
 }

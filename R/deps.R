@@ -1,39 +1,32 @@
 
 #' Retrieve the reverse dependencies for a package
 #'
+#' Uses the value of `getOption("repo")[["CRAN"]]` to determine where to find
+#' CRAN metadata.
+#'
 #' @param package The package (or packages) to search for reverse dependencies.
 #' @inheritParams revdep_check
 #' @export
 cran_revdeps <- function(package, dependencies = TRUE, bioc = FALSE) {
-  pkgs <- lapply(package, function(pkg) cran_revdeps_versions(pkg, dependencies, bioc)$package)
-  pkgs <- unique(unlist(pkgs))
-  pkgs[order(tolower(pkgs))]
+  cran_revdeps_versions(package, dependencies, bioc)$package
 }
 
-#' @importFrom remotes bioc_install_repos
-#' @importFrom crancache available_packages
+cran_revdeps_versions <- function(packages, dependencies = TRUE, bioc = FALSE) {
+  stopifnot(is.character(packages))
 
-cran_revdeps_versions <- function(package, dependencies = TRUE, bioc = FALSE) {
-  stopifnot(is_string(package))
-  repos <- get_repos(bioc)
-
-  allpkgs <- available_packages(repos = repos)
-  alldeps <- allpkgs[, dependencies, drop = FALSE]
-  alldeps[is.na(alldeps)] <- ""
-  deps <- apply(alldeps, 1, paste, collapse = ",")
-  rd <- grepl(paste0("\\b", package, "\\b"), deps)
-
-  data.frame(
-    stringsAsFactors = FALSE,
-    package = unname(allpkgs[rd, "Package"]),
-    version = unname(allpkgs[rd, "Version"])
+  cache <- pkgcache::cranlike_metadata_cache$new(
+    repos = get_repos(bioc = bioc),
+    platforms = "source"
   )
+
+  revdeps <- cache$revdeps(packages, dependencies = dependencies, recursive = FALSE)
+  revdeps[c("package", "version")]
 }
 
 get_repos <- function(bioc) {
   repos <- c(
     getOption("repos"),
-    if (bioc) bioc_install_repos()
+    if (bioc) remotes::bioc_install_repos()
   )
   if (! "CRAN" %in% names(repos) || repos["CRAN"] == "@CRAN@") {
     repos["CRAN"] <- "https://cloud.r-project.org"
