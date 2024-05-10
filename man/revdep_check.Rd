@@ -46,6 +46,8 @@ released version on CRAN and once for the local development version. It
 then reports the differences so you can see what checks were previously
 ok but now fail.
 
+It requires to use a repos option that provides the source code of the packages not binaries.
+
 Once your package has been successfully submitted to CRAN, you should
 run \code{revdep_reset()}. This deletes all files used for checking, freeing
 up disk space and leaving you in a clean state for the next release.
