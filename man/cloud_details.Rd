@@ -19,6 +19,7 @@ Display detailed revdep results from a cloud run
 \seealso{
 Other cloud: 
 \code{\link{cloud_broken}()},
+\code{\link{cloud_browse}()},
 \code{\link{cloud_cancel}()},
 \code{\link{cloud_check}()},
 \code{\link{cloud_fetch_results}()},

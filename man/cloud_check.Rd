@@ -8,8 +8,10 @@ cloud_check(
   pkg = ".",
   tarball = NULL,
   revdep_packages = NULL,
-  r_version = "4.1.1",
-  check_args = "--no-manual"
+  extra_revdeps = NULL,
+  r_version = "4.3.1",
+  check_args = "--no-manual",
+  bioc = FALSE
 )
 }
 \arguments{
@@ -21,9 +23,17 @@ automatically built for the package at \code{pkg} by \code{\link[pkgbuild:build]
 \item{revdep_packages}{A character vector of packages to check, if \code{NULL}
 equal to \code{\link[=cran_revdeps]{cran_revdeps()}}}
 
+\item{extra_revdeps}{Additional packages to use as source for reverse
+dependencies.}
+
 \item{r_version}{The R version to use.}
 
 \item{check_args}{Additional argument to pass to \verb{R CMD check}}
+
+\item{bioc}{Also check revdeps that live in Bioconductor? Default \code{FALSE}.
+Note that the cloud revdep check service does not currently include system
+dependencies of Bioconductor packages, so there is potential for more
+failed checks.}
 }
 \value{
 The AWS Batch job name
@@ -34,6 +44,7 @@ Submit a reverse dependency checking job to the cloud
 \seealso{
 Other cloud: 
 \code{\link{cloud_broken}()},
+\code{\link{cloud_browse}()},
 \code{\link{cloud_cancel}()},
 \code{\link{cloud_details}()},
 \code{\link{cloud_fetch_results}()},

@@ -1,1 +1,13 @@
-url: https://r-lib.github.io/revdepcheck
+url: https://revdepcheck.r-lib.org
+
+# don't use dev mode: auto since revdepcheck is not released on CRAN
+development:
+  mode: release
+
+template:
+  package: tidytemplate
+  bootstrap: 5
+
+  includes:
+    in_header: |
+      <script defer data-domain="revdepcheck.r-lib.org,all.tidyverse.org" src="https://plausible.io/js/plausible.js"></script>

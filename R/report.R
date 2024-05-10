@@ -56,7 +56,7 @@ revdep_report_summary <- function(pkg = ".", file = "", all = FALSE, results = N
 }
 
 revdep_report_section <- function(title, rows, file) {
-  if (nrow(rows) == 0) {
+  if (NROW(rows) == 0) {
     return()
   }
 
@@ -177,7 +177,7 @@ cat_package_info <- function(cmp, file, bioc = TRUE, cran = TRUE) {
     paste0("* Source code: ", pkg_source_link(chk)),
     addifx("Date/Publication"),
     paste0("* Number of recursive dependencies: ", num_deps(chk$package, bioc = bioc, cran = cran)),
-    sprintf("\nRun `%s_details(, \"%s\")` for more info", type, chk$package)
+    sprintf("\nRun `revdepcheck::%s_details(, \"%s\")` for more info", type, chk$package)
   )
   out <- wrap_tag("details", out)
   cat(out, file = file)
@@ -231,7 +231,7 @@ normalize_space <- function(x) {
 }
 
 cat_failure_section <- function(title, rows, file) {
-  if (nrow(rows) == 0) {
+if (NROW(rows) == 0) {
     return()
   }
 

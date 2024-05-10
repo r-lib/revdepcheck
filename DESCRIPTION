@@ -5,12 +5,12 @@ Authors@R: c(
     person("Gábor", "Csárdi", , "csardi.gabor@gmail.com", c("cre", "aut", "cph")),
     person("Hadley", "Wickham", role = "aut"),
     person("RConsortium", role = "cph"),
-    person("RStudio", role = "cph")
+    person("RStudio", role = c("cph", "fnd"))
   )
 Description: Automated, isolated reserve dependency checking, with automatic
     comparison of the results to the current CRAN checks.
 License: MIT + file LICENSE
-URL: https://r-lib.github.io/revdepcheck,
+URL: https://revdepcheck.r-lib.org,
     https://github.com/r-lib/revdepcheck#readme
 BugReports: https://github.com/r-lib/revdepcheck/issues
 Imports: 
@@ -55,8 +55,9 @@ Suggests:
 VignetteBuilder: 
     knitr
 Remotes:
-    git::https://github.com/r-lib/crancache.git@main,
+    r-lib/crancache,
+    r-lib/remotes
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.3

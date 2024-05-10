@@ -1,11 +1,12 @@
 
 #' Retrieve the reverse dependencies for a package
 #'
-#' @param package The package to search for reverse dependencies
+#' @param package The package (or packages) to search for reverse dependencies.
 #' @inheritParams revdep_check
 #' @export
 cran_revdeps <- function(package, dependencies = TRUE, bioc = FALSE, cran = TRUE) {
-  pkgs <- cran_revdeps_versions(package, dependencies, bioc, cran)$package
+  pkgs <- lapply(package, function(pkg) cran_revdeps_versions(pkg, dependencies, bioc, cran)$package)
+  pkgs <- unique(unlist(pkgs))
   pkgs[order(tolower(pkgs))]
 }
 

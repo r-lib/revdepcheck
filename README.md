@@ -1,13 +1,10 @@
-# revdepcheck
 
-> Automated, Isolated, Reverse Dependency Checking
+# ❗ This package is not actively maintained
 
-<!-- badges: start -->
-[![R-CMD-check](https://github.com/r-lib/revdepcheck/workflows/R-CMD-check/badge.svg)](https://github.com/r-lib/revdepcheck/actions)
-[![Codecov test coverage](https://codecov.io/gh/r-lib/revdepcheck/branch/main/graph/badge.svg)](https://codecov.io/gh/r-lib/revdepcheck?branch=main)
-[![](http://www.r-pkg.org/badges/version/revdepcheck)](http://www.r-pkg.org/pkg/revdepcheck)
-[![CRAN RStudio mirror downloads](http://cranlogs.r-pkg.org/badges/revdepcheck)](http://www.r-pkg.org/pkg/revdepcheck)
-<!-- badges: end -->
+Use it at your own risks. For alternative reverse dependency check tools, see
+- the `?tools::check_packages_in_dir()` base R function, or
+- https://github.com/r-devel/recheck which you can use with Docker
+  or on GitHub Actions.
 
 ## Features
 
@@ -27,10 +24,8 @@
 
 ## Installation
 
-Once on CRAN, install the package as usual:
-
 ```r
-install.packages("revdepcheck")
+pak::pkg_install("r-lib/revdepcheck")
 ```
 
 ## Usage
