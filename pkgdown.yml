@@ -3,7 +3,7 @@ pkgdown: 2.0.9
 pkgdown_sha: ~
 articles:
   cloud: cloud.html
-last_built: 2024-05-07T09:04Z
+last_built: 2024-05-10T19:43Z
 urls:
   reference: https://revdepcheck.r-lib.org/reference
   article: https://revdepcheck.r-lib.org/articles
