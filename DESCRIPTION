@@ -57,6 +57,7 @@ VignetteBuilder:
 Remotes:
     r-lib/crancache,
     r-lib/remotes
+Config/Needs/website: tidyverse/tidytemplate
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
