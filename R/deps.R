@@ -4,8 +4,8 @@
 #' @param package The package (or packages) to search for reverse dependencies.
 #' @inheritParams revdep_check
 #' @export
-cran_revdeps <- function(package, dependencies = TRUE, bioc = FALSE) {
-  pkgs <- lapply(package, function(pkg) cran_revdeps_versions(pkg, dependencies, bioc)$package)
+cran_revdeps <- function(package, dependencies = TRUE, bioc = FALSE, cran = TRUE) {
+  pkgs <- lapply(package, function(pkg) cran_revdeps_versions(pkg, dependencies, bioc, cran)$package)
   pkgs <- unique(unlist(pkgs))
   pkgs[order(tolower(pkgs))]
 }
@@ -13,15 +13,15 @@ cran_revdeps <- function(package, dependencies = TRUE, bioc = FALSE) {
 #' @importFrom remotes bioc_install_repos
 #' @importFrom crancache available_packages
 
-cran_revdeps_versions <- function(package, dependencies = TRUE, bioc = FALSE) {
+cran_revdeps_versions <- function(package, dependencies = TRUE, bioc = FALSE, cran = TRUE) {
   stopifnot(is_string(package))
-  repos <- get_repos(bioc)
+  repos <- get_repos(bioc, cran)
 
   allpkgs <- available_packages(repos = repos)
   alldeps <- allpkgs[, dependencies, drop = FALSE]
   alldeps[is.na(alldeps)] <- ""
   deps <- apply(alldeps, 1, paste, collapse = ",")
-  rd <- grepl(paste0("\\b", package, "\\b"), deps)
+  rd <- grepl(sprintf("(,| |\\n)(%s)(,| |\\n)", package), deps)
 
   data.frame(
     stringsAsFactors = FALSE,
@@ -30,17 +30,21 @@ cran_revdeps_versions <- function(package, dependencies = TRUE, bioc = FALSE) {
   )
 }
 
-get_repos <- function(bioc) {
+get_repos <- function(bioc, cran) {
   repos <- c(
     getOption("repos"),
     if (bioc) bioc_install_repos()
   )
-  if (! "CRAN" %in% names(repos) || repos["CRAN"] == "@CRAN@") {
+  
+  if ((! "CRAN" %in% names(repos) || repos["CRAN"] == "@CRAN@") && cran) {
     repos["CRAN"] <- "https://cloud.r-project.org"
   }
 
   ## Drop duplicated repos (by name only)
-  names <- names(repos)
+  ## If the repos is not a named vector, names would be a NULL
+  ## and duplicated(names) would be a logical(0) resulting in dropping entire 
+  ## vector
+  names <- names(repos) %|0|% rep("", times = length(repos))
   repos <- repos[!(nzchar(names) & duplicated(names))]
 
   repos

@@ -12,6 +12,7 @@ revdep_check(
   timeout = as.difftime(10, units = "mins"),
   num_workers = 1,
   bioc = TRUE,
+  cran = TRUE,
   env = revdep_env_vars()
 )
 
@@ -32,6 +33,9 @@ complete. Default is 10 minutes.}
 
 \item{bioc}{Also check revdeps that live in Bioconductor?}
 
+\item{cran}{Should cran mirror be attached to getOpion("repos") if it
+is not already present.}
+
 \item{env}{Environment variables to set for the install and check
 processes. See \code{\link[=revdep_env_vars]{revdep_env_vars()}}.}
 }
@@ -41,6 +45,8 @@ package. To avoid false positives, it runs \verb{R CMD check} twice: once for
 released version on CRAN and once for the local development version. It
 then reports the differences so you can see what checks were previously
 ok but now fail.
+
+It requires to use a repos option that provides the source code of the packages not binaries.
 
 Once your package has been successfully submitted to CRAN, you should
 run \code{revdep_reset()}. This deletes all files used for checking, freeing
