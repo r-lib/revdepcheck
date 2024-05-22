@@ -3,6 +3,8 @@
 * Add `cran` parameter to the `get_repos()` internal and propagate it to the
   upstream functions including `revdep_check()`. It allow user to decide
   whether htey want to always append CRAN mirror to repos or not (@maksymis)
+  
+* `cloud_check(r_version = "4.4.0")` is the updated default.
 
 # revdepcheck (development version)
 
