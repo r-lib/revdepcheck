@@ -1,11 +1,3 @@
-
-# ❗ This package is not actively maintained
-
-Use it at your own risks. For alternative reverse dependency check tools, see
-- the `?tools::check_packages_in_dir()` base R function, or
-- https://github.com/r-devel/recheck which you can use with Docker
-  or on GitHub Actions.
-
 ## Features
 
 * To avoid false positives due to existing failures, revdepcheck runs 
