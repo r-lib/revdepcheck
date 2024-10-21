@@ -1,10 +1,9 @@
 pandoc: 3.1.11
-pkgdown: 2.0.9
+pkgdown: 2.1.1
 pkgdown_sha: ~
 articles:
   cloud: cloud.html
-last_built: 2024-05-10T19:43Z
+last_built: 2024-10-21T13:11Z
 urls:
   reference: https://revdepcheck.r-lib.org/reference
   article: https://revdepcheck.r-lib.org/articles
-
