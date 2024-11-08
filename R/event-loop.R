@@ -166,7 +166,7 @@ handle_event <- function(state, which) {
       state$workers[[which]]$stderr <-
         c(state$workers[[which]]$stderr, err <- proc$read_error(n = 10000))
     } else {
-      state$workers[[which]]$stderr <- ""
+      state$workers[[which]]$stderr <- err <- ""
     }
   } else {
     state$workers[[which]]$stdout <-
@@ -175,7 +175,7 @@ handle_event <- function(state, which) {
       state$workers[[which]]$stderr <-
         c(state$workers[[which]]$stderr, err <- proc$read_all_error())
     } else {
-      state$workers[[which]]$stderr <- ""
+      state$workers[[which]]$stderr <- err <- ""
     }
   }
 
