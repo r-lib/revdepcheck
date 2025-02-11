@@ -114,7 +114,7 @@ revdep_report_if <- function(pkg = ".", file = "", predicate, results = NULL,
   if (sum(show)) {
     map(results[show], failure_details, file = file, bioc = bioc, cran = cran)
   } else {
-    cat("*Wow, no problems at all. :)*", file = file)
+    cat("*Wow, no problems at all. :)*\n", file = file)
   }
 
   invisible()
