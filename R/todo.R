@@ -1,13 +1,13 @@
-
 #' Manage the package checking to-do list.
 #'
-#' `revdep_todo()` tells you which packages still need to be checked.
-#' `revdep_add()` adds a single package to the to-do list.
-#' `revdep_rm()` removes packages from the todo list.
-
-#' `revdep_add_broken()` re-adds all broken packages from the last check
-#' (this is useful if you think you've fixed the underlying problem in
-#' your package).
+#' @description
+#' * `revdep_add()` adds a single package to the to-do list.
+#' * `revdep_add_broken()` re-adds all broken packages from the last check
+#'   (this is useful if you think you've fixed the underlying problem in
+#'   your package).
+#' * `revdep_add_new()` adds any new dependencies since the last run.
+#' * `revdep_rm()` removes packages from the todo list.
+#' * `revdep_todo()` tells you which packages still need to be checked.
 #'
 #' @inheritParams revdep_check
 #' @param packages Character vector of package names to add
@@ -16,7 +16,6 @@
 #' @param timeout_failures Whether to re-add packages that timed out.
 #'
 #' @export
-
 revdep_add <- function(pkg = ".", packages) {
   pkg <- pkg_check(pkg)
 
@@ -31,8 +30,8 @@ revdep_add <- function(pkg = ".", packages) {
 
 #' @export
 #' @rdname revdep_add
-
-revdep_add_broken <- function(pkg = ".", install_failures = FALSE,
+revdep_add_broken <- function(pkg = ".",
+                              install_failures = FALSE,
                               timeout_failures = FALSE) {
   pkg <- pkg_check(pkg)
 
@@ -51,7 +50,6 @@ revdep_add_broken <- function(pkg = ".", install_failures = FALSE,
 
 #' @export
 #' @rdname revdep_add
-
 revdep_add_new <- function(pkg = ".") {
   pkg <- pkg_check(pkg)
 
@@ -72,17 +70,16 @@ revdep_add_new <- function(pkg = ".") {
 
 #' @export
 #' @rdname revdep_add
-
-revdep_todo <- function(pkg = ".") {
-  db_todo_status(pkg)
-}
-
-#' @export
-#' @rdname revdep_add
-
 revdep_rm <- function(pkg = ".", packages) {
   pkg <- pkg_check(pkg)
   db_todo_rm(pkg, packages)
 
   invisible(revdep_todo(pkg))
+}
+
+#' @export
+#' @rdname revdep_add
+revdep_todo <- function(pkg = ".") {
+  pkg <- pkg_check(pkg)
+  db_todo_status(pkg)
 }
