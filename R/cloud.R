@@ -157,7 +157,7 @@ cloud_check <- function(pkg = ".",
   tarball = NULL,
   revdep_packages = NULL,
   extra_revdeps = NULL,
-  r_version = "4.4.0",
+  r_version = "4.5.1",
   check_args = "--no-manual",
   bioc = FALSE) {
   if (is.null(tarball)) {
