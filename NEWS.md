@@ -1,3 +1,7 @@
+# 1.0.0.9003
+
+- * `cloud_check(r_version = "4.5.1")` is the updated default.
+
 # 1.0.0.9002
 
 * Add `cran` parameter to the `get_repos()` internal and propagate it to the
