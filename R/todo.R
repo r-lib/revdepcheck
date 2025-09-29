@@ -1,4 +1,3 @@
-
 #' Manage the package checking to-do list.
 #'
 #' `revdep_todo()` tells you which packages still need to be checked.
@@ -32,8 +31,11 @@ revdep_add <- function(pkg = ".", packages) {
 #' @export
 #' @rdname revdep_add
 
-revdep_add_broken <- function(pkg = ".", install_failures = FALSE,
-                              timeout_failures = FALSE) {
+revdep_add_broken <- function(
+  pkg = ".",
+  install_failures = FALSE,
+  timeout_failures = FALSE
+) {
   pkg <- pkg_check(pkg)
 
   packages <- db_results(pkg, NULL)
@@ -65,7 +67,9 @@ revdep_add_new <- function(pkg = ".") {
   revdeps <- cran_revdeps_versions(pkgname, dependencies, bioc = bioc)
 
   todo <- db_todo_add_new(pkg, revdeps, silent = FALSE)
-  if (length(todo)) db_metadata_set(pkg, "todo", "install")
+  if (length(todo)) {
+    db_metadata_set(pkg, "todo", "install")
+  }
 
   invisible(revdep_todo(pkg))
 }

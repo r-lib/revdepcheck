@@ -40,13 +40,19 @@ print.revdepcheck_maintainers <- function(x, ...) {
 #'   directly.
 #' @export
 
-revdep_email <- function(type = c("broken", "failed"), pkg = ".", packages = NULL, draft = FALSE) {
+revdep_email <- function(
+  type = c("broken", "failed"),
+  pkg = ".",
+  packages = NULL,
+  draft = FALSE
+) {
   type <- match.arg(type)
 
   packages <- db_results(pkg, packages)
   status <- map_chr(packages, rcmdcheck_status)
 
-  cond <- switch(type,
+  cond <- switch(
+    type,
     broken = status %in% c("-", "t-", "i-"),
     failed = status %in% c("i+", "t+")
   )
@@ -55,7 +61,12 @@ revdep_email <- function(type = c("broken", "failed"), pkg = ".", packages = NUL
   invisible()
 }
 
-revdep_email_by_type <- function(pkg, packages, type = "broken", draft = FALSE) {
+revdep_email_by_type <- function(
+  pkg,
+  packages,
+  type = "broken",
+  draft = FALSE
+) {
   if (length(packages) == 0) {
     message("All ok :D")
     return(invisible())
@@ -84,7 +95,10 @@ revdep_email_by_type <- function(pkg, packages, type = "broken", draft = FALSE) 
 
     body <- email_build(type = type, data = data)
     to <- data$your_email
-    subject <- glue_data(data, "{your_package} and upcoming CRAN release of {my_package}")
+    subject <- glue_data(
+      data,
+      "{your_package} and upcoming CRAN release of {my_package}"
+    )
 
     ok[[i]] <- email_send(to, body, subject, draft = draft)
   }
@@ -103,7 +117,11 @@ revdep_email_by_type <- function(pkg, packages, type = "broken", draft = FALSE) 
 #' @export
 #' @rdname revdep_email
 
-revdep_email_draft <- function(type = "broken", pkg = ".", data = email_data(pkg)) {
+revdep_email_draft <- function(
+  type = "broken",
+  pkg = ".",
+  data = email_data(pkg)
+) {
   cat_line(rule("Draft email"))
 
   data <- map(data, bold)
@@ -129,7 +147,8 @@ package_data <- function(packages, pkg = ".") {
     new <- unique(cmp$hash[cmp$which == "new"])
     broke <- setdiff(new, old)
 
-    idx <- switch(x$status,
+    idx <- switch(
+      x$status,
       "-" = cmp$hash %in% broke & cmp$which == "new",
       "t-" = ,
       "i-" = cmp$which == "new"
@@ -181,7 +200,8 @@ email_send <- function(to, body, subject, draft = TRUE) {
 email_build <- function(type = "broken", data = email_data(".")) {
   name <- paste0("email-", type, ".txt")
   template_path <- system.file(
-    "templates", name,
+    "templates",
+    name,
     package = "revdepcheck",
     mustWork = TRUE
   )

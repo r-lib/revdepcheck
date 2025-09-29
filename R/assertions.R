@@ -1,4 +1,3 @@
-
 #' @importFrom assertthat assert_that on_failure<-
 
 is_string <- function(x) {
