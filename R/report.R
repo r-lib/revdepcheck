@@ -155,7 +155,7 @@ revdep_report_if <- function(
 }
 
 failure_details <- function(x, file = "", bioc = TRUE, cran = TRUE) {
-  cat_header(x$package, file = file)
+  cat_header(x$package, " (", x$new$version, ")", level = 1, file = file)
   cat_package_info(x, file = file, bioc = bioc, cran = cran)
   cat_line(file = file)
 
@@ -195,49 +195,33 @@ failure_details <- function(x, file = "", bioc = TRUE, cran = TRUE) {
 
 cat_package_info <- function(cmp, file, bioc = TRUE, cran = TRUE) {
   chk <- cmp$new
-  type <- chk$type %||% "revdep"
-  desc <-
-    tryCatch(desc::desc(text = chk$description), error = function(x) NULL)
+  desc <- tryCatch(desc::desc(text = chk$description), error = function(x) NULL)
 
-  addifx <- function(field) {
-    if (is.null(desc)) {
-      return(NULL)
-    }
-    if (!desc$has_fields(field)) {
-      return(NULL)
-    }
-    paste0("* ", field, ": ", normalize_space(desc$get_field(field)))
+  github <- pkg_github(desc)
+  if (!is.null(github)) {
+    cat_glue("* GitHub: {github}", file = file)
   }
-  out <- c(
-    paste0("* Version: ", chk$version),
-    paste0("* GitHub: ", pkg_github(desc)),
-    paste0("* Source code: ", pkg_source_link(chk)),
-    addifx("Date/Publication"),
-    paste0(
-      "* Number of recursive dependencies: ",
-      num_deps(chk$package, bioc = bioc, cran = cran)
-    ),
-    sprintf(
-      "\nRun `revdepcheck::%s_details(, \"%s\")` for more info",
-      type,
-      chk$package
-    )
+
+  if (!is.null(chk$cran)) {
+    url <- paste0("https://github.com/cran/", chk$package)
+    cat_glue("* Github mirror: {url}", file = file)
+  }
+
+  if (!is.null(desc)) {
+    cat_glue("* Maintainer: {desc$get_maintainer()}", file = file)
+  }
+  cat_line(file = file)
+
+  type <- chk$type %||% "revdep"
+  cat_glue(
+    'Run `revdepcheck::{type}_details(, "{chk$package}")` for more info',
+    file = file
   )
-  out <- wrap_tag("details", out)
-  cat(out, file = file)
 }
 
 num_deps <- function(pkg, bioc = TRUE, cran = TRUE) {
   repos <- get_repos(bioc = bioc, cran = cran)
   length(cran_deps(pkg, repos))
-}
-
-pkg_source_link <- function(chk) {
-  if (!is.null(chk$cran)) {
-    paste0("https://github.com/cran/", chk$package)
-  } else {
-    NA
-  }
 }
 
 pkg_github <- function(desc) {
@@ -248,7 +232,7 @@ pkg_github <- function(desc) {
   gh_links <- grep("^https?://github.com/", urls, value = TRUE)
 
   if (length(gh_links) == 0) {
-    NA_character_
+    NULL
   } else {
     re <- paste0(
       "^",
@@ -283,28 +267,29 @@ cat_failure_section <- function(title, rows, file) {
   cat(format_details_bullets(rows$output), sep = "", file = file)
 }
 
-format_details_bullets <- function(x, max_lines = 20) {
+format_details_bullets <- function(x, max_lines = 25) {
   map_chr(x, format_details_bullet, max_lines = max_lines)
 }
 
-format_details_bullet <- function(x, max_lines = 20) {
+format_details_bullet <- function(x, max_lines = 30) {
   lines <- strsplit(x, "\n")[[1]]
 
   title <- trimws(lines[[1]])
-  details <- line_trunc(lines[-1], 10)
 
-  if (length(details) > 0) {
-    details <- c("```", details, "```")
+  details <- lines[-1]
+  n <- length(details)
+  # We don't use trunc_lines() here because the start of the test is usually
+  # least interesting, and that's the primary case where we need to truncate
+  if (n > max_lines) {
+    details <- c("...", details[(n - max_lines + 1):n])
   }
+  if (n > 0) {
+    details <- c("```", details, "```")
+    details <- paste(strrep(" ", 4), details)
+  }
+  details <- paste0(details, "\n", collapse = "")
 
-  pad <- strrep(" ", 4)
-  paste0(
-    "*   ",
-    red(title),
-    "\n",
-    paste0(pad, details, "\n", collapse = ""),
-    "\n"
-  )
+  paste0("*   ", red(title), "\n", details, "\n")
 }
 
 #' `revdep_report_cran()` prints a short summary of the reverse dependency
@@ -540,6 +525,12 @@ report_revdeps <- function(pkg = ".", all = FALSE, results = NULL) {
 cat_line <- function(..., file = "", sep = "") {
   cat(..., "\n", sep = sep, file = file)
 }
+
+cat_glue <- function(msg, envir = parent.frame(), file = "", sep = "") {
+  msg <- glue::glue(msg, .envir = envir)
+  cat(msg, "\n", sep = sep, file = file)
+}
+
 
 cat_rule <- function(..., file = "") {
   cat_line(rule(...), file = file)
