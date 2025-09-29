@@ -1,4 +1,3 @@
-
 #' @importFrom rcmdcheck compare_checks
 
 try_compare_checks <- function(package, old, new) {
@@ -33,8 +32,7 @@ rcmdcheck_version.rcmdcheck_error <- function(x) "?"
 #' @export
 rcmdcheck_version.rcmdcheck_comparison <- function(x) x$versions[[1]]
 
-is_broken <- function(x, install_failures = FALSE,
-                      timeout_failures = FALSE) {
+is_broken <- function(x, install_failures = FALSE, timeout_failures = FALSE) {
   stat <- rcmdcheck_status(x)
   stat == "-" ||
     (install_failures && stat %in% c("i-", "E", "?")) ||
@@ -71,9 +69,17 @@ print.rcmdcheck_error_summary <- function(x, ...) {
   pale <- make_style("darkgrey")
   cat_line(pale(paste0(
     col_align(x$header, width = 40),
-    " ", symbol$line, symbol$line, " ",
-    "E: ", red(x$comp[1]), " | ",
-    "W: ", red(x$comp[2]), " | ",
-    "N: ", red(x$comp[3])
+    " ",
+    symbol$line,
+    symbol$line,
+    " ",
+    "E: ",
+    red(x$comp[1]),
+    " | ",
+    "W: ",
+    red(x$comp[2]),
+    " | ",
+    "N: ",
+    red(x$comp[3])
   )))
 }

@@ -21,7 +21,9 @@ revdep_details <- function(pkg = ".", revdep) {
 #' @export
 
 print.revdepcheck_results <- function(x, ...) {
-  for (package in x) print(summary(package))
+  for (package in x) {
+    print(summary(package))
+  }
   invisible(x)
 }
 
@@ -77,8 +79,12 @@ print.revdepcheck_details <- function(x, ...) {
 
 print_install_out <- function(x) {
   details <- check_details(x)
-  if (any(grepl("Installation failed.*00install.out.*for details",
-                details$errors))) {
+  if (
+    any(grepl(
+      "Installation failed.*00install.out.*for details",
+      details$errors
+    ))
+  ) {
     out <- strsplit(details$install_out, "\n")[[1]]
     cat("\n", symbol$line, symbol$line, sep = "")
     if (length(out) > 15) {

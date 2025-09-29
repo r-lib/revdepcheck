@@ -1,4 +1,3 @@
-
 #' Set up/retrieve the directory structure for the checks
 #'
 #' Currently the following files and directories are used.
@@ -33,11 +32,23 @@
 #'
 #' @keywords internal
 
-dir_find <- function(pkgdir,
-                     what = c("root", "db", "old", "new", "pkg", "check",
-                              "checks", "lib", "pkgold", "pkgnew", "cloud"),
-                     package = NULL) {
-
+dir_find <- function(
+  pkgdir,
+  what = c(
+    "root",
+    "db",
+    "old",
+    "new",
+    "pkg",
+    "check",
+    "checks",
+    "lib",
+    "pkgold",
+    "pkgnew",
+    "cloud"
+  ),
+  package = NULL
+) {
   pkgdir <- pkg_check(pkgdir)
   pkg <- pkg_name(pkgdir)
 
@@ -47,23 +58,28 @@ dir_find <- function(pkgdir,
     function(x) x
   }
 
-  switch(match.arg(what),
-    root =  file.path(pkgdir, "revdep"),
-    db =    file.path(pkgdir, "revdep", "data.sqlite"),
+  switch(
+    match.arg(what),
+    root = file.path(pkgdir, "revdep"),
+    db = file.path(pkgdir, "revdep", "data.sqlite"),
 
     checks = file.path(pkgdir, "revdep", idx("checks")),
     check = file.path(pkgdir, "revdep", idx("checks"), package),
 
-    lib =   file.path(pkgdir, "revdep", idx("library")),
-    pkg =   file.path(pkgdir, "revdep", idx("library"), package),
-    old =   file.path(pkgdir, "revdep", idx("library"), pkg, "old"),
-    new =   file.path(pkgdir, "revdep", idx("library"), pkg, "new"),
+    lib = file.path(pkgdir, "revdep", idx("library")),
+    pkg = file.path(pkgdir, "revdep", idx("library"), package),
+    old = file.path(pkgdir, "revdep", idx("library"), pkg, "old"),
+    new = file.path(pkgdir, "revdep", idx("library"), pkg, "new"),
 
     ## Order is important here, because installs should go to the first
-    pkgold = c(file.path(pkgdir, "revdep", idx("library"), package),
-               file.path(pkgdir, "revdep", idx("library"), pkg, "old")),
-    pkgnew = c(file.path(pkgdir, "revdep", idx("library"), package),
-               file.path(pkgdir, "revdep", idx("library"), pkg, "new")),
+    pkgold = c(
+      file.path(pkgdir, "revdep", idx("library"), package),
+      file.path(pkgdir, "revdep", idx("library"), pkg, "old")
+    ),
+    pkgnew = c(
+      file.path(pkgdir, "revdep", idx("library"), package),
+      file.path(pkgdir, "revdep", idx("library"), pkg, "new")
+    ),
     cloud = c(file.path(pkgdir, "revdep", idx("cloud")))
   )
 }
@@ -86,8 +102,5 @@ dir_setup_package <- function(pkgdir, package) {
 }
 
 dir_create <- function(paths) {
-  map_lgl(paths, dir.create,
-    recursive = TRUE,
-    showWarnings = FALSE
-  )
+  map_lgl(paths, dir.create, recursive = TRUE, showWarnings = FALSE)
 }

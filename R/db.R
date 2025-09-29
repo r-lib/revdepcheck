@@ -1,4 +1,3 @@
-
 dbenv <- new.env()
 
 db_version <- "3.0.0"
@@ -6,8 +5,10 @@ db_version <- "3.0.0"
 #' @importFrom RSQLite dbIsValid dbConnect SQLite
 
 db <- function(package) {
-  if (exists(package, envir = dbenv) &&
-      dbIsValid(con <- dbenv[[package]])) {
+  if (
+    exists(package, envir = dbenv) &&
+      dbIsValid(con <- dbenv[[package]])
+  ) {
     con
   } else if (package == ":memory:") {
     dbenv[[package]] <- dbConnect(SQLite(), ":memory:")
@@ -39,16 +40,26 @@ db_disconnect <- function(package) {
 db_check_version <- function(package) {
   db <- db(package)
   ## If not metadata table, we just assume that the DB is empty
-  if (!dbExistsTable(db, "metadata")) return()
+  if (!dbExistsTable(db, "metadata")) {
+    return()
+  }
   dbver <- dbGetQuery(
-    db, "SELECT value FROM metadata WHERE name = 'dbversion'")
+    db,
+    "SELECT value FROM metadata WHERE name = 'dbversion'"
+  )
   rdver <- dbGetQuery(
-    db, "SELECT value FROM metadata WHERE name = 'revdepcheckversion'")
-  if (dbver[1,1] != db_version) {
-    verstr <- if (nrow(rdver)) rdver[1,1] else "< 1.0.0.9001"
-    stop("This revdep DB was created by revdepcheck ", verstr, ". ",
-         "You can use `revdep_reset()` to remove the DB, or you can ",
-         "install a different version of revdepcheck.")
+    db,
+    "SELECT value FROM metadata WHERE name = 'revdepcheckversion'"
+  )
+  if (dbver[1, 1] != db_version) {
+    verstr <- if (nrow(rdver)) rdver[1, 1] else "< 1.0.0.9001"
+    stop(
+      "This revdep DB was created by revdepcheck ",
+      verstr,
+      ". ",
+      "You can use `revdep_reset()` to remove the DB, or you can ",
+      "install a different version of revdepcheck."
+    )
   }
 }
 
@@ -61,7 +72,6 @@ db_check_version <- function(package) {
 #' @importFrom DBI dbExecute
 
 db_setup <- function(package) {
-
   db <- db(package)
 
   dbExecute(db, "DROP TABLE IF EXISTS revdeps")
@@ -77,7 +87,8 @@ db_setup <- function(package) {
   ## Contents 00install.out file will be stored as INSTALL_OUT, if
   ## there were any errors. PREPERROR means that there was an error
   ## before starting the actual check
-  dbExecute(db,
+  dbExecute(
+    db,
     "CREATE TABLE revdeps (
       package TEXT,
       version TEXT,
@@ -99,11 +110,15 @@ db_setup <- function(package) {
 
 db_metadata_init <- function(package) {
   db_metadata_set(package, "dbversion", db_version)
-  db_metadata_set(package, "revdepcheckversion",
-                  getNamespaceVersion("revdepcheck")[[1]])
+  db_metadata_set(
+    package,
+    "revdepcheckversion",
+    getNamespaceVersion("revdepcheck")[[1]]
+  )
 
-  if (package != ":memory:")
+  if (package != ":memory:") {
     db_metadata_set(package, "package", pkg_name(package))
+  }
 }
 
 #' @importFrom DBI dbExecute sqlInterpolate
@@ -113,7 +128,8 @@ db_metadata_set <- function(package, name, value) {
 
   dbWithTransaction(db, {
     sql <- sqlInterpolate(
-      db, "DELETE FROM metadata WHERE name = ?name",
+      db,
+      "DELETE FROM metadata WHERE name = ?name",
       name = name
     )
     dbExecute(db, sql)
@@ -132,7 +148,8 @@ db_metadata_set <- function(package, name, value) {
 
 db_metadata_get <- function(package, name) {
   db <- db(package)
-  sql <- sqlInterpolate(db,
+  sql <- sqlInterpolate(
+    db,
     "SELECT value FROM metadata WHERE name = ?name",
     name = name
   )
@@ -157,14 +174,20 @@ db_clean <- function(package) {
 #' @importFrom RSQLite dbExistsTable
 
 db_exists <- function(package) {
-  if (!file.exists(dir_find(package, "db"))) return(FALSE)
-  if (!dbExistsTable(db(package), "revdeps")) return(FALSE)
+  if (!file.exists(dir_find(package, "db"))) {
+    return(FALSE)
+  }
+  if (!dbExistsTable(db(package), "revdeps")) {
+    return(FALSE)
+  }
 
   TRUE
 }
 
 db_list <- function(package) {
-  if (!db_exists(package)) return(character())
+  if (!db_exists(package)) {
+    return(character())
+  }
   pkgs <- dbGetQuery(
     db(package),
     "SELECT DISTINCT package, which FROM revdeps"
@@ -203,14 +226,18 @@ db_todo_add_internal <- function(db, packages, silent = TRUE) {
       "Adding packages to TODO list: \n",
       paste("*", packages, "\n", collapse = ""),
       "\n",
-      "Run revdepcheck::revdep_check() to check")
+      "Run revdepcheck::revdep_check() to check"
+    )
   }
   todo <- dbReadTable(db, "todo")
   todo$status[todo$package %in% packages] <- "todo"
   new <- setdiff(packages, todo$package)
   if (length(new)) {
-    newdf <- data.frame(package = new, status = "todo",
-                        stringsAsFactors = FALSE)
+    newdf <- data.frame(
+      package = new,
+      status = "todo",
+      stringsAsFactors = FALSE
+    )
     todo <- rbind(todo, newdf)
   }
   dbWriteTable(db, "todo", todo, overwrite = TRUE)
@@ -227,9 +254,11 @@ db_todo_add_new <- function(pkgdir, revdeps, silent) {
   dbWithTransaction(db, {
     intodo <- db_todo_status_internal(db)$package
     donever <- dbGetQuery(
-      db, "SELECT r.package, r.version FROM todo t, revdeps r
+      db,
+      "SELECT r.package, r.version FROM todo t, revdeps r
            WHERE r.package = t.package AND t.status = 'done' AND
-                 r.which = 'new'")
+                 r.which = 'new'"
+    )
 
     ## Need to add packages that are not in the todo table at all
     to_add <- setdiff(revdeps$package, intodo)
@@ -253,7 +282,8 @@ db_todo_rm <- function(pkgdir, packages) {
   db <- db(pkgdir)
 
   dbWithTransaction(
-    db, {
+    db,
+    {
       todo <- dbReadTable(db, "todo")
       todo$status[todo$package %in% packages] <- "ignore"
       miss <- setdiff(packages, todo$package)
@@ -269,17 +299,27 @@ db_todo_rm <- function(pkgdir, packages) {
 
 #' @importFrom DBI dbExecute sqlInterpolate
 
-db_insert <- function(pkgdir, package, version = NULL, maintainer = NULL,
-                      status, which = c("old", "new"), duration, starttime,
-                      result, summary) {
-
+db_insert <- function(
+  pkgdir,
+  package,
+  version = NULL,
+  maintainer = NULL,
+  status,
+  which = c("old", "new"),
+  duration,
+  starttime,
+  result,
+  summary
+) {
   which <- match.arg(which)
 
   db <- db(pkgdir)
 
   ## To avoid duplicate records in the DB
-  dbExecute(db,
-    sqlInterpolate(db,
+  dbExecute(
+    db,
+    sqlInterpolate(
+      db,
       "DELETE FROM revdeps WHERE package = ?package AND which = ?which",
       package = package,
       which = which
@@ -289,13 +329,18 @@ db_insert <- function(pkgdir, package, version = NULL, maintainer = NULL,
   ## If only one of them is done, then we don't do this, so
   ## both checks are re-run if the checks are interrupted half-way
   dbWithTransaction(
-    db, {
+    db,
+    {
       q <- "SELECT which FROM revdeps WHERE package = ?package AND which <> ?which"
-      done <- dbGetQuery(db, sqlInterpolate(db, q,
-        package = package, which = which))
+      done <- dbGetQuery(
+        db,
+        sqlInterpolate(db, q, package = package, which = which)
+      )
       if (nrow(done)) {
-        dbExecute(db,
-          sqlInterpolate(db,
+        dbExecute(
+          db,
+          sqlInterpolate(
+            db,
             "UPDATE todo SET status='done' WHERE package = ?package",
             package = package
           )
@@ -310,14 +355,20 @@ db_insert <- function(pkgdir, package, version = NULL, maintainer = NULL,
          (?package, ?version, ?maintainer, ?status, ?which, ?duration,
           ?starttime, ?result, ?summary)"
 
-
   ## TODO: better way to get version, maintainer, so they are never NULL
-  dbExecute(db,
-    sqlInterpolate(db, q,
-      package = package, version = version %|0|% "",
+  dbExecute(
+    db,
+    sqlInterpolate(
+      db,
+      q,
+      package = package,
+      version = version %|0|% "",
       maintainer = maintainer %|0|% "",
-      status = status, which = which, duration = duration,
-      starttime = as.character(starttime), result = result,
+      status = status,
+      which = which,
+      duration = duration,
+      starttime = as.character(starttime),
+      result = result,
       summary = summary %|0|% ""
     )
   )
@@ -326,7 +377,7 @@ db_insert <- function(pkgdir, package, version = NULL, maintainer = NULL,
 filter_result_pkgs <- function(res, revdeps) {
   if (!is.null(revdeps)) {
     res <- res[res$package %in% revdeps, ]
-    if (any(miss <- ! revdeps %in% res$package)) {
+    if (any(miss <- !revdeps %in% res$package)) {
       warning(
         "No results for packages: ",
         paste(sQuote(revdeps[miss]), collapse = ", ")
@@ -340,23 +391,36 @@ db_get_results <- function(pkg, revdeps) {
   db <- db(pkg)
 
   if (is.null(revdeps)) {
-    old <- dbGetQuery(db,
+    old <- dbGetQuery(
+      db,
       "SELECT * FROM revdeps WHERE which = 'old'
-       ORDER BY package COLLATE NOCASE")
-    new <- dbGetQuery(db,
+       ORDER BY package COLLATE NOCASE"
+    )
+    new <- dbGetQuery(
+      db,
       "SELECT * FROM revdeps WHERE which = 'new'
-       ORDER BY package COLLATE NOCASE")
-
+       ORDER BY package COLLATE NOCASE"
+    )
   } else {
     revdepstr <- paste0("(", paste0('"', revdeps, '"', collapse = ","), ")")
-    old <- dbGetQuery(db, paste0(
-      "SELECT * FROM revdeps
-       WHERE which = 'old' AND package IN ", revdepstr,
-      "ORDER BY package COLLATE NOCASE"))
-    new <- dbGetQuery(db, paste0(
-      "SELECT * FROM revdeps
-       WHERE which = 'new' AND package IN ", revdepstr,
-      "ORDER BY package COLLATE NOCASE"))
+    old <- dbGetQuery(
+      db,
+      paste0(
+        "SELECT * FROM revdeps
+       WHERE which = 'old' AND package IN ",
+        revdepstr,
+        "ORDER BY package COLLATE NOCASE"
+      )
+    )
+    new <- dbGetQuery(
+      db,
+      paste0(
+        "SELECT * FROM revdeps
+       WHERE which = 'new' AND package IN ",
+        revdepstr,
+        "ORDER BY package COLLATE NOCASE"
+      )
+    )
   }
 
   list(old = old, new = new)

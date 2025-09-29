@@ -3,8 +3,16 @@ library_compare <- function(pkg) {
   lib_old <- library_meta(dir_find(pkg, "old"))
 
   lib_cmp <- merge(
-    data.frame(package = lib_old$Package, old = lib_old$Version, stringsAsFactors = FALSE),
-    data.frame(package = lib_new$Package, new = lib_new$Version, stringsAsFactors = FALSE),
+    data.frame(
+      package = lib_old$Package,
+      old = lib_old$Version,
+      stringsAsFactors = FALSE
+    ),
+    data.frame(
+      package = lib_new$Package,
+      new = lib_new$Version,
+      stringsAsFactors = FALSE
+    ),
     all = TRUE
   )
 

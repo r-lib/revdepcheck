@@ -1,17 +1,23 @@
-
 #' @importFrom rcmdcheck rcmdcheck_process
 
-check_proc <- function(pkgdir, pkgname, version = c("old", "new"),
-                       env = character()) {
+check_proc <- function(
+  pkgdir,
+  pkgname,
+  version = c("old", "new"),
+  env = character()
+) {
   version <- match.arg(version)
 
   dir <- dir_find(pkgdir, "check", pkgname)
   tarball <- latest_file(dir(dir, pattern = "\\.tar\\.gz$", full.names = TRUE))
   if (length(tarball) == 0) {
-    stop(sprintf(
-      "Internal error for package %s. No *.tar.gz file found.",
-      pkgname
-    ), call. = FALSE)
+    stop(
+      sprintf(
+        "Internal error for package %s. No *.tar.gz file found.",
+        pkgname
+      ),
+      call. = FALSE
+    )
   }
 
   out <- file.path(dir, version)
@@ -43,8 +49,13 @@ check_task <- function(state, task) {
   px <- check_proc(pkgdir, pkgname, version = version, env = state$options$env)
 
   ## Update state
-  worker <- list(process = px, package = pkgname,
-                 stdout = character(), stderr = character(), task = task)
+  worker <- list(
+    process = px,
+    package = pkgname,
+    stdout = character(),
+    stderr = character(),
+    task = task
+  )
   state$workers <- c(state$workers, list(worker))
 
   wpkg <- match(worker$package, state$packages$package)
@@ -53,13 +64,10 @@ check_task <- function(state, task) {
   new_state <-
     if (current_state == "downloaded" && version == "old") {
       "checking"
-
     } else if (current_state == "checking" && version == "new") {
       "checking-checking"
-
     } else if (current_state == "done-downloaded" && version == "new") {
       "done-checking"
-
     } else {
       stop("Internal revdepcheck error, invalid state")
     }
@@ -81,7 +89,9 @@ revdep_env_vars <- function(force_suggests = FALSE) {
   c(
     # Switch off expensive check for package version
     # https://github.com/hadley/devtools/issues/1271
-    if (getRversion() >= "3.4.0" && as.numeric(R.version[["svn rev"]]) >= 70944) {
+    if (
+      getRversion() >= "3.4.0" && as.numeric(R.version[["svn rev"]]) >= 70944
+    ) {
       c("_R_CHECK_CRAN_INCOMING_REMOTE_" = "FALSE")
     } else {
       c("_R_CHECK_CRAN_INCOMING_" = "FALSE")
@@ -107,21 +117,16 @@ check_done <- function(state, worker) {
   new_state <-
     if (current_state == "checking" && iam_old) {
       "done-downloaded"
-
     } else if (current_state == "checking-checking" && iam_old) {
       "done-checking"
-
     } else if (current_state == "checking-checking" && !iam_old) {
       "checking-done"
-
     } else if (current_state == "checking-done" && iam_old) {
       cleanup_library(state, worker)
       "done"
-
     } else if (current_state == "done-checking" && !iam_old) {
       cleanup_library(state, worker)
       "done"
-
     } else {
       stop("Internal revdepcheck error, invalid state")
     }
@@ -162,10 +167,15 @@ check_done <- function(state, worker) {
   maintainer <- description$get_maintainer()
 
   db_insert(
-    state$options$pkgdir, worker$package,
-    version = chkres$version, maintainer = maintainer, status = status,
-    which = my_task$args[[2]], duration = duration,
-    starttime = as.character(starttime), result = unclass(toJSON(chkres)),
+    state$options$pkgdir,
+    worker$package,
+    version = chkres$version,
+    maintainer = maintainer,
+    status = status,
+    which = my_task$args[[2]],
+    duration = duration,
+    starttime = as.character(starttime),
+    result = unclass(toJSON(chkres)),
     summary = unclass(toJSON(summary))
   )
 
@@ -205,4 +215,3 @@ library_info <- function(file = "", libpath = .libPaths()) {
     file = file
   )
 }
-

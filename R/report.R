@@ -1,4 +1,3 @@
-
 #' Markdown report of reverse dependency check results
 #'
 #' You can use these functions to get intermediate reports of a [revdep_check()]
@@ -20,7 +19,12 @@
 #' @importFrom crayon black red yellow green
 #' @importFrom sessioninfo platform_info
 
-revdep_report_summary <- function(pkg = ".", file = "", all = FALSE, results = NULL) {
+revdep_report_summary <- function(
+  pkg = ".",
+  file = "",
+  all = FALSE,
+  results = NULL
+) {
   pkg <- pkg_check(pkg)
   if (is_string(file) && !identical(file, "")) {
     file <- file(file, encoding = "UTF-8", open = "w")
@@ -50,7 +54,9 @@ revdep_report_summary <- function(pkg = ".", file = "", all = FALSE, results = N
 
   revdep_report_section("Failed to check", revdeps[failed, ], file = file)
   revdep_report_section("New problems", revdeps[broken, ], file = file)
-  if (all) revdep_report_section("All", revdeps, file = file)
+  if (all) {
+    revdep_report_section("All", revdeps, file = file)
+  }
 
   invisible()
 }
@@ -70,16 +76,28 @@ revdep_report_section <- function(title, rows, file) {
 #' @export
 #' @rdname revdep_report_summary
 
-revdep_report_problems <- function(pkg = ".", file = "", all = FALSE, results = NULL, 
-                                   bioc = TRUE, cran = TRUE) {
+revdep_report_problems <- function(
+  pkg = ".",
+  file = "",
+  all = FALSE,
+  results = NULL,
+  bioc = TRUE,
+  cran = TRUE
+) {
   ## We show the packages that
   ## 1. are newly broken
   ## 2. still broken, if all == TRUE
   problem <- function(x) {
     any(x$cmp$change == 1) || (all && any(x$cmp$change == 0))
   }
-  revdep_report_if(pkg = pkg, file = file, predicate = problem, results = results,
-                   bioc = bioc, cran = cran)
+  revdep_report_if(
+    pkg = pkg,
+    file = file,
+    predicate = problem,
+    results = results,
+    bioc = bioc,
+    cran = cran
+  )
 }
 
 #' `revdep_report_failures()` generates a report about packages that failed
@@ -88,18 +106,34 @@ revdep_report_problems <- function(pkg = ".", file = "", all = FALSE, results = 
 #' @export
 #' @rdname revdep_report_summary
 
-revdep_report_failures <- function(pkg = ".", file = "", results = NULL, 
-                                   bioc = TRUE, cran = TRUE) {
+revdep_report_failures <- function(
+  pkg = ".",
+  file = "",
+  results = NULL,
+  bioc = TRUE,
+  cran = TRUE
+) {
   problem <- function(x) {
     !x$status %in% c("+", "-")
   }
-  revdep_report_if(pkg = pkg, file = file, predicate = problem, results = results, 
-                   bioc = bioc, cran = cran)
+  revdep_report_if(
+    pkg = pkg,
+    file = file,
+    predicate = problem,
+    results = results,
+    bioc = bioc,
+    cran = cran
+  )
 }
 
-revdep_report_if <- function(pkg = ".", file = "", predicate, results = NULL, 
-                             bioc = TRUE, cran = TRUE) {
-
+revdep_report_if <- function(
+  pkg = ".",
+  file = "",
+  predicate,
+  results = NULL,
+  bioc = TRUE,
+  cran = TRUE
+) {
   if (is_string(file) && !identical(file, "")) {
     file <- file(file, encoding = "UTF-8", open = "w")
     on.exit(close(file), add = TRUE)
@@ -137,25 +171,24 @@ failure_details <- function(x, file = "", bioc = TRUE, cran = TRUE) {
     cat_line(line_trunc(x$old$stdout), sep = "\n", file = file)
     cat_line(line_trunc(x$old$stderr), sep = "\n", file = file)
     cat_line("```", file = file)
+  } else {
+    rows <- x$cmp
+    cat_failure_section("Newly broken", rows[rows$change == +1, ], file = file)
+    cat_failure_section("Newly fixed", rows[rows$change == -1, ], file = file)
+    cat_failure_section("In both", rows[rows$change == 0, ], file = file)
 
-    } else {
-      rows <- x$cmp
-      cat_failure_section("Newly broken", rows[rows$change == +1, ], file = file)
-      cat_failure_section("Newly fixed",  rows[rows$change == -1, ], file = file)
-      cat_failure_section("In both",      rows[rows$change ==  0, ], file = file)
-
-      if (x$status %in% c("i-", "i+")) {
-        cat_header("Installation", level = 2, file = file)
-        cat_header("Devel", level = 3, file = file)
-        cat_line("```", file = file)
-        cat_line(line_trunc(x$new$install_out), sep = "\n", file = file)
-        cat_line("```", file = file)
-        cat_header("CRAN", level = 3, file = file)
-        cat_line("```", file = file)
-        cat_line(line_trunc(x$old[[1]]$install_out), sep = "\n", file = file)
-        cat_line("```", file = file)
-      }
+    if (x$status %in% c("i-", "i+")) {
+      cat_header("Installation", level = 2, file = file)
+      cat_header("Devel", level = 3, file = file)
+      cat_line("```", file = file)
+      cat_line(line_trunc(x$new$install_out), sep = "\n", file = file)
+      cat_line("```", file = file)
+      cat_header("CRAN", level = 3, file = file)
+      cat_line("```", file = file)
+      cat_line(line_trunc(x$old[[1]]$install_out), sep = "\n", file = file)
+      cat_line("```", file = file)
     }
+  }
 
   invisible()
 }
@@ -167,8 +200,12 @@ cat_package_info <- function(cmp, file, bioc = TRUE, cran = TRUE) {
     tryCatch(desc::desc(text = chk$description), error = function(x) NULL)
 
   addifx <- function(field) {
-    if (is.null(desc)) return(NULL)
-    if (!desc$has_fields(field)) return(NULL)
+    if (is.null(desc)) {
+      return(NULL)
+    }
+    if (!desc$has_fields(field)) {
+      return(NULL)
+    }
     paste0("* ", field, ": ", normalize_space(desc$get_field(field)))
   }
   out <- c(
@@ -176,8 +213,15 @@ cat_package_info <- function(cmp, file, bioc = TRUE, cran = TRUE) {
     paste0("* GitHub: ", pkg_github(desc)),
     paste0("* Source code: ", pkg_source_link(chk)),
     addifx("Date/Publication"),
-    paste0("* Number of recursive dependencies: ", num_deps(chk$package, bioc = bioc, cran = cran)),
-    sprintf("\nRun `revdepcheck::%s_details(, \"%s\")` for more info", type, chk$package)
+    paste0(
+      "* Number of recursive dependencies: ",
+      num_deps(chk$package, bioc = bioc, cran = cran)
+    ),
+    sprintf(
+      "\nRun `revdepcheck::%s_details(, \"%s\")` for more info",
+      type,
+      chk$package
+    )
   )
   out <- wrap_tag("details", out)
   cat(out, file = file)
@@ -231,7 +275,7 @@ normalize_space <- function(x) {
 }
 
 cat_failure_section <- function(title, rows, file) {
-if (NROW(rows) == 0) {
+  if (NROW(rows) == 0) {
     return()
   }
 
@@ -255,7 +299,9 @@ format_details_bullet <- function(x, max_lines = 20) {
 
   pad <- strrep(" ", 4)
   paste0(
-    "*   ", red(title), "\n",
+    "*   ",
+    red(title),
+    "\n",
     paste0(pad, details, "\n", collapse = ""),
     "\n"
   )
@@ -289,9 +335,18 @@ revdep_report_cran <- function(pkg = ".", file = "", results = NULL) {
   cat_line("## revdepcheck results", file = file)
   cat_line(file = file)
   cat_line(
-    "We checked ", length(results), " reverse dependencies",
-    if (any(!on_cran))
-      paste0(" (", sum(on_cran), " from CRAN + ", sum(!on_cran), " from Bioconductor)"),
+    "We checked ",
+    length(results),
+    " reverse dependencies",
+    if (any(!on_cran)) {
+      paste0(
+        " (",
+        sum(on_cran),
+        " from CRAN + ",
+        sum(!on_cran),
+        " from Bioconductor)"
+      )
+    },
     ", comparing R CMD check results across CRAN and dev versions of this package.",
     file = file
   )
@@ -299,8 +354,8 @@ revdep_report_cran <- function(pkg = ".", file = "", results = NULL) {
   cat_line(" * We saw ", sum(broke), " new problems", file = file)
   cat_line(" * We failed to check ", sum(failed), " packages", file = file)
   if (any(broke | failed)) {
-      cat_line(file = file)
-      cat_line("Issues with CRAN packages are summarised below.", file = file)
+    cat_line(file = file)
+    cat_line("Issues with CRAN packages are summarised below.", file = file)
   }
   cat_line(file = file)
 
@@ -312,16 +367,25 @@ revdep_report_cran <- function(pkg = ".", file = "", results = NULL) {
     issues <- map(results[broke], "[[", "cmp")
     new <- map(issues, function(x) x$output[x$change == 1])
     first_line <- map(new, function(x) map_chr(strsplit(x, "\n"), "[[", 1))
-    collapsed <- map_chr(first_line, function(x) paste0("  ", x, "\n", collapse = ""))
+    collapsed <- map_chr(first_line, function(x) {
+      paste0("  ", x, "\n", collapse = "")
+    })
 
-    cat(paste0("* ", package[broke], "\n", collapsed, "\n", collapse = ""), file = file)
+    cat(
+      paste0("* ", package[broke], "\n", collapsed, "\n", collapse = ""),
+      file = file
+    )
   }
 
   if (any(failed)) {
     cat_line("### Failed to check", file = file)
     cat_line(file = file)
     desc <- unname(c(i = "failed to install", t = "check timed out")[status])
-    cat(paste0("* ", format(package[failed]), " (", desc[failed], ")\n"), sep = "", file = file)
+    cat(
+      paste0("* ", format(package[failed]), " (", desc[failed], ")\n"),
+      sep = "",
+      file = file
+    )
   }
 
   invisible()
@@ -338,7 +402,13 @@ on_cran <- function(x) {
 #' @export
 #' @rdname revdep_report_summary
 
-revdep_report <- function(pkg = ".", all = FALSE, results = NULL, bioc = TRUE, cran = TRUE) {
+revdep_report <- function(
+  pkg = ".",
+  all = FALSE,
+  results = NULL,
+  bioc = TRUE,
+  cran = TRUE
+) {
   pkg <- pkg_check(pkg)
   root <- dir_find(pkg, "root")
 
@@ -362,12 +432,23 @@ revdep_report <- function(pkg = ".", all = FALSE, results = NULL, bioc = TRUE, c
   revdep_report_summary(pkg, file = readme_file, all = all, results = results)
 
   message("Writing problems to 'revdep/problems.md'")
-  revdep_report_problems(pkg, file = file.path(root, "problems.md"), all = all, 
-                         results = results, bioc = bioc, cran = cran)
+  revdep_report_problems(
+    pkg,
+    file = file.path(root, "problems.md"),
+    all = all,
+    results = results,
+    bioc = bioc,
+    cran = cran
+  )
 
   message("Writing failures to 'revdep/failures.md'")
-  revdep_report_failures(pkg, file = file.path(root, "failures.md"), results = results, 
-                         bioc = bioc, cran = cran)
+  revdep_report_failures(
+    pkg,
+    file = file.path(root, "failures.md"),
+    results = results,
+    bioc = bioc,
+    cran = cran
+  )
 
   message("Writing CRAN report to 'revdep/cran.md'")
   revdep_report_cran(pkg, file = file.path(root, "cran.md"), results = results)
@@ -435,7 +516,7 @@ report_revdeps <- function(pkg = ".", all = FALSE, results = NULL) {
     n_issues <- map_int(results, function(x) sum(x$cmp$change == 1))
   }
 
-  status <-  map_chr(results, rcmdcheck_status)
+  status <- map_chr(results, rcmdcheck_status)
   pkgname <- map_chr(results, "[[", "package")
 
   data.frame(

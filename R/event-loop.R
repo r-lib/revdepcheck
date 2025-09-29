@@ -1,4 +1,3 @@
-
 #' This is the event loop of the revdep check process
 #'
 #' @param state The full state of the check process:
@@ -60,14 +59,19 @@ run_event_loop <- function(state) {
   while (1) {
     "!DEBUG event loop iteration, `length(state$workers)` workers"
     check_for_timeouts(state)
-    if (are_we_done(state)) break;
+    if (are_we_done(state)) {
+      break
+    }
     state$progress_bar$tick(0, tokens = list(packages = checking_now(state)))
     events <- poll(state)
     state <- handle_events(state, events)
-    task  <- schedule_next_task(state)
+    task <- schedule_next_task(state)
     state <- do_task(state, task)
-    if (package_version(getNamespaceVersion(asNamespace("processx"))) <=
-        "3.0.0") gc()
+    if (
+      package_version(getNamespaceVersion(asNamespace("processx"))) <= "3.0.0"
+    ) {
+      gc()
+    }
   }
 
   "!DEBUG event loop is done"
@@ -83,8 +87,10 @@ run_event_loop <- function(state) {
 check_for_timeouts <- function(state) {
   now <- Sys.time()
   for (w in state$workers) {
-    if (now - w$process$get_start_time() > state$options$timeout &&
-        w$process$is_alive()) {
+    if (
+      now - w$process$get_start_time() > state$options$timeout &&
+        w$process$is_alive()
+    ) {
       "!DEBUG Killing worker for package `w$package`"
       w$killed <- TRUE
       w$process$kill(close_connections = FALSE)
@@ -107,12 +113,19 @@ checking_now <- function(state) {
   width <- getOption("width") - 38 # conservative estimate
   upkgs <- unique(pkgs)
   ustate <- wstate$state[match(upkgs, wstate$package)]
-  sum_lookup <- c("todo" = "??", "deps_installing" = "I",
-                  "deps_installed" = "I", "downloading" = "D",
-                  "downloaded" = "D", "checking" = "C_",
-                  "checking-checking" = "CC", "done-checking" = "vC",
-                  "checking-done" = "Cv", "done-downloaded" = "vD",
-                  "done" = "vv")
+  sum_lookup <- c(
+    "todo" = "??",
+    "deps_installing" = "I",
+    "deps_installed" = "I",
+    "downloading" = "D",
+    "downloaded" = "D",
+    "checking" = "C_",
+    "checking-checking" = "CC",
+    "done-checking" = "vC",
+    "checking-done" = "Cv",
+    "done-downloaded" = "vD",
+    "done" = "vv"
+  )
   str <- paste0(upkgs, " [", sum_lookup[ustate], "]", collapse = ", ")
   paste0("(", length(pkgs), ") ", str_trunc(str, width))
 }
@@ -125,7 +138,6 @@ poll <- function(state) {
     "!DEBUG poll with timeout of `timeout` ms"
     res <- processx::poll(procs, ms = timeout)
     map_lgl(res, function(x) "ready" %in% x)
-
   } else {
     "!DEBUG nothing to poll"
     logical()
@@ -148,13 +160,14 @@ get_process_waiting_time <- function(worker, timeout) {
 }
 
 handle_events <- function(state, events) {
-  for (i in which(events)) state <- handle_event(state, i)
+  for (i in which(events)) {
+    state <- handle_event(state, i)
+  }
   state$workers <- drop_nulls(state$workers)
   state
 }
 
 handle_event <- function(state, which) {
-
   "!DEBUG handle event, package `state$workers[[which]]$package`"
   proc <- state$workers[[which]]$process
 
@@ -182,8 +195,10 @@ handle_event <- function(state, which) {
   "!DEBUG read out `nchar(out)`/`nchar(err)` characters"
 
   ## If there is still output, then wait a bit more
-  if (proc$is_incomplete_output() ||
-      (proc$has_error_connection() && proc$is_incomplete_error())) {
+  if (
+    proc$is_incomplete_output() ||
+      (proc$has_error_connection() && proc$is_incomplete_error())
+  ) {
     return(state)
   }
 
@@ -197,10 +212,8 @@ handle_event <- function(state, which) {
 
   if (worker$task$name == "deps_install") {
     deps_install_done(state, worker)
-
   } else if (worker$task$name == "download") {
     download_done(state, worker)
-
   } else if (worker$task$name == "check") {
     check_done(state, worker)
   }
@@ -283,19 +296,15 @@ do_task <- function(state, task) {
     ## Do nothing, return the state as it is
     "!DEBUG do an idle task"
     state
-
   } else if (task$name == "deps_install") {
     "!DEBUG do a dependency install task: `task[[2]]`"
     deps_install_task(state, task)
-
   } else if (task$name == "download") {
     "!DEBUG do a download task: `task[[2]]`"
     download_task(state, task)
-
   } else if (task$name == "check") {
     "!DEBUG do a check task: `task[[2]]`"
     check_task(state, task)
-
   } else {
     stop("Unknown task")
   }
@@ -303,5 +312,7 @@ do_task <- function(state, task) {
 
 remove_workers <- function(state) {
   "!DEBUG remove `length(state$workers)` workers"
-  for (w in state$workers) w$process$kill()
+  for (w in state$workers) {
+    w$process$kill()
+  }
 }

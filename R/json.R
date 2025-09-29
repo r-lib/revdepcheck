@@ -1,4 +1,3 @@
-
 toJSON <- function(x, force = TRUE, ...) {
   jsonlite::toJSON(
     list(
@@ -25,8 +24,8 @@ checkFromJSON <- function(txt, ...) {
   }
 
   check <- fromJSON(txt, ...)
-  check$errors   <- as.character(check$errors)
+  check$errors <- as.character(check$errors)
   check$warnings <- as.character(check$warnings)
-  check$notes    <- as.character(check$notes)
+  check$notes <- as.character(check$notes)
   check
 }

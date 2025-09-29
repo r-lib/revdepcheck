@@ -14,10 +14,13 @@ cloud_status <- function(job_name = cloud_job(), update_interval = 10) {
 
   info <- cloud_job_info(job_name)
 
-  started_time <- as.POSIXct(info$started_timestamp, tz = "UTC", format="%Y-%m-%dT%H:%M:%OS")
+  started_time <- as.POSIXct(
+    info$started_timestamp,
+    tz = "UTC",
+    format = "%Y-%m-%dT%H:%M:%OS"
+  )
 
   cloud_status_check <- function(job_name) {
-
     status <- cloud_job_status(job_name)
 
     if (length(status) == 0) {
@@ -32,7 +35,14 @@ cloud_status <- function(job_name = cloud_job(), update_interval = 10) {
     }
 
     names(results) <- tolower(names(results))
-    results <- results[c("pending", "runnable", "starting", "running", "succeeded", "failed")]
+    results <- results[c(
+      "pending",
+      "runnable",
+      "starting",
+      "running",
+      "succeeded",
+      "failed"
+    )]
 
     num_completed <- sum(results[c("succeeded", "failed")])
     num_queued <- sum(results[c("pending", "runnable")])
@@ -40,29 +50,45 @@ cloud_status <- function(job_name = cloud_job(), update_interval = 10) {
 
     current_time <- Sys.time()
 
-    elapsed <- hms::as_hms(as.integer(difftime(current_time, started_time, units = "secs")))
+    elapsed <- hms::as_hms(as.integer(difftime(
+      current_time,
+      started_time,
+      units = "secs"
+    )))
 
     status_bar_text <- "[{num_queued}/{col_blue(num_running)}/{col_green(results[['succeeded']])}/{col_red(results[['failed']])} - {.strong {size}}] {elapsed}"
 
     if (results[["failed"]] > 0) {
-        cli_status_clear(id = status_id, result = "failed", msg_failed = paste0("{.emph FAILED}: ", status_bar_text))
-        cli_alert("run {.run revdepcheck::cloud_summary()} for interactive results")
-        cli_alert("run {.run revdepcheck::cloud_report()} for markdown reports")
-        return(FALSE)
+      cli_status_clear(
+        id = status_id,
+        result = "failed",
+        msg_failed = paste0("{.emph FAILED}: ", status_bar_text)
+      )
+      cli_alert(
+        "run {.run revdepcheck::cloud_summary()} for interactive results"
+      )
+      cli_alert("run {.run revdepcheck::cloud_report()} for markdown reports")
+      return(FALSE)
     }
 
     if (num_completed == length(info$revdep_packages)) {
-        cli_status_clear(id = status_id, result = "done", msg_done = paste0("{.emph SUCCEEDED}: ", status_bar_text))
-        cli_alert("run {.run revdepcheck::cloud_summary()} for interactive results")
-        cli_alert("run {.run revdepcheck::cloud_report()} for markdown reports")
-        return(TRUE)
+      cli_status_clear(
+        id = status_id,
+        result = "done",
+        msg_done = paste0("{.emph SUCCEEDED}: ", status_bar_text)
+      )
+      cli_alert(
+        "run {.run revdepcheck::cloud_summary()} for interactive results"
+      )
+      cli_alert("run {.run revdepcheck::cloud_report()} for markdown reports")
+      return(TRUE)
     }
 
     cli::cli_status_update(id = status_id, status_bar_text)
     return(NA)
   }
 
-  while(is.na(res <- cloud_status_check(job_name))) {
+  while (is.na(res <- cloud_status_check(job_name))) {
     Sys.sleep(update_interval)
   }
 
@@ -100,7 +126,10 @@ cloud_fetch_results <- function(job_name = cloud_job(pkg = pkg), pkg = ".") {
 
   to_download <- !file.exists(out_files)
 
-  pb <- cli_progress_bar(format = "Downloading package results: {pb_percent}", total = sum(to_download))
+  pb <- cli_progress_bar(
+    format = "Downloading package results: {pb_percent}",
+    total = sum(to_download)
+  )
   handle_success <- function(res) {
     if (res$status_code >= 400) {
       out_file <- sprintf("%s/%s.tar.gz", out_dir, basename(dirname(res$url)))
@@ -112,19 +141,36 @@ cloud_fetch_results <- function(job_name = cloud_job(pkg = pkg), pkg = ".") {
   for (i in which(to_download)) {
     out_file <- out_files[[i]]
     package <- packages[[i]]
-    url <- sprintf("https://xgyefaepu5.execute-api.us-east-1.amazonaws.com/staging/check/%s/packages/%s/results.tar.gz", job_name, package)
+    url <- sprintf(
+      "https://xgyefaepu5.execute-api.us-east-1.amazonaws.com/staging/check/%s/packages/%s/results.tar.gz",
+      job_name,
+      package
+    )
 
     handle <- new_handle()
     handle_setopt(handle, url = enc2utf8(url))
-    handle_setheaders(handle, "x-api-key" = Sys.getenv("RSTUDIO_CLOUD_REVDEP_KEY"), Accept = "application/x-gzip")
-    multi_add(handle = handle, done = handle_success, pool = pool, data = out_file)
+    handle_setheaders(
+      handle,
+      "x-api-key" = Sys.getenv("RSTUDIO_CLOUD_REVDEP_KEY"),
+      Accept = "application/x-gzip"
+    )
+    multi_add(
+      handle = handle,
+      done = handle_success,
+      pool = pool,
+      data = out_file
+    )
   }
   out <- multi_run(pool = pool)
   cli_progress_done(id = pb)
 
-  to_extract <- file.exists(out_files) & !dir.exists(file.path(out_dir, packages))
+  to_extract <- file.exists(out_files) &
+    !dir.exists(file.path(out_dir, packages))
 
-  pb2 <- cli_progress_bar(format = "Extracting package results: {pb_percent}", total = sum(to_extract))
+  pb2 <- cli_progress_bar(
+    format = "Extracting package results: {pb_percent}",
+    total = sum(to_extract)
+  )
   for (i in which(to_extract)) {
     out_file <- out_files[[i]]
     utils::untar(out_file, exdir = out_dir)
@@ -153,13 +199,15 @@ cloud_fetch_results <- function(job_name = cloud_job(pkg = pkg), pkg = ".") {
 #' @importFrom httr GET PATCH POST stop_for_status add_headers content
 #' @family cloud
 #' @export
-cloud_check <- function(pkg = ".",
+cloud_check <- function(
+  pkg = ".",
   tarball = NULL,
   revdep_packages = NULL,
   extra_revdeps = NULL,
   r_version = "4.4.0",
   check_args = "--no-manual",
-  bioc = FALSE) {
+  bioc = FALSE
+) {
   if (is.null(tarball)) {
     cli::cli_alert_info("Building package tarball")
     pkg <- pkg_check(pkg)
@@ -179,10 +227,14 @@ cloud_check <- function(pkg = ".",
   }
 
   if (length(revdep_packages) == 1) {
-    stop("`revdepcheck::cloud_check()` can't work with exactly 1 revdep package (AWS batch jobs must have more than one job)", call. = FALSE)
+    stop(
+      "`revdepcheck::cloud_check()` can't work with exactly 1 revdep package (AWS batch jobs must have more than one job)",
+      call. = FALSE
+    )
   }
 
-  post_response <- POST("https://xgyefaepu5.execute-api.us-east-1.amazonaws.com/staging/check",
+  post_response <- POST(
+    "https://xgyefaepu5.execute-api.us-east-1.amazonaws.com/staging/check",
     config = add_headers("x-api-key" = Sys.getenv("RSTUDIO_CLOUD_REVDEP_KEY")),
     body = list(
       package_name = package_name,
@@ -207,7 +259,8 @@ cloud_check <- function(pkg = ".",
   cli_alert_success("Uploaded package tarball")
 
   cli_alert_info("Spawning batch job")
-  patch_response <- PATCH("https://xgyefaepu5.execute-api.us-east-1.amazonaws.com",
+  patch_response <- PATCH(
+    "https://xgyefaepu5.execute-api.us-east-1.amazonaws.com",
     config = add_headers("x-api-key" = Sys.getenv("RSTUDIO_CLOUD_REVDEP_KEY")),
     path = paste0("staging/check", "/", job_name),
     body = list(status = "running"),
@@ -237,8 +290,8 @@ cloud_check <- function(pkg = ".",
 #' @family cloud
 #' @export
 cloud_cancel <- function(job_name = cloud_job()) {
-
-  patch_response <- PATCH("https://xgyefaepu5.execute-api.us-east-1.amazonaws.com",
+  patch_response <- PATCH(
+    "https://xgyefaepu5.execute-api.us-east-1.amazonaws.com",
     config = add_headers("x-api-key" = Sys.getenv("RSTUDIO_CLOUD_REVDEP_KEY")),
     path = paste0("staging/check", "/", job_name),
     body = list(status = "cancelled"),
@@ -265,15 +318,17 @@ cloud_stop_for_status <- function(response) {
 
   call <- sys.call(-1)
 
-  cond <- structure(list(
-    message = paste0(msg, collapse = "\n")
-  ),
-  class = c(
-    "cloud_error",
-    paste0("http_error_", status),
-    "error",
-    "condition"
-  ))
+  cond <- structure(
+    list(
+      message = paste0(msg, collapse = "\n")
+    ),
+    class = c(
+      "cloud_error",
+      paste0("http_error_", status),
+      "error",
+      "condition"
+    )
+  )
 
   stop(cond)
 }
@@ -298,20 +353,22 @@ cloud_check_result <- function(check_log, description, dependency_error) {
         # DESCRIPTION can exist but be empty, e.g. for a Bioconductor package
         # or a when package's minimum R version isn't met
         # at the VERY LEAST, let's get a package name
-        package     = description$get_field("Package", sub("[.]Rcheck$", "", basename(check_dir))),
-        version     = description$get("Version")[[1]],
-        cran        = description$get_field("Repository", "") == "CRAN",
-        bioc        = description$has_fields("biocViews"),
+        package = description$get_field(
+          "Package",
+          sub("[.]Rcheck$", "", basename(check_dir))
+        ),
+        version = description$get("Version")[[1]],
+        cran = description$get_field("Repository", "") == "CRAN",
+        bioc = description$has_fields("biocViews"),
 
-        checkdir    = check_dir,
-        test_fail   = rcmdcheck:::get_test_fail(check_dir),
+        checkdir = check_dir,
+        test_fail = rcmdcheck:::get_test_fail(check_dir),
         install_out = rcmdcheck:::get_install_out(check_dir),
 
         type = "cloud"
-        ),
+      ),
       class = "rcmdcheck"
-      )
-    )
+    ))
   }
 
   stdout <- brio::read_file(check_log)
@@ -326,24 +383,24 @@ cloud_check_result <- function(check_log, description, dependency_error) {
 
   res <- structure(
     list(
-      stdout      = stdout,
-      timeout     = FALSE,
+      stdout = stdout,
+      timeout = FALSE,
       status = if (isTRUE(dependency_error)) -1L else 0L,
 
-      rversion    = rcmdcheck:::parse_rversion(entries),
-      platform    = rcmdcheck:::parse_platform(entries),
-      errors      = notdone(grep("ERROR\n",   entries, value = TRUE)),
-      warnings    = notdone(grep("WARNING\n", entries, value = TRUE)),
-      notes       = notdone(grep("NOTE\n",    entries, value = TRUE)),
+      rversion = rcmdcheck:::parse_rversion(entries),
+      platform = rcmdcheck:::parse_platform(entries),
+      errors = notdone(grep("ERROR\n", entries, value = TRUE)),
+      warnings = notdone(grep("WARNING\n", entries, value = TRUE)),
+      notes = notdone(grep("NOTE\n", entries, value = TRUE)),
 
       description = description$str(normalize = FALSE),
-      package     = description$get("Package"),
-      version     = description$get("Version")[[1]],
-      cran        = description$get_field("Repository", "") == "CRAN",
-      bioc        = description$has_fields("biocViews"),
+      package = description$get("Package"),
+      version = description$get("Version")[[1]],
+      cran = description$get_field("Repository", "") == "CRAN",
+      bioc = description$has_fields("biocViews"),
 
-      checkdir    = check_dir,
-      test_fail   = rcmdcheck:::get_test_fail(check_dir),
+      checkdir = check_dir,
+      test_fail = rcmdcheck:::get_test_fail(check_dir),
       install_out = rcmdcheck:::get_install_out(check_dir),
 
       type = "cloud"
@@ -365,14 +422,22 @@ cloud_compare <- function(pkg) {
   new <- file.path(pkg, "new", paste0(basename(pkg), ".Rcheck"), "00check.log")
 
   dependency_path <- file.path(pkg, "dependency_install.log")
-  dependency_error <- any(grep("ERROR: .*is not available for package", readLines(dependency_path, warn = FALSE))) || !(file.exists(old) && file.exists(new))
+  dependency_error <- any(grep(
+    "ERROR: .*is not available for package",
+    readLines(dependency_path, warn = FALSE)
+  )) ||
+    !(file.exists(old) && file.exists(new))
   old <- cloud_check_result(old, description, dependency_error)
   new <- cloud_check_result(new, description, dependency_error)
   if (isTRUE(dependency_error)) {
     # DESCRIPTION can exist but be empty, e.g. for a Bioconductor package
     # or a when package's minimum R version isn't met
     # at the VERY LEAST, let's get a package name
-    res <- rcmdcheck_error(description$get_field("Package", basename(pkg)), old, new)
+    res <- rcmdcheck_error(
+      description$get_field("Package", basename(pkg)),
+      old,
+      new
+    )
     res$version <- description$get("Version")[[1]]
     return(res)
   }
@@ -419,7 +484,14 @@ cloud_details <- function(job_name = cloud_job(pkg = pkg), revdep, pkg = ".") {
 #' @inheritParams revdep_report
 #' @family cloud
 #' @export
-cloud_report <- function(job_name = cloud_job(pkg = pkg), pkg = ".", file = "", all = FALSE, results = NULL, failures = TRUE) {
+cloud_report <- function(
+  job_name = cloud_job(pkg = pkg),
+  pkg = ".",
+  file = "",
+  all = FALSE,
+  results = NULL,
+  failures = TRUE
+) {
   pkg <- pkg_check(pkg)
   root <- dir_find(pkg, "root")
 
@@ -430,27 +502,51 @@ cloud_report <- function(job_name = cloud_job(pkg = pkg), pkg = ".", file = "", 
   cli_alert_info("Generating reports")
 
   cli_alert_info("Writing summary to {.file revdep/README.md}")
-  cloud_report_summary(file = file.path(root, "README.md"), all = all, results = results, pkg = pkg)
+  cloud_report_summary(
+    file = file.path(root, "README.md"),
+    all = all,
+    results = results,
+    pkg = pkg
+  )
 
   cli_alert_info("Writing problems to {.file revdep/problems.md}")
-  cloud_report_problems(file = file.path(root, "problems.md"), all = all, results = results, pkg = pkg)
+  cloud_report_problems(
+    file = file.path(root, "problems.md"),
+    all = all,
+    results = results,
+    pkg = pkg
+  )
 
   if (failures) {
     cli_alert_info("Writing failures to {.file revdep/failures.md}")
-    cloud_report_failures(file = file.path(root, "failures.md"), results = results, pkg = pkg)
+    cloud_report_failures(
+      file = file.path(root, "failures.md"),
+      results = results,
+      pkg = pkg
+    )
   } else {
     unlink(file.path(root, "failures.md"))
   }
 
   cli_alert_info("Writing CRAN comments to {.file revdep/cran.md}")
-  revdep_report_cran(file = file.path(root, "cran.md"), results = results, pkg = pkg)
+  revdep_report_cran(
+    file = file.path(root, "cran.md"),
+    results = results,
+    pkg = pkg
+  )
 
   invisible()
 }
 
 #' @rdname cloud_report
 #' @export
-cloud_report_summary <- function(job_name = cloud_job(pkg = pkg), file = "", all = FALSE, pkg = ".", results = NULL) {
+cloud_report_summary <- function(
+  job_name = cloud_job(pkg = pkg),
+  file = "",
+  all = FALSE,
+  pkg = ".",
+  results = NULL
+) {
   if (is.null(results)) {
     results <- cloud_results(job_name, pkg)
   }
@@ -477,14 +573,22 @@ cloud_report_summary <- function(job_name = cloud_job(pkg = pkg), file = "", all
 
   revdep_report_section("Failed to check", revdeps[failed, ], file = file)
   revdep_report_section("New problems", revdeps[broken, ], file = file)
-  if (all) revdep_report_section("All", revdeps, file = file)
+  if (all) {
+    revdep_report_section("All", revdeps, file = file)
+  }
 
   invisible()
 }
 
 #' @rdname cloud_report
 #' @export
-cloud_report_problems <- function(job_name = cloud_job(pkg = pkg), pkg = ".", file = "", all = FALSE, results = NULL) {
+cloud_report_problems <- function(
+  job_name = cloud_job(pkg = pkg),
+  pkg = ".",
+  file = "",
+  all = FALSE,
+  results = NULL
+) {
   if (is.null(results)) {
     results <- cloud_results(job_name, pkg)
   }
@@ -493,7 +597,12 @@ cloud_report_problems <- function(job_name = cloud_job(pkg = pkg), pkg = ".", fi
 
 #' @rdname cloud_report
 #' @export
-cloud_report_failures <- function(job_name = cloud_job(pkg = pkg), pkg = ".", file = "", results = NULL) {
+cloud_report_failures <- function(
+  job_name = cloud_job(pkg = pkg),
+  pkg = ".",
+  file = "",
+  results = NULL
+) {
   if (is.null(results)) {
     results <- cloud_results(job_name, pkg)
   }
@@ -502,7 +611,11 @@ cloud_report_failures <- function(job_name = cloud_job(pkg = pkg), pkg = ".", fi
 
 #' @rdname cloud_report
 #' @export
-cloud_report_cran <- function(job_name = cloud_job(pkg = pkg), pkg = ".", results = NULL) {
+cloud_report_cran <- function(
+  job_name = cloud_job(pkg = pkg),
+  pkg = ".",
+  results = NULL
+) {
   if (is.null(results)) {
     results <- cloud_results(job_name, pkg)
   }
@@ -523,9 +636,16 @@ cloud_results <- function(job_name = cloud_job(pkg = pkg), pkg = ".") {
   cloud_fetch_results(job_name, pkg = pkg)
 
   cli_alert_info("Comparing results")
-  pkgs <- list.dirs(file.path(cloud, job_name), full.names = TRUE, recursive = FALSE)
+  pkgs <- list.dirs(
+    file.path(cloud, job_name),
+    full.names = TRUE,
+    recursive = FALSE
+  )
 
-  pb <- cli_progress_bar(format = "Processing package results: {pb_percent} ({basename(pkg)})", total = length(pkgs))
+  pb <- cli_progress_bar(
+    format = "Processing package results: {pb_percent} ({basename(pkg)})",
+    total = length(pkgs)
+  )
   out <- lapply(pkgs, function(pkg) {
     cli_progress_update(id = pb)
     cloud_compare(pkg)
@@ -537,7 +657,13 @@ cloud_results <- function(job_name = cloud_job(pkg = pkg), pkg = ".") {
 #' @inheritParams cloud_report
 #' @inherit revdep_email
 #' @export
-cloud_email <- function(type = c("broken", "failed"), job_name = cloud_job(pkg = pkg), pkg = ".", packages = NULL, draft = FALSE) {
+cloud_email <- function(
+  type = c("broken", "failed"),
+  job_name = cloud_job(pkg = pkg),
+  pkg = ".",
+  packages = NULL,
+  draft = FALSE
+) {
   type <- match.arg(type)
 
   package_results <- cloud_results(job_name, pkg)
@@ -549,7 +675,8 @@ cloud_email <- function(type = c("broken", "failed"), job_name = cloud_job(pkg =
 
   status <- map_chr(package_results, rcmdcheck_status)
 
-  cond <- switch(type,
+  cond <- switch(
+    type,
     broken = status %in% c("-", "t-", "i-"),
     failed = status %in% c("i+", "t+")
   )
@@ -582,12 +709,17 @@ cloud_job <- function(job_name = NULL, pkg = ".") {
     cloud_dirs <- character()
   }
   if (length(cloud_dirs) < 1) {
-    stop("Can't find any previous `revdepcheck::cloud_check()` results locally, can't discover `job_name`", call. = FALSE)
+    stop(
+      "Can't find any previous `revdepcheck::cloud_check()` results locally, can't discover `job_name`",
+      call. = FALSE
+    )
   }
 
   latest <- cloud_dirs[which.max(file.info(cloud_dirs)$mtime)]
   cloud_data$job_name <- basename(latest)
-  cli_alert_success("Most recent cloud job {.arg job_name}: {.val {cloud_data$job_name}}")
+  cli_alert_success(
+    "Most recent cloud job {.arg job_name}: {.val {cloud_data$job_name}}"
+  )
   invisible(cloud_data$job_name)
 }
 
@@ -633,7 +765,10 @@ cloud_plot <- function(job_name = cloud_job()) {
     stringsAsFactors = FALSE
   )
 
-  succeeded <- list_job_to_tbl(cloud_job_status(job_name, "SUCCEEDED"), "succeeded")
+  succeeded <- list_job_to_tbl(
+    cloud_job_status(job_name, "SUCCEEDED"),
+    "succeeded"
+  )
 
   failed <- list_job_to_tbl(cloud_job_status(job_name, "FAILED"), "failed")
 
@@ -652,9 +787,13 @@ cloud_plot <- function(job_name = cloud_job()) {
         xend = hms::as_hms(stopped - created),
         color = status
       )
-      ) +
-    ggplot2::scale_color_manual(values = c("succeeded" = "darkgrey", "failed" = "red")) +
-    ggplot2::scale_y_discrete(guide = ggplot2::guide_axis(check.overlap = TRUE)) +
+    ) +
+    ggplot2::scale_color_manual(
+      values = c("succeeded" = "darkgrey", "failed" = "red")
+    ) +
+    ggplot2::scale_y_discrete(
+      guide = ggplot2::guide_axis(check.overlap = TRUE)
+    ) +
     ggplot2::guides(color = "none") +
     ggplot2::labs(x = NULL, y = NULL) +
     ggplot2::theme(
@@ -666,8 +805,8 @@ cloud_plot <- function(job_name = cloud_job()) {
 utils::globalVariables(c("package", "y", "started", "created", "stopped"))
 
 cloud_job_info <- function(job_name = cloud_job()) {
-
-  response <- GET("https://xgyefaepu5.execute-api.us-east-1.amazonaws.com",
+  response <- GET(
+    "https://xgyefaepu5.execute-api.us-east-1.amazonaws.com",
     config = add_headers("x-api-key" = Sys.getenv("RSTUDIO_CLOUD_REVDEP_KEY")),
     path = paste0("staging/check", "/", job_name),
     encode = "json"
@@ -677,7 +816,21 @@ cloud_job_info <- function(job_name = cloud_job()) {
   content(response, simplifyVector = TRUE)
 }
 
-cloud_job_status <- function(job_name = cloud_job(pkg = pkg), status = c("ALL", "RUNNING", "SUBMITTED", "PENDENG", "RUNNABLE", "STARTING", "RUNNING", "SUCCEEDED", "FAILED"), pkg = ".") {
+cloud_job_status <- function(
+  job_name = cloud_job(pkg = pkg),
+  status = c(
+    "ALL",
+    "RUNNING",
+    "SUBMITTED",
+    "PENDENG",
+    "RUNNABLE",
+    "STARTING",
+    "RUNNING",
+    "SUCCEEDED",
+    "FAILED"
+  ),
+  pkg = "."
+) {
   status <- match.arg(status)
 
   if (status == "ALL") {
@@ -686,7 +839,8 @@ cloud_job_status <- function(job_name = cloud_job(pkg = pkg), status = c("ALL", 
     status <- paste0("/", status)
   }
 
-  response <- GET("https://xgyefaepu5.execute-api.us-east-1.amazonaws.com",
+  response <- GET(
+    "https://xgyefaepu5.execute-api.us-east-1.amazonaws.com",
     config = add_headers("x-api-key" = Sys.getenv("RSTUDIO_CLOUD_REVDEP_KEY")),
     path = paste0("staging/check", "/", job_name, "/", "status", status),
     encode = "json"
@@ -703,7 +857,10 @@ cloud_job_status <- function(job_name = cloud_job(pkg = pkg), status = c("ALL", 
 cloud_job_mapping <- function(job_name = cloud_job()) {
   info <- cloud_job_info(job_name)
 
-  tibble::tibble(package = info$revdep_packages, id = seq_along(info$revdep_packages) - 1)
+  tibble::tibble(
+    package = info$revdep_packages,
+    id = seq_along(info$revdep_packages) - 1
+  )
 }
 
 #' Retrieve the names broken or failed packages
@@ -718,7 +875,12 @@ cloud_job_mapping <- function(job_name = cloud_job()) {
 #' @family cloud
 #' @returns A character vector with the names of broken packages, to be passed to `cloud_check()`.
 #' @export
-cloud_broken <- function(job_name = cloud_job(pkg = pkg), pkg = ".", install_failures = FALSE, timeout_failures = FALSE) {
+cloud_broken <- function(
+  job_name = cloud_job(pkg = pkg),
+  pkg = ".",
+  install_failures = FALSE,
+  timeout_failures = FALSE
+) {
   results <- cloud_results(job_name = job_name, pkg = pkg)
   broken <- map_lgl(results, is_broken, install_failures, timeout_failures)
 
@@ -741,13 +903,15 @@ cloud_failed <- function(job_name = cloud_job(pkg = pkg), pkg = ".") {
 #' @family cloud
 #' @export
 cloud_browse <- function(job_name = cloud_job(), package = NULL) {
-
   info <- cloud_job_info(job_name)
 
   job_id <- info$batch_job_id
 
   if (is.null(package)) {
-    utils::browseURL(sprintf("https://console.aws.amazon.com/batch/home?region=us-east-1#jobs/array-job/%s", job_id))
+    utils::browseURL(sprintf(
+      "https://console.aws.amazon.com/batch/home?region=us-east-1#jobs/array-job/%s",
+      job_id
+    ))
     return(invisible())
   }
 
@@ -755,5 +919,9 @@ cloud_browse <- function(job_name = cloud_job(), package = NULL) {
 
   array_num <- mapping$id[mapping$package == package]
 
-  utils::browseURL(sprintf("https://console.aws.amazon.com/batch/home?region=us-east-1#jobs/detail/%s:%i", job_id, array_num))
+  utils::browseURL(sprintf(
+    "https://console.aws.amazon.com/batch/home?region=us-east-1#jobs/detail/%s:%i",
+    job_id,
+    array_num
+  ))
 }
