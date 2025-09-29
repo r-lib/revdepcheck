@@ -6,6 +6,7 @@
 \alias{cloud_report_problems}
 \alias{cloud_report_failures}
 \alias{cloud_report_cran}
+\alias{cloud_report_checklist}
 \title{Markdown report of reverse dependency check results from the cloud}
 \usage{
 cloud_report(
@@ -41,6 +42,12 @@ cloud_report_failures(
 )
 
 cloud_report_cran(job_name = cloud_job(pkg = pkg), pkg = ".", results = NULL)
+
+cloud_report_checklist(
+  job_name = cloud_job(pkg = pkg),
+  pkg = ".",
+  results = NULL
+)
 }
 \arguments{
 \item{job_name}{The job name, as returned by \code{\link[=cloud_check]{cloud_check()}}.}

@@ -194,27 +194,15 @@ failure_details <- function(x, file = "", bioc = TRUE, cran = TRUE) {
 }
 
 cat_package_info <- function(cmp, file, bioc = TRUE, cran = TRUE) {
-  chk <- cmp$new
-  desc <- tryCatch(desc::desc(text = chk$description), error = function(x) NULL)
+  links <- pkg_links(cmp)
+  cat_line(
+    paste0("* ", names(links), ": <", links, ">\n", collapse = ""),
+    file = file
+  )
 
-  github <- pkg_github(desc)
-  if (!is.null(github)) {
-    cat_glue("* GitHub: {github}", file = file)
-  }
-
-  if (!is.null(chk$cran)) {
-    url <- paste0("https://github.com/cran/", chk$package)
-    cat_glue("* Github mirror: {url}", file = file)
-  }
-
-  if (!is.null(desc)) {
-    cat_glue("* Maintainer: {desc$get_maintainer()}", file = file)
-  }
-  cat_line(file = file)
-
-  type <- chk$type %||% "revdep"
+  type <- cmp$new$type %||% "revdep"
   cat_glue(
-    'Run `revdepcheck::{type}_details(, "{chk$package}")` for more info',
+    'Run `revdepcheck::{type}_details(, "{cmp$package}")` for more info',
     file = file
   )
 }
