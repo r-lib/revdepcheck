@@ -2,13 +2,13 @@ Package: revdepcheck
 Title: Automated Reverse Dependency Checking
 Version: 1.0.0.9002
 Authors@R: c(
-    person("Gábor", "Csárdi", , "csardi.gabor@gmail.com", c("cre", "aut", "cph")),
+    person("Gábor", "Csárdi", , "csardi.gabor@gmail.com", role = c("cre", "aut", "cph")),
     person("Hadley", "Wickham", role = "aut"),
     person("RConsortium", role = "cph"),
     person("RStudio", role = c("cph", "fnd"))
   )
-Description: Automated, isolated reserve dependency checking, with automatic
-    comparison of the results to the current CRAN checks.
+Description: Automated, isolated reserve dependency checking, with
+    automatic comparison of the results to the current CRAN checks.
 License: MIT + file LICENSE
 URL: https://revdepcheck.r-lib.org,
     https://github.com/r-lib/revdepcheck#readme
@@ -61,4 +61,4 @@ Config/Needs/website: tidyverse/tidytemplate
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.3
