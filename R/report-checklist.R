@@ -35,7 +35,7 @@ pkg_links <- function(result) {
 
   if (length(links) == 0) {
     # Should never get here, but just in case
-    "UKNOWN"
+    "UNKNOWN"
   } else {
     unlist(links)
   }
