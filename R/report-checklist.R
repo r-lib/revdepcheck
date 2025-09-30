@@ -4,7 +4,7 @@ revdep_report_checklist <- function(pkg, results, file = "") {
 
   for (problem in problems) {
     url <- pkg_links(problem)[[1]]
-    cat_glue("* [ ] [{problem$package}]({url}) — ", file = file)
+    cat_glue("* [ ] [{problem$package}]({url}) \u2014 ", file = file)
   }
 }
 
@@ -20,7 +20,7 @@ pkg_links <- function(result) {
     links[["GitHub"]] <- pkg_github(desc)
 
     maintainer <- desc$get_maintainer()
-    email <- rematch2::re_match(desc$get_maintainer(), "<(.+)>")[[1]]
+    email <- rematch2::re_match(maintainer, "<(.+)>")[[1]]
     if (!is.na(email)) {
       links[["Email"]] <- paste0("mailto:", email)
     }
@@ -33,5 +33,10 @@ pkg_links <- function(result) {
     )
   }
 
-  unlist(links)
+  if (length(links) == 0) {
+    # Should never get here, but just in case
+    "UKNOWN"
+  } else {
+    unlist(links)
+  }
 }
