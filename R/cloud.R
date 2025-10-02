@@ -622,6 +622,20 @@ cloud_report_cran <- function(
   revdep_report_cran(pkg = pkg, results = results)
 }
 
+#' @rdname cloud_report
+#' @export
+cloud_report_checklist <- function(
+  job_name = cloud_job(pkg = pkg),
+  pkg = ".",
+  results = NULL
+) {
+  if (is.null(results)) {
+    results <- cloud_results(job_name, pkg)
+  }
+  revdep_report_checklist(pkg = pkg, results = results)
+}
+
+
 #' Retrieve cloud results
 #'
 #' Intended for expert use only, this can be used as input to the [cloud_report()] and other functions.
