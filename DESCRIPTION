@@ -13,6 +13,7 @@ License: MIT + file LICENSE
 URL: https://revdepcheck.r-lib.org,
     https://github.com/r-lib/revdepcheck#readme
 BugReports: https://github.com/r-lib/revdepcheck/issues
+Depends: R (>= 4.1.0)
 Imports: 
     assertthat,
     brio,
