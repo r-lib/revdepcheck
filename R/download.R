@@ -59,7 +59,46 @@ download_done <- function(state, worker) {
   if (!length(tarball)) {
     n_attempts <- worker$task$args[[2]]
     if (n_attempts > 20L) {
-      stop(sprintf("Failed downloading package %s", pkgname), call. = FALSE)
+      # Package download failed after max retries - skip this package gracefully
+      wpkg <- match(worker$package, state$packages$package)
+      cleanup_library(state, worker)
+      state$packages$state[wpkg] <- "done"
+
+      status <- "PREPERROR"
+      starttime <- worker$process$get_start_time()
+      duration <- as.numeric(Sys.time() - starttime)
+
+      result <- list(
+        stdout = worker$stdout,
+        stderr = worker$stderr,
+        errormsg = sprintf(
+          "Failed downloading package %s after %d attempts. Package may be archived or unavailable.",
+          pkgname,
+          n_attempts
+        )
+      )
+
+      for (which in c("old", "new")) {
+        db_insert(
+          pkgdir,
+          pkgname,
+          version = NULL,
+          status = status,
+          which = which,
+          duration = duration,
+          starttime = as.character(starttime),
+          result = unclass(toJSON(result)),
+          summary = NULL
+        )
+      }
+
+      message(
+        sprintf(
+          "Skipping package %s: download failed (package may be archived or unavailable)",
+          pkgname
+        )
+      )
+      return(state)
     } else {
       return(download_task(state, task("download", pkgname, n_attempts + 1L)))
     }
