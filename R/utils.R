@@ -69,7 +69,7 @@ str_trunc <- function(x, n) {
   }
 }
 
-line_trunc <- function(x, n = 10) {
+line_trunc <- function(x, n = 500) {
   if (length(x) == 1 && grepl("\n", x, fixed = TRUE)) {
     x <- strsplit(x, "\n")[[1]]
   }
