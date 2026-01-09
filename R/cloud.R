@@ -665,6 +665,7 @@ cloud_results <- function(job_name = cloud_job(pkg = pkg), pkg = ".") {
     cloud_compare(pkg)
   })
   cli_progress_done(id = pb)
+  names(out) <- basename(pkgs)
   out
 }
 
