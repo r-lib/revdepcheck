@@ -180,6 +180,15 @@ failure_details <- function(x, file = "", bioc = TRUE, cran = TRUE) {
     cat_failure_section("Newly fixed", rows[rows$change == -1, ], file = file)
     cat_failure_section("In both", rows[rows$change == 0, ], file = file)
 
+    if (FALSE && length(x$new$test_fail) > 0) {
+      cat_header("Test output", level = 2, file = file)
+
+      for (i in seq_along(x$new$test_fail)) {
+        cat_header(names(x$new$test_fail)[[i]], level = 3, file = file)
+        cat_line(line_trunc(x$new$errors), sep = "\n", file = file)
+      }
+    }
+
     if (x$status %in% c("i-", "i+")) {
       cat_header("Installation", level = 2, file = file)
       cat_header("Devel", level = 3, file = file)
