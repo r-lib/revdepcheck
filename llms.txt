@@ -1,0 +1,168 @@
+## Features
+
+- To avoid false positives due to existing failures, revdepcheck runs
+  `R CMD check` twice for each revdep, once with the CRAN version of
+  your package, and once with the local development version. revdepcheck
+  reports the difference, so you can see exactly what has changed.
+
+- To speed up installation of revdeps and their dependencies,
+  revdepcheck relies on [crancache](https://github.com/r-lib/crancache).
+  You can see what packages are currently cached with
+  [`crancache::crancache_list()`](https://rdrr.io/pkg/crancache/man/crancache_list.html).
+
+- revdepcheck is carefully designed to make long running checks as
+  pleasant as possible. You run checks in parallel, check time is
+  limited to 10 minutes, and an elegant progress bar keeps you
+  up-to-date with what’s happening (including an estimate of how much
+  time is remaining).
+
+## Installation
+
+``` r
+pak::pkg_install("r-lib/revdepcheck")
+```
+
+## Usage
+
+``` r
+library(revdepcheck)
+```
+
+Check package in working directory, creating “revdep/” directory if it
+doesn’t already exist:
+
+``` r
+revdep_check(num_workers = 4)
+```
+
+If the run fails to complete, run again and it will pick up where it
+left off:
+
+``` r
+revdep_check(num_workers = 4)
+```
+
+During execution, run these in a *separate R process* to view status
+completed checks:
+
+``` r
+revdep_summary()                 # table of results by package 
+revdep_details(".", "<package>") # full details for the specified package
+```
+
+Generate human-friendly summary documents in `revdep/`:
+
+``` r
+revdep_report()
+## Writing *partial* report
+## Writing summary to 'revdep/README.md'
+## Writing problems to 'revdep/problems.md'
+## Writing failures to 'revdep/failures.md'
+```
+
+Manage a “todo” list of packages to examine:
+
+``` r
+revdep_add(pkg = ".", <packages>)  # add <packages> to the list
+revdep_rm(pkg = ".", <packages>).  # remove <packages> from list
+
+revdep_add_broken()  # add all broken packages
+revdep_add_new()     # add newly available packages
+revdep_todo()        # list packages in the todo list
+```
+
+Clear out all previous results
+
+``` r
+revdep_reset()
+```
+
+We recommend running
+[`revdep_check()`](https://revdepcheck.r-lib.org/reference/revdep_check.md)
+in a separate process (e.g. new terminal under RStudio). That way, while
+it runs in a background tab, you can easily use your
+`revdep_details(revdep = "pkg")` to see what’s gone wrong with “pkg”.
+
+## Status Flags:
+
+- install newly fails: `i-`
+- install still fails: `i+`
+- install/check newly timeouts: `t-`
+- install/check still timeouts: `t+`
+- No new failures, success: `+`
+- Some new failures: `-`
+
+## License
+
+MIT © [Gábor Csárdi](https://github.com/gaborcsardi), [R
+Consortium](https://github.com/rconsortium), [RStudio
+Inc](https://github.com/rstudio)
+
+# Package index
+
+## All functions
+
+- [`cloud_broken()`](https://revdepcheck.r-lib.org/reference/cloud_broken.md)
+  [`cloud_failed()`](https://revdepcheck.r-lib.org/reference/cloud_broken.md)
+  : Retrieve the names broken or failed packages
+- [`cloud_browse()`](https://revdepcheck.r-lib.org/reference/cloud_browse.md)
+  : Browse to the AWS url for the job
+- [`cloud_cancel()`](https://revdepcheck.r-lib.org/reference/cloud_cancel.md)
+  : Cancel a running cloud run
+- [`cloud_check()`](https://revdepcheck.r-lib.org/reference/cloud_check.md)
+  : Submit a reverse dependency checking job to the cloud
+- [`cloud_details()`](https://revdepcheck.r-lib.org/reference/cloud_details.md)
+  : Display detailed revdep results from a cloud run
+- [`cloud_email()`](https://revdepcheck.r-lib.org/reference/cloud_email.md)
+  : Notify revdep maintainers about problems
+- [`cloud_job()`](https://revdepcheck.r-lib.org/reference/cloud_job.md)
+  : Return the current cloud job
+- [`cloud_job_mapping()`](https://revdepcheck.r-lib.org/reference/cloud_job_mapping.md)
+  : Get a tibble of batch sub-job ids for all checked packages
+- [`cloud_plot()`](https://revdepcheck.r-lib.org/reference/cloud_plot.md)
+  : Plot the running time per package of a cloud job
+- [`cloud_report()`](https://revdepcheck.r-lib.org/reference/cloud_report.md)
+  [`cloud_report_summary()`](https://revdepcheck.r-lib.org/reference/cloud_report.md)
+  [`cloud_report_problems()`](https://revdepcheck.r-lib.org/reference/cloud_report.md)
+  [`cloud_report_failures()`](https://revdepcheck.r-lib.org/reference/cloud_report.md)
+  [`cloud_report_cran()`](https://revdepcheck.r-lib.org/reference/cloud_report.md)
+  [`cloud_report_checklist()`](https://revdepcheck.r-lib.org/reference/cloud_report.md)
+  : Markdown report of reverse dependency check results from the cloud
+- [`cloud_status()`](https://revdepcheck.r-lib.org/reference/cloud_status.md)
+  : Monitor the status of a cloud job
+- [`cloud_summary()`](https://revdepcheck.r-lib.org/reference/cloud_summary.md)
+  : Display revdep results
+- [`cran_revdeps()`](https://revdepcheck.r-lib.org/reference/cran_revdeps.md)
+  : Retrieve the reverse dependencies for a package
+- [`revdep_add()`](https://revdepcheck.r-lib.org/reference/revdep_add.md)
+  [`revdep_add_broken()`](https://revdepcheck.r-lib.org/reference/revdep_add.md)
+  [`revdep_add_new()`](https://revdepcheck.r-lib.org/reference/revdep_add.md)
+  [`revdep_todo()`](https://revdepcheck.r-lib.org/reference/revdep_add.md)
+  [`revdep_rm()`](https://revdepcheck.r-lib.org/reference/revdep_add.md)
+  : Manage the package checking to-do list.
+- [`revdep_check()`](https://revdepcheck.r-lib.org/reference/revdep_check.md)
+  [`revdep_reset()`](https://revdepcheck.r-lib.org/reference/revdep_check.md)
+  : Run revdep checks
+- [`revdep_details()`](https://revdepcheck.r-lib.org/reference/revdep_details.md)
+  [`revdep_summary()`](https://revdepcheck.r-lib.org/reference/revdep_details.md)
+  : Display revdep results
+- [`revdep_email()`](https://revdepcheck.r-lib.org/reference/revdep_email.md)
+  [`revdep_email_draft()`](https://revdepcheck.r-lib.org/reference/revdep_email.md)
+  : Notify revdep maintainers about problems
+- [`revdep_env_vars()`](https://revdepcheck.r-lib.org/reference/revdep_env_vars.md)
+  : Environment variables to set for install and check processes while
+  running the reverse dependency check
+- [`revdep_maintainers()`](https://revdepcheck.r-lib.org/reference/revdep_maintainers.md)
+  : List maintainers of all reverse dependencies
+- [`revdep_report_summary()`](https://revdepcheck.r-lib.org/reference/revdep_report_summary.md)
+  [`revdep_report_problems()`](https://revdepcheck.r-lib.org/reference/revdep_report_summary.md)
+  [`revdep_report_failures()`](https://revdepcheck.r-lib.org/reference/revdep_report_summary.md)
+  [`revdep_report_cran()`](https://revdepcheck.r-lib.org/reference/revdep_report_summary.md)
+  [`revdep_report()`](https://revdepcheck.r-lib.org/reference/revdep_report_summary.md)
+  : Markdown report of reverse dependency check results
+
+# Articles
+
+### All vignettes
+
+- [cloud](https://revdepcheck.r-lib.org/articles/cloud.md):

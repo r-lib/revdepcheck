@@ -1,0 +1,71 @@
+# Set up/retrieve the directory structure for the checks
+
+Currently the following files and directories are used. They are all in
+the main revdep directory, which is `revdep` in the package tree.
+
+- `library`: a collection of package libraries
+
+- `library/data.sqlite`: the SQLite database that contains the check
+  data.
+
+- `library/<checked-pkg>/old`: library that contains the *old* version
+  of the revdep-checked package, together with its dependencies.
+
+- `library/<checked-pkg>/new`: library that contains the *new* version
+  of the revdep-checked package, together with its dependencies.
+
+- `library/<pkg>` are the libraries for the reverse dependencies.
+
+## Usage
+
+``` r
+dir_find(
+  pkgdir,
+  what = c("root", "db", "old", "new", "pkg", "check", "checks", "lib", "pkgold",
+    "pkgnew", "cloud"),
+  package = NULL
+)
+
+dir_setup(pkgdir)
+
+dir_setup_package(pkgdir, package)
+```
+
+## Arguments
+
+- pkgdir:
+
+  Path to the package we are revdep-checking.
+
+- what:
+
+  Directory to query:
+
+  - `"root"`: the root of the check directory,
+
+  - `"db"`: the database file,
+
+  - `"old"`: the library of the old version of the package.
+
+  - `"new"`: the library of the new version of the package.
+
+  - `"pkg"`: the library of the reverse dependency, the `package`
+    argument must be supplied as well.
+
+  - `"check"`: the check directory of the reverse dependency, the
+    `package` argument must be supplied as well.
+
+  - `"pkgold"`: package libraries to use when checking `package` with
+    the old version.
+
+  - `"pkgnew"`: package libraries to use when checking `package` with
+    the new version.
+
+- package:
+
+  The name of the package, if `what` is `"pkg"`, `"check"`, `"pkgold"`
+  or `"pkgnew"`.
+
+## Value
+
+Character scalar, the requested path.
