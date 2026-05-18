@@ -17,17 +17,17 @@ Intended mainly for internal and expert use. This function when needed by
 call it explicitly.
 }
 \seealso{
-Other cloud: 
-\code{\link{cloud_broken}()},
-\code{\link{cloud_browse}()},
-\code{\link{cloud_cancel}()},
-\code{\link{cloud_check}()},
-\code{\link{cloud_details}()},
-\code{\link{cloud_plot}()},
-\code{\link{cloud_report}()},
-\code{\link{cloud_results}()},
-\code{\link{cloud_status}()},
-\code{\link{cloud_summary}()}
+Other cloud:
+\code{\link[=cloud_broken]{cloud_broken()}},
+\code{\link[=cloud_browse]{cloud_browse()}},
+\code{\link[=cloud_cancel]{cloud_cancel()}},
+\code{\link[=cloud_check]{cloud_check()}},
+\code{\link[=cloud_details]{cloud_details()}},
+\code{\link[=cloud_plot]{cloud_plot()}},
+\code{\link[=cloud_report]{cloud_report()}},
+\code{\link[=cloud_results]{cloud_results()}},
+\code{\link[=cloud_status]{cloud_status()}},
+\code{\link[=cloud_summary]{cloud_summary()}}
 }
 \concept{cloud}
 \keyword{internal}
