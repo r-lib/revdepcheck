@@ -19,12 +19,14 @@
 ## Installation
 
 ``` r
+
 pak::pkg_install("r-lib/revdepcheck")
 ```
 
 ## Usage
 
 ``` r
+
 library(revdepcheck)
 ```
 
@@ -32,6 +34,7 @@ Check package in working directory, creating “revdep/” directory if it
 doesn’t already exist:
 
 ``` r
+
 revdep_check(num_workers = 4)
 ```
 
@@ -39,6 +42,7 @@ If the run fails to complete, run again and it will pick up where it
 left off:
 
 ``` r
+
 revdep_check(num_workers = 4)
 ```
 
@@ -46,6 +50,7 @@ During execution, run these in a *separate R process* to view status
 completed checks:
 
 ``` r
+
 revdep_summary()                 # table of results by package 
 revdep_details(".", "<package>") # full details for the specified package
 ```
@@ -53,6 +58,7 @@ revdep_details(".", "<package>") # full details for the specified package
 Generate human-friendly summary documents in `revdep/`:
 
 ``` r
+
 revdep_report()
 ## Writing *partial* report
 ## Writing summary to 'revdep/README.md'
@@ -74,6 +80,7 @@ revdep_todo()        # list packages in the todo list
 Clear out all previous results
 
 ``` r
+
 revdep_reset()
 ```
 

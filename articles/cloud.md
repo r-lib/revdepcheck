@@ -1,6 +1,7 @@
 # cloud
 
 ``` r
+
 library(revdepcheck)
 ```
 
@@ -27,6 +28,7 @@ e.g. `Remote: url::https://github.com/org/pkg/archive/main.tar.gz`,
 which does not use the GitHub API.
 
 ``` r
+
 # Kickoff a new check
 # The devel package is automatically built from the current
 # working directory, or specify a pre-built package with `tarball`.
