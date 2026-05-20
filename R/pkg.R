@@ -25,3 +25,24 @@ pkg_version <- function(pkgdir) {
 pkg_bug_reports <- function(pkgdir) {
   read.dcf(file.path(pkgdir, "DESCRIPTION"))[, "BugReports"][[1]]
 }
+
+# Helper for testing ------------------------------------------------------
+
+local_package <- function(fields = list(), env = parent.frame()) {
+  dir <- tempfile()
+  dir.create(dir)
+  dir.create(file.path(dir, "revdep"))
+  withr::defer(unlink(dir, recursive = TRUE), envir = env)
+
+  defaults <- list(
+    Package = "Test",
+    Version = "1.0.0"
+  )
+
+  fields <- utils::modifyList(defaults, fields)
+  write.dcf(fields, file.path(dir, "DESCRIPTION"))
+
+  db_setup(dir)
+
+  dir
+}
