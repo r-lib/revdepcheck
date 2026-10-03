@@ -25,7 +25,7 @@ Imports:
     DBI,
     desc (>= 1.3.0),
     glue,
-    gmailr,
+    gmailr (>= 1.0.0),
     hms,
     httr,
     jsonlite,
@@ -61,4 +61,4 @@ Config/Needs/website: tidyverse/tidytemplate
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.3
+Config/roxygen2/version: 8.0.0

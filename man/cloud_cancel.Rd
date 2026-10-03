@@ -13,16 +13,16 @@ cloud_cancel(job_name = cloud_job())
 Cancel a running cloud run
 }
 \seealso{
-Other cloud: 
-\code{\link{cloud_broken}()},
-\code{\link{cloud_browse}()},
-\code{\link{cloud_check}()},
-\code{\link{cloud_details}()},
-\code{\link{cloud_fetch_results}()},
-\code{\link{cloud_plot}()},
-\code{\link{cloud_report}()},
-\code{\link{cloud_results}()},
-\code{\link{cloud_status}()},
-\code{\link{cloud_summary}()}
+Other cloud:
+\code{\link[=cloud_broken]{cloud_broken()}},
+\code{\link[=cloud_browse]{cloud_browse()}},
+\code{\link[=cloud_check]{cloud_check()}},
+\code{\link[=cloud_details]{cloud_details()}},
+\code{\link[=cloud_fetch_results]{cloud_fetch_results()}},
+\code{\link[=cloud_plot]{cloud_plot()}},
+\code{\link[=cloud_report]{cloud_report()}},
+\code{\link[=cloud_results]{cloud_results()}},
+\code{\link[=cloud_status]{cloud_status()}},
+\code{\link[=cloud_summary]{cloud_summary()}}
 }
 \concept{cloud}

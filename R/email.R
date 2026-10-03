@@ -170,16 +170,14 @@ package_data <- function(packages, pkg = ".") {
   map(data_package, function(x) utils::modifyList(data_base, x))
 }
 
-#' @importFrom gmailr mime send_message
-
 email_send <- function(to, body, subject, draft = TRUE) {
-  email <- mime(To = to, Subject = subject, body = body)
+  email <- gmailr::gm_mime(To = to, Subject = subject, body = body)
 
-  send <- if (draft) gmailr::create_draft else gmailr::send_message
+  send <- if (draft) gmailr::gm_create_draft else gmailr::gm_send_message
   msg <- if (draft) "Drafting" else "Sending"
   tryCatch(
     {
-      message(msg, ": ", gmailr::subject(email))
+      message(msg, ": ", gmailr::gm_subject(email))
       send(email)
       TRUE
     },
