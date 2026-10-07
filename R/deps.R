@@ -1,16 +1,19 @@
 #' Retrieve the reverse dependencies for a package
 #'
 #' @param package The package (or packages) to search for reverse dependencies.
+#' @param filters Filters for [utils::available.packages()], `NULL` for the
+#'   default ones.
 #' @inheritParams revdep_check
 #' @export
 cran_revdeps <- function(
   package,
   dependencies = TRUE,
   bioc = FALSE,
-  cran = TRUE
+  cran = TRUE,
+  filters = NULL
 ) {
   pkgs <- lapply(package, function(pkg) {
-    cran_revdeps_versions(pkg, dependencies, bioc, cran)$package
+    cran_revdeps_versions(pkg, dependencies, bioc, cran, filters)$package
   })
   pkgs <- unique(unlist(pkgs))
   pkgs[order(tolower(pkgs))]
@@ -23,12 +26,13 @@ cran_revdeps_versions <- function(
   package,
   dependencies = TRUE,
   bioc = FALSE,
-  cran = TRUE
+  cran = TRUE,
+  filters = NULL
 ) {
   stopifnot(is_string(package))
   repos <- get_repos(bioc, cran)
 
-  allpkgs <- available_packages(repos = repos)
+  allpkgs <- available_packages_with(repos, filters)
   alldeps <- allpkgs[, dependencies, drop = FALSE]
   alldeps[is.na(alldeps)] <- ""
   deps <- apply(alldeps, 1, paste, collapse = ",")
@@ -61,8 +65,8 @@ get_repos <- function(bioc, cran) {
   repos
 }
 
-cran_deps <- function(package, repos) {
-  allpkgs <- available_packages(repos = repos)
+cran_deps <- function(package, repos, filters = NULL) {
+  allpkgs <- available_packages_with(repos, filters)
   current <- deps <- package
   dependencies <- c("Depends", "Imports", "LinkingTo", "Suggests")
   while (TRUE) {
@@ -77,6 +81,17 @@ cran_deps <- function(package, repos) {
   }
 
   setdiff(deps, c(package, base_packages()))
+}
+
+## crancache::available_packages() cannot take explicit filters, its
+## argument handling only works for the default, so use utils when filters
+## are needed. The cache repositories only matter for installing anyway.
+available_packages_with <- function(repos, filters = NULL) {
+  if (is.null(filters)) {
+    available_packages(repos = repos)
+  } else {
+    utils::available.packages(repos = repos, filters = filters)
+  }
 }
 
 parse_deps <- function(deps) {

@@ -7,8 +7,14 @@ pkg_check <- function(pkgdir) {
     stop("`pkgdir` must be an existing directory", call. = FALSE)
   }
 
-  if (!file.exists(file.path(pkgdir, "DESCRIPTION"))) {
-    stop("`pkgdir` must contain a DESCRIPTION file", call. = FALSE)
+  ## A root created by rdev_init() is accepted wherever a package directory
+  ## is, see is_rdev()
+  if (!file.exists(file.path(pkgdir, "DESCRIPTION")) && !is_rdev(pkgdir)) {
+    stop(
+      "`pkgdir` must contain a DESCRIPTION file, or be a root created ",
+      "by `rdev_init()`",
+      call. = FALSE
+    )
   }
 
   normalizePath(pkgdir, mustWork = FALSE)

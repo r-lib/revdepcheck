@@ -1,5 +1,11 @@
 # 1.0.0.9002
 
+* New `rdev_init()`, `rdev_add()`, `rdev_check()` and friends check a set of
+  CRAN packages with two builds of R and report the differences, for testing
+  local changes to R itself. The two builds take the place of the CRAN and
+  development versions of a package in the usual `revdep_check()` workflow
+  (prototype).
+
 * Add `cran` parameter to the `get_repos()` internal and propagate it to the
   upstream functions including `revdep_check()`. It allow user to decide
   whether htey want to always append CRAN mirror to repos or not (@maksymis)

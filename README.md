@@ -66,6 +66,37 @@ revdep_reset()
 
 We recommend running `revdep_check()` in a separate process (e.g. new terminal under RStudio). That way, while it runs in a background tab, you can easily use your `revdep_details(revdep = "pkg")` to see what's gone wrong with "pkg".
 
+## Checking packages against a change to R
+
+The `rdev_*()` functions run the same workflow with two builds of R in
+place of the two versions of a package. Build R once from unmodified
+sources and once with your change, point `rdev_init()` at the two
+binaries (a build tree works, no `make install` needed), choose the
+packages to check, and run:
+
+```r
+root <- "~/rcheck/my-branch"
+rdev_init(
+  root,
+  r_old = "~/r/build-trunk/bin/R",
+  r_new = "~/r/build-my-branch/bin/R"
+)
+
+# Specific packages, everything that depends on Rcpp, or both
+rdev_add(root, packages = c("data.table", "dplyr"), revdeps_of = "Rcpp")
+
+rdev_check(root, num_workers = 8)
+```
+
+Reports are written to `root` as `README.md`, `problems.md` and
+`failures.md`, with the old build in the role of CRAN and the new build in
+the role of the development version. After rebuilding the new R, run
+`rdev_add_broken(root)` and `rdev_check(root)` again: results from the old
+build are reused, so only the new build is re-checked.
+
+Both builds share the package libraries, so they must have the same
+`major.minor` version and a compatible ABI. See `?rdev_check` for details.
+
 ## Status Flags:
 
 * install newly fails:  `i-`

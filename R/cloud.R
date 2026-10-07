@@ -5,8 +5,7 @@
 #'
 #' @param update_interval The number of seconds between querying for updates
 #' @family cloud
-#' @importFrom cli cli_format cli_status_update col_green col_blue col_red
-#'   style_bold cli_status_clear cli_status cli_alert
+#' @importFrom cli cli_format cli_status_update col_green col_blue col_red style_bold cli_status_clear cli_status cli_alert
 #' @inheritParams cloud_report
 #' @export
 cloud_status <- function(job_name = cloud_job(), update_interval = 10) {

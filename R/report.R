@@ -34,13 +34,22 @@ revdep_report_summary <- function(
     on.exit(options(opts), add = TRUE)
   }
 
+  rdev <- is_rdev(pkg)
+
   cat_header("Platform", file = file)
-  cat_kable(report_platform(), file = file)
+  cat_kable(report_platform(rdev = rdev), file = file)
 
-  cat_header("Dependencies", file = file)
-  cat_kable(report_libraries(pkg), file = file)
+  if (rdev) {
+    cat_header("R builds", file = file)
+    cat_kable(rdev_report_builds(pkg), file = file)
 
-  cat_header("Revdeps", file = file)
+    cat_header("Packages", file = file)
+  } else {
+    cat_header("Dependencies", file = file)
+    cat_kable(report_libraries(pkg), file = file)
+
+    cat_header("Revdeps", file = file)
+  }
   revdeps <- report_revdeps(pkg, all = all, results = results)
 
   status <- revdeps$status
@@ -155,18 +164,20 @@ revdep_report_if <- function(
 }
 
 failure_details <- function(x, file = "", bioc = TRUE, cran = TRUE) {
+  labels <- side_labels(x)
+
   cat_header(x$package, " (", x$new$version, ")", level = 1, file = file)
   cat_package_info(x, file = file, bioc = bioc, cran = cran)
   cat_line(file = file)
 
   if (x$status == "E") {
     cat_header("Error before installation", level = 2, file = file)
-    cat_header("Devel", level = 3, file = file)
+    cat_header(labels$new, level = 3, file = file)
     cat_line("```", file = file)
     cat_line(line_trunc(x$new$stdout), sep = "\n", file = file)
     cat_line(line_trunc(x$new$stderr), sep = "\n", file = file)
     cat_line("```", file = file)
-    cat_header("CRAN", level = 3, file = file)
+    cat_header(labels$old, level = 3, file = file)
     cat_line("```", file = file)
     cat_line(line_trunc(x$old$stdout), sep = "\n", file = file)
     cat_line(line_trunc(x$old$stderr), sep = "\n", file = file)
@@ -179,11 +190,11 @@ failure_details <- function(x, file = "", bioc = TRUE, cran = TRUE) {
 
     if (x$status %in% c("i-", "i+")) {
       cat_header("Installation", level = 2, file = file)
-      cat_header("Devel", level = 3, file = file)
+      cat_header(labels$new, level = 3, file = file)
       cat_line("```", file = file)
       cat_line(line_trunc(x$new$install_out), sep = "\n", file = file)
       cat_line("```", file = file)
-      cat_header("CRAN", level = 3, file = file)
+      cat_header(labels$old, level = 3, file = file)
       cat_line("```", file = file)
       cat_line(line_trunc(x$old[[1]]$install_out), sep = "\n", file = file)
       cat_line("```", file = file)
@@ -191,6 +202,15 @@ failure_details <- function(x, file = "", bioc = TRUE, cran = TRUE) {
   }
 
   invisible()
+}
+
+## What the two sides of a comparison are called in the reports
+side_labels <- function(x) {
+  if (identical(x$new$type, "rdev")) {
+    list(old = "Old R", new = "New R")
+  } else {
+    list(old = "CRAN", new = "Devel")
+  }
 }
 
 cat_package_info <- function(cmp, file, bioc = TRUE, cran = TRUE) {
@@ -400,11 +420,12 @@ revdep_report <- function(
   }
 
   results <- results %||% db_results(pkg, NULL)
+  shown <- basename(root)
 
-  message("Writing summary to 'revdep/README.md'")
+  message("Writing summary to '", shown, "/README.md'")
   revdep_report_summary(pkg, file = readme_file, all = all, results = results)
 
-  message("Writing problems to 'revdep/problems.md'")
+  message("Writing problems to '", shown, "/problems.md'")
   revdep_report_problems(
     pkg,
     file = file.path(root, "problems.md"),
@@ -414,7 +435,7 @@ revdep_report <- function(
     cran = cran
   )
 
-  message("Writing failures to 'revdep/failures.md'")
+  message("Writing failures to '", shown, "/failures.md'")
   revdep_report_failures(
     pkg,
     file = file.path(root, "failures.md"),
@@ -423,16 +444,30 @@ revdep_report <- function(
     cran = cran
   )
 
-  message("Writing CRAN report to 'revdep/cran.md'")
-  revdep_report_cran(pkg, file = file.path(root, "cran.md"), results = results)
+  ## The CRAN submission summary is about a package release
+  if (!is_rdev(pkg)) {
+    message("Writing CRAN report to '", shown, "/cran.md'")
+    revdep_report_cran(
+      pkg,
+      file = file.path(root, "cran.md"),
+      results = results
+    )
+  }
 
   invisible()
 }
 
 # Helpers -----------------------------------------------------------------
 
-report_platform <- function() {
+report_platform <- function(rdev = FALSE) {
   platform <- platform_info()
+
+  ## The R version of this session is irrelevant when checking with other
+  ## R builds, those are reported separately
+  if (rdev) {
+    platform$version <- NULL
+  }
+
   data.frame(field = names(platform), value = unlist(platform))
 }
 

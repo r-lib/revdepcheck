@@ -66,6 +66,13 @@ revdep_check <- function(
   env = revdep_env_vars()
 ) {
   pkg <- pkg_check(pkg)
+  if (is_rdev(pkg)) {
+    stop(
+      "`pkg` is a root created by `rdev_init()`, use `rdev_check()`",
+      call. = FALSE
+    )
+  }
+
   dir_setup(pkg)
   if (!db_exists(pkg)) {
     db_setup(pkg)
@@ -231,10 +238,11 @@ revdep_run <- function(
   num_workers = 1,
   bioc = TRUE,
   env = character(),
-  cran = TRUE
+  cran = TRUE,
+  rdev = NULL
 ) {
   pkg <- pkg_check(pkg)
-  pkgname <- pkg_name(pkg)
+  pkgname <- if (is.null(rdev)) pkg_name(pkg)
 
   if (!inherits(timeout, "difftime")) {
     timeout <- as.difftime(timeout, units = "secs")
@@ -253,7 +261,8 @@ revdep_run <- function(
       num_workers = num_workers,
       env = env,
       bioc = bioc,
-      cran = cran
+      cran = cran,
+      rdev = rdev
     ),
     packages = data.frame(
       package = todo,

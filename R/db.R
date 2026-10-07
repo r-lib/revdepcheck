@@ -116,7 +116,8 @@ db_metadata_init <- function(package) {
     getNamespaceVersion("revdepcheck")[[1]]
   )
 
-  if (package != ":memory:") {
+  ## There is no package under test in rdev mode
+  if (package != ":memory:" && !is_rdev(package)) {
     db_metadata_set(package, "package", pkg_name(package))
   }
 }
@@ -431,12 +432,27 @@ db_results <- function(pkg, revdeps) {
 
   packages <- union(res$old$package, res$new$package)
 
+  ## Reports use the type to label the two sides of the comparison
+  type <- if (is_rdev(pkg)) "rdev"
+
   lapply_with_names(packages, function(package) {
     oldcheck <- checkFromJSON(res$old$result[match(package, res$old$package)])
     newcheck <- checkFromJSON(res$new$result[match(package, res$new$package)])
 
+    if (!is.null(type)) {
+      oldcheck <- check_set_type(oldcheck, type)
+      newcheck <- check_set_type(newcheck, type)
+    }
+
     try_compare_checks(package, oldcheck, newcheck)
   })
+}
+
+check_set_type <- function(check, type) {
+  if (is.list(check)) {
+    check$type <- type
+  }
+  check
 }
 
 db_maintainers <- function(pkg) {

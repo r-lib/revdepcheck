@@ -9,7 +9,7 @@
 dir_find(
   pkgdir,
   what = c("root", "db", "old", "new", "pkg", "check", "checks", "lib", "pkgold",
-    "pkgnew", "cloud"),
+    "pkgnew", "cloud", "tools", "cache"),
   package = NULL
 )
 
@@ -18,7 +18,8 @@ dir_setup(pkgdir)
 dir_setup_package(pkgdir, package)
 }
 \arguments{
-\item{pkgdir}{Path to the package we are revdep-checking.}
+\item{pkgdir}{Path to the package we are revdep-checking, or a root
+created by \code{\link[=rdev_init]{rdev_init()}}.}
 
 \item{what}{Directory to query:
 \itemize{
@@ -34,7 +35,13 @@ argument must be supplied as well.
 the old version.
 \item \code{"pkgnew"}: package libraries to use when checking \code{package} with
 the new version.
-}}
+\item \code{"tools"}: the tools library, see above.
+\item \code{"cache"}: the default crancache cache directory, see above.
+}
+
+An \code{\link[=rdev_init]{rdev_init()}} root has no package under test, so \code{"old"} and
+\code{"new"} are \code{NULL} there, and \code{"pkgold"} and \code{"pkgnew"} are just the
+library of the reverse dependency.}
 
 \item{package}{The name of the package, if \code{what} is \code{"pkg"}, \code{"check"},
 \code{"pkgold"} or \code{"pkgnew"}.}
@@ -45,16 +52,20 @@ Character scalar, the requested path.
 \description{
 Currently the following files and directories are used.
 They are all in the main revdep directory, which is \code{revdep} in the
-package tree.
+package tree, or the root directory itself for a check set up with
+\code{\link[=rdev_init]{rdev_init()}}.
 \itemize{
 \item \code{library}: a collection of package libraries
-\item \code{library/data.sqlite}: the SQLite database that contains the check
-data.
+\item \code{data.sqlite}: the SQLite database that contains the check data.
 \item \verb{library/<checked-pkg>/old}: library that contains the \emph{old} version
 of the revdep-checked package, together with its dependencies.
 \item \verb{library/<checked-pkg>/new}: library that contains the \emph{new} version
 of the revdep-checked package, together with its dependencies.
 \item \verb{library/<pkg>} are the libraries for the reverse dependencies.
+\item \code{tools}: library with the packages the worker processes need when
+they run a different R build than the current session, see
+\code{\link[=rdev_check]{rdev_check()}}.
+\item \code{crancache}: the default crancache package cache of \code{\link[=rdev_check]{rdev_check()}}.
 }
 }
 \keyword{internal}

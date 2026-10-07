@@ -4,7 +4,13 @@
 \alias{cran_revdeps}
 \title{Retrieve the reverse dependencies for a package}
 \usage{
-cran_revdeps(package, dependencies = TRUE, bioc = FALSE, cran = TRUE)
+cran_revdeps(
+  package,
+  dependencies = TRUE,
+  bioc = FALSE,
+  cran = TRUE,
+  filters = NULL
+)
 }
 \arguments{
 \item{package}{The package (or packages) to search for reverse dependencies.}
@@ -16,6 +22,9 @@ release, we recommend using the default.}
 
 \item{cran}{Should cran mirror be attached to getOpion("repos") if it
 is not already present.}
+
+\item{filters}{Filters for \code{\link[utils:available.packages]{utils::available.packages()}}, \code{NULL} for the
+default ones.}
 }
 \description{
 Retrieve the reverse dependencies for a package
